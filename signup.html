@@ -18,10 +18,10 @@ Sign Up
 
 <p id="msg"></p>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -34,15 +34,31 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Capture referral from URL (?ref=USERID)
+const urlParams = new URLSearchParams(window.location.search);
+const referrer = urlParams.get("ref");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    // Create auth user
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Save user in Firestore with referral info
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      referrer: referrer || null,
+      createdAt: new Date()
+    });
+
     document.getElementById("msg").innerText = "Account created successfully!";
     window.location.href = "login.html";
+
   } catch (error) {
     document.getElementById("msg").innerText = error.message;
   }
