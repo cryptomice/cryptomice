@@ -1,29 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
-.box{max-width:400px;margin:80px auto;background:white;padding:20px;border-radius:8px}
-input{width:100%;padding:10px;margin-top:10px}
-button{width:100%;padding:12px;margin-top:10px;background:#0a66c2;color:white;border:none}
-</style>
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
 
-<div class="box">
+<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+
 <h2>Login</h2>
 
-<input type="email" placeholder="Enter email">
-<input type="password" placeholder="Enter password">
+<input id="email" type="email" placeholder="Email" style="display:block;width:100%;padding:10px;margin:10px 0;">
+<input id="password" type="password" placeholder="Password" style="display:block;width:100%;padding:10px;margin:10px 0;">
 
-<button onclick="location.href='dashboard.html'">
+<button id="loginBtn" style="padding:10px;width:100%;">
 Login
 </button>
 
-<p>No account? Sign up</p>
-</div>
+<p id="msg"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    document.getElementById("msg").innerText = "Login successful!";
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    document.getElementById("msg").innerText = error.message;
+  }
+});
+</script>
 
 </body>
 </html>
