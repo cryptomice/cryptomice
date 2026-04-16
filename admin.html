@@ -1,1 +1,80 @@
-<h1>Admin Page Exists</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+
+<h2>Admin Dashboard</h2>
+
+<p id="status">Checking access...</p>
+
+<hr>
+
+<h3>Users</h3>
+<div id="users"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const status = document.getElementById("status");
+const usersDiv = document.getElementById("users");
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+
+  if (!userSnap.exists() || userSnap.data().role !== "admin") {
+    status.innerText = "Access Denied (Not Admin)";
+    return;
+  }
+
+  status.innerText = "Admin Access Granted";
+
+  const allUsers = await getDocs(collection(db, "users"));
+
+  allUsers.forEach((u) => {
+    const data = u.data();
+
+    const div = document.createElement("div");
+    div.style.background = "white";
+    div.style.padding = "10px";
+    div.style.margin = "10px 0";
+
+    div.innerHTML = `
+      <b>Email:</b> ${data.email || "N/A"} <br>
+      <b>Referrals:</b> ${data.referrals || 0} <br>
+      <b>Earnings:</b> $${data.earnings || 0}
+    `;
+
+    usersDiv.appendChild(div);
+  });
+
+});
+</script>
+
+</body>
+</html>
