@@ -25,7 +25,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs } 
+import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -115,7 +115,8 @@ onAuthStateChanged(auth, async (user) => {
         <b>Email:</b> ${d.email || "N/A"} <br>
         <b>Amount:</b> $${d.amount || 0} <br>
         <b>Wallet:</b> ${d.cryptoAddress || "N/A"} <br>
-        <b>Status:</b> ${d.status || "pending"}
+        <b>Status:</b> ${d.status || "pending"} <br><br>
+        <button onclick="approveWithdrawal('${w.id}')">Approve</button>
       `;
 
       withdrawalsDiv.appendChild(box);
@@ -127,6 +128,18 @@ onAuthStateChanged(auth, async (user) => {
   }
 
 });
+
+window.approveWithdrawal = async function(id) {
+  try {
+    await updateDoc(doc(db, "withdrawals", id), {
+      status: "approved"
+    });
+    alert("Withdrawal approved");
+    location.reload();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+};
 </script>
 
 </body>
