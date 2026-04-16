@@ -24,6 +24,22 @@
 <p>Referrals: <span id="refCount">0</span></p>
 <p>Earnings: $<span id="earnings">0</span></p>
 
+<hr>
+
+<h3>Request Withdrawal</h3>
+
+<input id="withdrawAmount" type="number" placeholder="Enter amount" 
+style="padding:10px;width:100%;margin:5px 0;">
+
+<input id="withdrawWallet" type="text" placeholder="Enter your crypto wallet address" 
+style="padding:10px;width:100%;margin:5px 0;">
+
+<button id="withdrawBtn" style="padding:10px;width:100%;">
+Request Withdrawal
+</button>
+
+<p id="withdrawMsg"></p>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
