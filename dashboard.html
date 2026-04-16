@@ -44,8 +44,14 @@ Request Withdrawal
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-import { getFirestore, doc, getDoc } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  collection, 
+  addDoc, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -88,10 +94,45 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+// COPY LINK
 window.copyLink = function () {
   navigator.clipboard.writeText(document.getElementById("refLink").innerText);
   alert("Copied!");
 };
+
+// WITHDRAW LOGIC
+document.getElementById("withdrawBtn").addEventListener("click", async () => {
+
+  const amount = document.getElementById("withdrawAmount").value;
+  const wallet = document.getElementById("withdrawWallet").value;
+  const msg = document.getElementById("withdrawMsg");
+
+  if (!amount || amount <= 0) {
+    msg.innerText = "Enter valid amount";
+    return;
+  }
+
+  if (!wallet) {
+    msg.innerText = "Enter wallet address";
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "withdrawals"), {
+      userId: currentUID,
+      email: document.getElementById("userEmail").innerText,
+      amount: parseFloat(amount),
+      cryptoAddress: wallet,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+
+    msg.innerText = "Withdrawal request sent!";
+  } catch (error) {
+    msg.innerText = error.message;
+  }
+
+});
 </script>
 
 </body>
