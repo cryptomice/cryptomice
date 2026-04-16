@@ -17,6 +17,11 @@
 <h3>Users</h3>
 <div id="users">Loading users...</div>
 
+<hr>
+
+<h3>Withdrawal Requests</h3>
+<div id="withdrawals">Loading withdrawals...</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
@@ -39,6 +44,7 @@ const db = getFirestore(app);
 const status = document.getElementById("status");
 const debug = document.getElementById("debug");
 const usersDiv = document.getElementById("users");
+const withdrawalsDiv = document.getElementById("withdrawals");
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -64,18 +70,11 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     status.innerText = "Admin Access Granted";
-    debug.innerText = "Loading users from Firestore...";
+    debug.innerText = "Loading users...";
 
+    // LOAD USERS
     const allUsers = await getDocs(collection(db, "users"));
-
-    debug.innerText = "Users found: " + allUsers.size;
-
     usersDiv.innerHTML = "";
-
-    if (allUsers.empty) {
-      usersDiv.innerHTML = "<p>No users found</p>";
-      return;
-    }
 
     allUsers.forEach((u) => {
       const data = u.data();
@@ -92,6 +91,34 @@ onAuthStateChanged(auth, async (user) => {
       `;
 
       usersDiv.appendChild(div);
+    });
+
+    // LOAD WITHDRAWALS
+    debug.innerText = "Loading withdrawals...";
+    const wdSnap = await getDocs(collection(db, "withdrawals"));
+    withdrawalsDiv.innerHTML = "";
+
+    if (wdSnap.empty) {
+      withdrawalsDiv.innerHTML = "<p>No withdrawal requests</p>";
+      return;
+    }
+
+    wdSnap.forEach((w) => {
+      const d = w.data();
+
+      const box = document.createElement("div");
+      box.style.background = "white";
+      box.style.padding = "10px";
+      box.style.margin = "10px 0";
+
+      box.innerHTML = `
+        <b>Email:</b> ${d.email || "N/A"} <br>
+        <b>Amount:</b> $${d.amount || 0} <br>
+        <b>Wallet:</b> ${d.cryptoAddress || "N/A"} <br>
+        <b>Status:</b> ${d.status || "pending"}
+      `;
+
+      withdrawalsDiv.appendChild(box);
     });
 
   } catch (error) {
