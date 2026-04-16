@@ -1,9 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+
+<h2>Create Account</h2>
+
+<input id="email" type="email" placeholder="Email"
+style="display:block;width:100%;padding:10px;margin:10px 0;">
+
+<input id="password" type="password" placeholder="Password"
+style="display:block;width:100%;padding:10px;margin:10px 0;">
+
+<button id="signupBtn" style="padding:10px;width:100%;">
+Sign Up
+</button>
+
+<p id="msg"></p>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-import { getFirestore, doc, setDoc, getDoc, updateDoc, increment } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc,
+  updateDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -18,58 +47,50 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.addEventListener("load", () => {
+// Get referral from URL
+const referrerId = new URLSearchParams(window.location.search).get("ref");
 
-  const emailEl = document.getElementById("email");
-  const passEl = document.getElementById("password");
-  const btn = document.getElementById("signupBtn");
+document.getElementById("signupBtn").addEventListener("click", async () => {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
-  if (!emailEl || !passEl || !btn || !msg) {
-    document.body.innerHTML = "<h3>Signup page error: missing elements</h3>";
-    return;
-  }
+  try {
 
-  const referrerId = new URLSearchParams(window.location.search).get("ref");
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  btn.addEventListener("click", async () => {
+    // Create user record
+    await setDoc(doc(db, "users", user.uid), {
+      email: email,
+      referrer: referrerId || null,
+      referrals: 0,
+      earnings: 0
+    });
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        emailEl.value,
-        passEl.value
-      );
+    // Update referrer safely
+    if (referrerId) {
+      const refDoc = doc(db, "users", referrerId);
+      const snap = await getDoc(refDoc);
 
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        email: emailEl.value,
-        referrer: referrerId || null,
-        referrals: 0,
-        earnings: 0
-      });
-
-      if (referrerId) {
-        const refDoc = doc(db, "users", referrerId);
-        const snap = await getDoc(refDoc);
-
-        if (snap.exists()) {
-          await updateDoc(refDoc, {
-            referrals: increment(1),
-            earnings: increment(1)
-          });
-        }
+      if (snap.exists()) {
+        await updateDoc(refDoc, {
+          referrals: increment(1),
+          earnings: increment(1)
+        });
       }
-
-      msg.innerText = "Account created successfully!";
-      window.location.href = "login.html";
-
-    } catch (e) {
-      msg.innerText = e.message;
     }
 
-  });
+    msg.innerText = "Account created successfully!";
+    window.location.href = "login.html";
+
+  } catch (error) {
+    msg.innerText = error.message;
+  }
 
 });
 </script>
+
+</body>
+</html>
