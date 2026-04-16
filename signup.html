@@ -24,44 +24,51 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// GET REFERRAL ID FROM URL
-const urlParams = new URLSearchParams(window.location.search);
-const referrerId = urlParams.get("ref");
+window.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("signupBtn").addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const urlParams = new URLSearchParams(window.location.search);
+  const referrerId = urlParams.get("ref");
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+  const signupBtn = document.getElementById("signupBtn");
+  const msg = document.getElementById("msg");
 
-    // SAVE NEW USER
-    await setDoc(doc(db, "users", user.uid), {
-      email: email,
-      referrer: referrerId || null,
-      referrals: 0,
-      earnings: 0
-    });
+  signupBtn.addEventListener("click", async () => {
 
-    // SAFE REFERRER UPDATE
-    if (referrerId) {
-      const referrerRef = doc(db, "users", referrerId);
-      const referrerSnap = await getDoc(referrerRef);
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-      if (referrerSnap.exists()) {
-        await updateDoc(referrerRef, {
-          referrals: increment(1),
-          earnings: increment(1)
-        });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save user in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: email,
+        referrer: referrerId || null,
+        referrals: 0,
+        earnings: 0
+      });
+
+      // Safe referral update
+      if (referrerId) {
+        const referrerRef = doc(db, "users", referrerId);
+        const referrerSnap = await getDoc(referrerRef);
+
+        if (referrerSnap.exists()) {
+          await updateDoc(referrerRef, {
+            referrals: increment(1),
+            earnings: increment(1)
+          });
+        }
       }
+
+      msg.innerText = "Account created successfully!";
+      window.location.href = "login.html";
+
+    } catch (error) {
+      msg.innerText = error.message;
     }
+  });
 
-    document.getElementById("msg").innerText = "Account created successfully!";
-    window.location.href = "login.html";
-
-  } catch (error) {
-    document.getElementById("msg").innerText = error.message;
-  }
 });
-</script>
+    </script>
