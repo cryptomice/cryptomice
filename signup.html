@@ -7,7 +7,8 @@ import {
   doc, 
   setDoc, 
   updateDoc, 
-  increment 
+  increment,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -43,14 +44,17 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
       earnings: 0
     });
 
-    // IF THERE IS A REFERRER → UPDATE THEM
+    // SAFE REFERRER UPDATE
     if (referrerId) {
       const referrerRef = doc(db, "users", referrerId);
+      const referrerSnap = await getDoc(referrerRef);
 
-      await updateDoc(referrerRef, {
-        referrals: increment(1),
-        earnings: increment(1)
-      });
+      if (referrerSnap.exists()) {
+        await updateDoc(referrerRef, {
+          referrals: increment(1),
+          earnings: increment(1)
+        });
+      }
     }
 
     document.getElementById("msg").innerText = "Account created successfully!";
@@ -60,4 +64,4 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     document.getElementById("msg").innerText = error.message;
   }
 });
-    </script>
+</script>
