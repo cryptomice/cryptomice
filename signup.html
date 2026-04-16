@@ -1,27 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Sign Up</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-
-<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
-
-<h2>Create Account</h2>
-
-<input id="email" type="email" placeholder="Email" style="display:block;width:100%;padding:10px;margin:10px 0;">
-<input id="password" type="password" placeholder="Password" style="display:block;width:100%;padding:10px;margin:10px 0;">
-
-<button id="signupBtn" style="padding:10px;width:100%;">
-Sign Up
-</button>
-
-<p id="msg"></p>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  increment 
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -36,25 +23,35 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Capture referral from URL (?ref=USERID)
+// GET REFERRAL ID FROM URL
 const urlParams = new URLSearchParams(window.location.search);
-const referrer = urlParams.get("ref");
+const referrerId = urlParams.get("ref");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
   try {
-    // Create auth user
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Save user in Firestore with referral info
+    // SAVE NEW USER
     await setDoc(doc(db, "users", user.uid), {
-      email: user.email,
-      referrer: referrer || null,
-      createdAt: new Date()
+      email: email,
+      referrer: referrerId || null,
+      referrals: 0,
+      earnings: 0
     });
+
+    // IF THERE IS A REFERRER → UPDATE THEM
+    if (referrerId) {
+      const referrerRef = doc(db, "users", referrerId);
+
+      await updateDoc(referrerRef, {
+        referrals: increment(1),
+        earnings: increment(1)
+      });
+    }
 
     document.getElementById("msg").innerText = "Account created successfully!";
     window.location.href = "login.html";
@@ -63,7 +60,4 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     document.getElementById("msg").innerText = error.message;
   }
 });
-</script>
-
-</body>
-</html>
+    </script>
