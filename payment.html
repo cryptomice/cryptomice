@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Payment Verification</title>
+  <title>Access Gate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
 
-<h2>Account Activation Payment</h2>
+<h2>Account Access</h2>
 
 <p style="color:red;">
-Send $2 in Litecoin to unlock account creation (review up to 24 hours)
+New users must pay $2 in Litecoin before account creation.
+Existing users can log in below.
 </p>
 
 <hr>
 
-<h3>Step 1: Send Payment</h3>
+<h3>🔒 Payment Section (New Users)</h3>
 
-<p><b>Litecoin Address:</b></p>
+<p>Send $2 in Litecoin to:</p>
+
 <p style="background:#fff;padding:10px;border:1px solid #ddd;">
 YOUR_LITECOIN_ADDRESS_HERE
 </p>
 
-<hr>
-
-<h3>Step 2: Submit Payment Proof</h3>
-
-<input id="email" type="email" placeholder="Enter your email"
+<input id="email" type="email" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="txid" type="text" placeholder="Enter Litecoin TXID"
+<input id="txid" type="text" placeholder="TXID (Litecoin payment proof)"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<button id="submitBtn" style="padding:10px;width:100%;">
+<button id="submitPayment" style="padding:10px;width:100%;">
 Submit Payment
 </button>
 
-<p id="msg"></p>
+<p id="payMsg"></p>
+
+<hr>
+
+<h3>🔓 Already Approved? Login</h3>
+
+<input id="loginEmail" type="email" placeholder="Email"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<input id="loginPassword" type="password" placeholder="Password"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<button id="loginBtn" style="padding:10px;width:100%;">
+Login
+</button>
+
+<p id="loginMsg"></p>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
 import { getFirestore, doc, setDoc } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
@@ -53,35 +70,44 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-document.getElementById("submitBtn").addEventListener("click", async () => {
+// PAYMENT SUBMISSION
+document.getElementById("submitPayment").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
   const txid = document.getElementById("txid").value.trim();
-  const msg = document.getElementById("msg");
+  const msg = document.getElementById("payMsg");
 
   if (!email || !txid) {
     msg.innerText = "Fill all fields";
     return;
   }
 
+  await setDoc(doc(db, "payments", txid), {
+    email: email,
+    txid: txid,
+    coin: "LTC",
+    amount: 2,
+    status: "pending",
+    createdAt: new Date()
+  });
+
+  msg.style.color = "green";
+  msg.innerText = "Payment submitted. Wait for approval (up to 24h).";
+});
+
+// LOGIN FOR APPROVED USERS
+document.getElementById("loginBtn").addEventListener("click", async () => {
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const msg = document.getElementById("loginMsg");
+
   try {
-
-    // CRITICAL FIX:
-    // Use TXID as document ID so admin sees everything correctly
-    await setDoc(doc(db, "payments", txid), {
-      email: email,
-      txid: txid,
-      coin: "LTC",
-      amount: 2,
-      status: "pending",
-      createdAt: new Date()
-    });
-
-    msg.style.color = "green";
-    msg.innerText = "Payment submitted successfully. Wait up to 24 hours.";
-
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
   } catch (error) {
     msg.innerText = error.message;
   }
@@ -90,4 +116,4 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
