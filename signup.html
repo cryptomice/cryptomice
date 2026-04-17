@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sign Up</title>
+  <title>Signup</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -9,29 +9,34 @@
 
 <h2>Create Account</h2>
 
+<p id="msg" style="color:red;"></p>
+
 <input id="email" type="email" placeholder="Email"
-style="display:block;width:100%;padding:10px;margin:10px 0;">
+style="padding:10px;width:100%;margin:5px 0;">
 
 <input id="password" type="password" placeholder="Password"
-style="display:block;width:100%;padding:10px;margin:10px 0;">
+style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="signupBtn" style="padding:10px;width:100%;">
-Sign Up
+Create Account
 </button>
-
-<p id="msg"></p>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
+  getFirestore,
+  doc,
   getDoc,
-  updateDoc,
-  increment
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -47,43 +52,51 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Get referral from URL
-const referrerId = new URLSearchParams(window.location.search).get("ref");
-
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
+  if (!email || !password) {
+    msg.innerText = "Fill all fields";
+    return;
+  }
+
   try {
 
+    // STEP 1: CHECK PAYMENT APPROVAL
+    const q = query(
+      collection(db, "payments"),
+      where("email", "==", email),
+      where("status", "==", "approved")
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      msg.innerText = "Access denied: Payment not approved yet (wait up to 24h)";
+      return;
+    }
+
+    // STEP 2: CREATE USER
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Create user record
+    // STEP 3: CREATE USER PROFILE
     await setDoc(doc(db, "users", user.uid), {
       email: email,
-      referrer: referrerId || null,
       referrals: 0,
-      earnings: 0
+      earnings: 0,
+      createdAt: new Date()
     });
 
-    // Update referrer safely
-    if (referrerId) {
-      const refDoc = doc(db, "users", referrerId);
-      const snap = await getDoc(refDoc);
-
-      if (snap.exists()) {
-        await updateDoc(refDoc, {
-          referrals: increment(1),
-          earnings: increment(1)
-        });
-      }
-    }
-
+    msg.style.color = "green";
     msg.innerText = "Account created successfully!";
-    window.location.href = "login.html";
+
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1500);
 
   } catch (error) {
     msg.innerText = error.message;
