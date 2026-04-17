@@ -14,8 +14,8 @@
 
 <hr>
 
-<h3>Approved Emails</h3>
-<div id="approved">Loading...</div>
+<h3>Withdrawal Requests</h3>
+<div id="withdrawals">Loading...</div>
 
 <script type="module">
 
@@ -27,6 +27,7 @@ import {
   getDocs,
   doc,
   setDoc,
+  updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
@@ -42,22 +43,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ================= LOAD PAYMENTS =================
-async function loadPayments() {
+// ================= PAYMENTS =================
+async function loadPayments(){
 
   const container = document.getElementById("payments");
   container.innerHTML = "";
 
-  const snap = await getDocs(collection(db, "paymentRequests"));
+  const snap = await getDocs(collection(db,"payments"));
 
-  if (snap.empty) {
-    container.innerHTML = "<p>No payment requests</p>";
-    return;
-  }
+  let found = false;
 
   snap.forEach(docSnap => {
 
     const d = docSnap.data();
+
+    if(d.status !== "pending") return;
+
+    found = true;
 
     const div = document.createElement("div");
     div.style.background = "white";
@@ -68,12 +70,12 @@ async function loadPayments() {
       <p><b>Email:</b> ${d.email}</p>
       <p><b>TXID:</b> ${d.txid}</p>
 
-      <button onclick="approve('${d.email}')">
+      <button onclick="approvePayment('${docSnap.id}','${d.email}')">
         Approve
       </button>
 
       <button style="background:red;color:white;margin-left:10px;"
-        onclick="remove('${d.email}')">
+        onclick="deletePayment('${docSnap.id}')">
         Delete
       </button>
     `;
@@ -81,68 +83,104 @@ async function loadPayments() {
     container.appendChild(div);
 
   });
+
+  if(!found){
+    container.innerHTML = "<p>No pending payments</p>";
+  }
 }
 
-// ================= APPROVE PAYMENT =================
-window.approve = async (email) => {
+window.approvePayment = async (id,email) => {
 
-  // mark email as approved (SIGNUP GATE)
-  await setDoc(doc(db, "approvedEmails", email), {
+  // allow signup
+  await setDoc(doc(db,"approvedEmails",email),{
     email,
-    approved: true,
+    approved:true,
     createdAt: new Date()
   });
 
-  // delete payment request
-  await deleteDoc(doc(db, "paymentRequests", email));
+  // DELETE payment record (your requirement)
+  await deleteDoc(doc(db,"payments",id));
 
-  alert("Approved");
+  alert("Approved and payment deleted");
   loadPayments();
 };
 
-// ================= DELETE PAYMENT =================
-window.remove = async (email) => {
-
-  await deleteDoc(doc(db, "paymentRequests", email));
-
-  alert("Deleted");
+window.deletePayment = async (id) => {
+  await deleteDoc(doc(db,"payments",id));
+  alert("Payment deleted");
   loadPayments();
 };
 
-// ================= LOAD APPROVED EMAILS =================
-async function loadApproved() {
 
-  const container = document.getElementById("approved");
+// ================= WITHDRAWALS =================
+async function loadWithdrawals(){
+
+  const container = document.getElementById("withdrawals");
   container.innerHTML = "";
 
-  const snap = await getDocs(collection(db, "approvedEmails"));
+  const snap = await getDocs(collection(db,"withdrawals"));
 
-  if (snap.empty) {
-    container.innerHTML = "<p>No approved users</p>";
-    return;
-  }
+  let found = false;
 
   snap.forEach(docSnap => {
 
     const d = docSnap.data();
 
+    if(d.status !== "pending") return;
+
+    found = true;
+
     const div = document.createElement("div");
-    div.style.background = "#dff0d8";
+    div.style.background = "white";
     div.style.padding = "10px";
     div.style.marginBottom = "10px";
 
     div.innerHTML = `
       <p><b>Email:</b> ${d.email}</p>
+      <p><b>Amount:</b> $${d.amount}</p>
+      <p><b>Wallet:</b> ${d.cryptoAddress}</p>
+
+      <button onclick="approveWithdraw('${docSnap.id}')">
+        Mark Paid
+      </button>
+
+      <button style="background:red;color:white;margin-left:10px;"
+        onclick="deleteWithdraw('${docSnap.id}')">
+        Delete
+      </button>
     `;
 
     container.appendChild(div);
 
   });
+
+  if(!found){
+    container.innerHTML = "<p>No pending withdrawals</p>";
+  }
 }
+
+window.approveWithdraw = async (id) => {
+
+  await updateDoc(doc(db,"withdrawals",id),{
+    status:"paid"
+  });
+
+  alert("Marked as paid");
+  loadWithdrawals();
+};
+
+window.deleteWithdraw = async (id) => {
+
+  await deleteDoc(doc(db,"withdrawals",id));
+
+  alert("Withdrawal deleted");
+  loadWithdrawals();
+};
+
 
 // INIT
 loadPayments();
-loadApproved();
+loadWithdrawals();
 
 </script>
 
