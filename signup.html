@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Create Account</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
 
 <h2>Create Account</h2>
 
-<p style="color:gray;">
-Only approved users can create an account.
-</p>
-
-<input id="email" type="email" placeholder="Enter approved email"
+<input id="email" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="password" type="password" placeholder="Create password"
+<input id="password" type="password" placeholder="Password"
 style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="signupBtn" style="padding:10px;width:100%;">
@@ -28,10 +24,9 @@ Create Account
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail
+import {
+  getAuth,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
@@ -39,7 +34,8 @@ import {
   doc,
   getDoc,
   setDoc,
-  deleteDoc
+  updateDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -55,65 +51,60 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// referral
-const urlParams = new URLSearchParams(window.location.search);
-const ref = urlParams.get("ref");
+function getRef() {
+  return new URLSearchParams(window.location.search).get("ref");
+}
 
-// SIGN UP
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const msg = document.getElementById("msg");
+  const ref = getRef();
 
   if (!email || !password) {
-    msg.style.color = "red";
     msg.innerText = "Fill all fields";
     return;
   }
 
   try {
 
-    // 1. CHECK IF ACCOUNT ALREADY EXISTS
-    const methods = await fetchSignInMethodsForEmail(auth, email);
-
-    if (methods.length > 0) {
-      msg.style.color = "red";
-      msg.innerText = "Account already exists. Please login.";
-      return;
-    }
-
-    // 2. CHECK IF EMAIL IS APPROVED BY ADMIN
-    const approvedRef = doc(db, "approvedEmails", email);
-    const approvedSnap = await getDoc(approvedRef);
-
-    if (!approvedSnap.exists()) {
-      msg.style.color = "red";
-      msg.innerText = "Payment not approved yet.";
-      return;
-    }
-
-    // 3. CREATE USER ACCOUNT
+    // 1. CREATE AUTH ACCOUNT
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCred.user.uid;
 
-    // 4. SAVE USER DATA
+    // 2. CREATE USER PROFILE
     await setDoc(doc(db, "users", uid), {
       email: email,
       referrals: 0,
       earnings: 0,
-      referredBy: ref || null
+      referredBy: ref || null,
+      createdAt: new Date()
     });
 
-    // 5. DELETE APPROVAL (ONE-TIME USE EMAIL)
-    await deleteDoc(doc(db, "approvedEmails", email));
+    // 3. HANDLE REFERRAL REWARD (ONLY AFTER ACCOUNT CREATION)
+    if (ref) {
+
+      const refUserRef = doc(db, "users", ref);
+      const refSnap = await getDoc(refUserRef);
+
+      if (refSnap.exists()) {
+
+        await updateDoc(refUserRef, {
+          referrals: increment(1),
+          earnings: increment(1) // $1 reward per signup
+        });
+
+      }
+    }
 
     msg.style.color = "green";
     msg.innerText = "Account created successfully";
 
+    // redirect to dashboard
     setTimeout(() => {
       window.location.href = "dashboard.html";
-    }, 1200);
+    }, 1000);
 
   } catch (e) {
     msg.style.color = "red";
@@ -121,6 +112,7 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
   }
 
 });
+
 </script>
 
 </body>
