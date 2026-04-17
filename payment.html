@@ -10,18 +10,24 @@
 <h2>Access Portal</h2>
 
 <p style="color:red;">
-You must pay $2 in Litecoin to activate account access.
-Approved users can log in below.
+Account access requires a one-time activation payment. Approved users can log in below.
 </p>
 
 <hr>
 
 <h3>1. Payment Section (New Users)</h3>
 
-<p>Send $2 in Litecoin to this address:</p>
+<p>
+To activate your account, send <b>$2 in Litecoin</b> to the platform address below:
+</p>
 
-<p style="background:white;padding:10px;border:1px solid #ccc;font-weight:bold;">
+<p style="background:white;padding:12px;border:1px solid #ccc;font-weight:bold;">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
+</p>
+
+<p style="font-size:13px;color:gray;">
+After sending payment, enter your email and transaction ID (TXID) for approval.
+Approval may take up to 24 hours.
 </p>
 
 <input id="email" type="email" placeholder="Enter your email"
@@ -38,7 +44,7 @@ Submit Payment
 
 <hr>
 
-<h3>2. Login (Approved Users Only)</h3>
+<h3>2. Login (Already Activated Users)</h3>
 
 <input id="loginEmail" type="email" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
@@ -70,7 +76,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// PAYMENT
+// SUBMIT PAYMENT
 document.getElementById("payBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
@@ -78,6 +84,7 @@ document.getElementById("payBtn").addEventListener("click", async () => {
   const msg = document.getElementById("payMsg");
 
   if (!email || !txid) {
+    msg.style.color = "red";
     msg.innerText = "Please fill all fields";
     return;
   }
@@ -93,11 +100,13 @@ document.getElementById("payBtn").addEventListener("click", async () => {
     });
 
     msg.style.color = "green";
-    msg.innerText = "Payment submitted. Wait for approval (up to 24h).";
+    msg.innerText = "Payment submitted successfully. Wait for approval.";
 
   } catch (e) {
+    msg.style.color = "red";
     msg.innerText = e.message;
   }
+
 });
 
 // LOGIN
@@ -111,6 +120,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, email, password);
     window.location.href = "dashboard.html";
   } catch (e) {
+    msg.style.color = "red";
     msg.innerText = e.message;
   }
 
@@ -118,4 +128,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
