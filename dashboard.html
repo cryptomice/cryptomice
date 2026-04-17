@@ -28,10 +28,10 @@
 
 <h3>Request Withdrawal</h3>
 
-<input id="withdrawAmount" type="number" placeholder="Enter amount" 
+<input id="withdrawAmount" type="number" placeholder="Minimum $1"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="withdrawWallet" type="text" placeholder="Enter your crypto wallet address" 
+<input id="withdrawWallet" type="text" placeholder="Enter your crypto wallet address"
 style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="withdrawBtn" style="padding:10px;width:100%;">
@@ -48,6 +48,7 @@ import {
   getFirestore, 
   doc, 
   getDoc, 
+  updateDoc,
   collection, 
   addDoc, 
   serverTimestamp 
@@ -94,21 +95,24 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// COPY LINK
 window.copyLink = function () {
   navigator.clipboard.writeText(document.getElementById("refLink").innerText);
   alert("Copied!");
 };
 
-// WITHDRAW LOGIC
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
-  const amount = document.getElementById("withdrawAmount").value;
+  const amount = parseFloat(document.getElementById("withdrawAmount").value);
   const wallet = document.getElementById("withdrawWallet").value;
   const msg = document.getElementById("withdrawMsg");
 
   if (!amount || amount <= 0) {
     msg.innerText = "Enter valid amount";
+    return;
+  }
+
+  if (amount < 1) {
+    msg.innerText = "Minimum withdrawal is $1";
     return;
   }
 
@@ -118,16 +122,39 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
   }
 
   try {
+
+    const userRef = doc(db, "users", currentUID);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+    const earnings = userData.earnings || 0;
+
+    if (amount > earnings) {
+      msg.innerText = "You cannot withdraw more than your earnings";
+      return;
+    }
+
     await addDoc(collection(db, "withdrawals"), {
       userId: currentUID,
-      email: document.getElementById("userEmail").innerText,
-      amount: parseFloat(amount),
+      email: userData.email,
+      amount: amount,
       cryptoAddress: wallet,
       status: "pending",
       createdAt: serverTimestamp()
     });
 
-    msg.innerText = "Withdrawal request sent!";
+    const newBalance = earnings - amount;
+
+    await updateDoc(userRef, {
+      earnings: newBalance
+    });
+
+    document.getElementById("earnings").innerText = newBalance;
+
+    document.getElementById("withdrawAmount").value = "";
+    document.getElementById("withdrawWallet").value = "";
+
+    msg.innerText = "Withdrawal request sent successfully";
+
   } catch (error) {
     msg.innerText = error.message;
   }
@@ -136,4 +163,4 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-</html>
+  </html>
