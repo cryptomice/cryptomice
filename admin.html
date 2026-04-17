@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Panel</title>
+  <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -13,13 +13,13 @@
 
 <hr>
 
-<h3>Users</h3>
-<div id="users">Loading users...</div>
+<h3>Payment Requests</h3>
+<div id="payments">Loading...</div>
 
 <hr>
 
-<h3>Withdrawal Requests</h3>
-<div id="withdrawals">Loading withdrawals...</div>
+<h3>Users</h3>
+<div id="users">Loading users...</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -28,10 +28,10 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { 
   getFirestore, 
   doc, 
-  getDoc, 
-  collection, 
+  getDoc,
+  collection,
   getDocs,
-  deleteDoc
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -48,8 +48,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const status = document.getElementById("status");
+const paymentsDiv = document.getElementById("payments");
 const usersDiv = document.getElementById("users");
-const withdrawalsDiv = document.getElementById("withdrawals");
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -58,47 +58,69 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userSnap = await getDoc(doc(db, "users", user.uid));
+  const adminSnap = await getDoc(doc(db, "users", user.uid));
 
-  if (!userSnap.exists() || userSnap.data().role !== "admin") {
-    status.innerText = "Access denied";
+  if (!adminSnap.exists() || adminSnap.data().role !== "admin") {
+    status.innerText = "Access Denied";
     return;
   }
 
   status.innerText = "Admin Access Granted";
 
-  // LOAD USERS
-  const usersSnap = await getDocs(collection(db, "users"));
-  usersDiv.innerHTML = "";
+  loadPayments();
+  loadUsers();
+});
 
-  usersSnap.forEach((u) => {
-    const data = u.data();
+// LOAD PAYMENTS
+async function loadPayments() {
 
-    const div = document.createElement("div");
-    div.style.background = "white";
-    div.style.padding = "10px";
-    div.style.margin = "10px 0";
+  const snap = await getDocs(collection(db, "payments"));
+  paymentsDiv.innerHTML = "";
 
-    div.innerHTML = `
-      <b>Email:</b> ${data.email || "N/A"} <br>
-      <b>Referrals:</b> ${data.referrals || 0} <br>
-      <b>Earnings:</b> $${data.earnings || 0}
-    `;
-
-    usersDiv.appendChild(div);
-  });
-
-  // LOAD WITHDRAWALS
-  const wdSnap = await getDocs(collection(db, "withdrawals"));
-  withdrawalsDiv.innerHTML = "";
-
-  if (wdSnap.empty) {
-    withdrawalsDiv.innerHTML = "No pending withdrawals";
+  if (snap.empty) {
+    paymentsDiv.innerHTML = "No payment requests";
     return;
   }
 
-  wdSnap.forEach((w) => {
-    const d = w.data();
+  snap.forEach((p) => {
+    const d = p.data();
+
+    const box = document.createElement("div");
+    box.style.background = "white";
+    box.style.padding = "10px";
+    box.style.margin = "10px 0";
+
+    let actions = "";
+
+    if (d.status === "pending") {
+      actions = `
+        <button onclick="approvePayment('${p.id}')">Approve</button>
+        <button onclick="rejectPayment('${p.id}')">Reject</button>
+      `;
+    } else {
+      actions = `<b>Status:</b> ${d.status}`;
+    }
+
+    box.innerHTML = `
+      <b>Email:</b> ${d.email} <br>
+      <b>TXID:</b> ${p.id} <br>
+      <b>Coin:</b> ${d.coin} <br>
+      <b>Status:</b> ${d.status} <br><br>
+      ${actions}
+    `;
+
+    paymentsDiv.appendChild(box);
+  });
+}
+
+// LOAD USERS
+async function loadUsers() {
+
+  const snap = await getDocs(collection(db, "users"));
+  usersDiv.innerHTML = "";
+
+  snap.forEach((u) => {
+    const d = u.data();
 
     const box = document.createElement("div");
     box.style.background = "white";
@@ -106,27 +128,37 @@ onAuthStateChanged(auth, async (user) => {
     box.style.margin = "10px 0";
 
     box.innerHTML = `
-      <b>Email:</b> ${d.email} <br>
-      <b>Amount:</b> $${d.amount} <br>
-      <b>Wallet:</b> ${d.cryptoAddress} <br>
-      <b>Status:</b> ${d.status} <br><br>
-      <button onclick="markPaid('${w.id}')">Mark Paid</button>
+      <b>Email:</b> ${d.email || "N/A"} <br>
+      <b>Referrals:</b> ${d.referrals || 0} <br>
+      <b>Earnings:</b> $${d.earnings || 0}
     `;
 
-    withdrawalsDiv.appendChild(box);
+    usersDiv.appendChild(box);
+  });
+}
+
+// APPROVE
+window.approvePayment = async function(id) {
+
+  await updateDoc(doc(db, "payments", id), {
+    status: "approved"
   });
 
-});
-
-window.markPaid = async function(id) {
-  if (!confirm("Confirm payment sent?")) return;
-
-  await deleteDoc(doc(db, "withdrawals", id));
-
-  alert("Payment completed and removed");
-
+  alert("Payment approved");
   location.reload();
 };
+
+// REJECT
+window.rejectPayment = async function(id) {
+
+  await updateDoc(doc(db, "payments", id), {
+    status: "rejected"
+  });
+
+  alert("Payment rejected");
+  location.reload();
+};
+
 </script>
 
 </body>
