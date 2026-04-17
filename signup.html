@@ -1,80 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Access Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create Account</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
 
-<h2>Access Portal</h2>
+<h2>Create Account</h2>
 
-<p style="color:red;">
-Account access requires a one-time activation payment. Approved users can log in below.
+<p style="color:gray;">
+Only approved users can create an account.
 </p>
 
-<hr>
-
-<h3>1. Payment Section (New Users)</h3>
-
-<p>
-To activate your account, send <b>$2 in Litecoin</b> to the platform address below:
-</p>
-
-<p style="background:white;padding:12px;border:1px solid #ccc;font-weight:bold;">
-ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
-</p>
-
-<p style="font-size:13px;color:gray;">
-After sending payment, enter your email and transaction ID (TXID) for approval.
-Approval may take up to 24 hours.
-</p>
-
-<input id="email" type="email" placeholder="Enter your email"
+<input id="email" type="email" placeholder="Enter approved email"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="txid" type="text" placeholder="Enter Litecoin TXID"
+<input id="password" type="password" placeholder="Create password"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<button id="payBtn" style="padding:10px;width:100%;">
-Submit Payment
+<button id="signupBtn" style="padding:10px;width:100%;">
+Create Account
 </button>
 
-<p id="payMsg"></p>
-
-<hr>
-
-<h3>2. Login (Already Activated Users)</h3>
-
-<input id="loginEmail" type="email" placeholder="Email"
-style="padding:10px;width:100%;margin:5px 0;">
-
-<input id="loginPassword" type="password" placeholder="Password"
-style="padding:10px;width:100%;margin:5px 0;">
-
-<button id="loginBtn" style="padding:10px;width:100%;">
-Login
-</button>
-
-<p id="loginMsg"></p>
-
-<hr>
-
-<h3>3. Sign Up (After Approval)</h3>
-
-<p style="font-size:13px;color:gray;">
-If your payment has been approved, create your account here.
-</p>
-
-<button onclick="window.location.href='signup.html'" 
-style="padding:12px;width:100%;background:#28a745;color:white;border:none;">
-Go to Sign Up
-</button>
+<p id="msg"></p>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -89,49 +55,66 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// SUBMIT PAYMENT
-document.getElementById("payBtn").addEventListener("click", async () => {
+// referral
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("ref");
+
+// SIGN UP
+document.getElementById("signupBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
-  const txid = document.getElementById("txid").value.trim();
-  const msg = document.getElementById("payMsg");
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
 
-  if (!email || !txid) {
+  if (!email || !password) {
     msg.style.color = "red";
-    msg.innerText = "Please fill all fields";
+    msg.innerText = "Fill all fields";
     return;
   }
 
   try {
-    await setDoc(doc(db, "payments", txid), {
+
+    // 1. CHECK IF ACCOUNT ALREADY EXISTS
+    const methods = await fetchSignInMethodsForEmail(auth, email);
+
+    if (methods.length > 0) {
+      msg.style.color = "red";
+      msg.innerText = "Account already exists. Please login.";
+      return;
+    }
+
+    // 2. CHECK IF EMAIL IS APPROVED BY ADMIN
+    const approvedRef = doc(db, "approvedEmails", email);
+    const approvedSnap = await getDoc(approvedRef);
+
+    if (!approvedSnap.exists()) {
+      msg.style.color = "red";
+      msg.innerText = "Payment not approved yet.";
+      return;
+    }
+
+    // 3. CREATE USER ACCOUNT
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
+
+    // 4. SAVE USER DATA
+    await setDoc(doc(db, "users", uid), {
       email: email,
-      txid: txid,
-      coin: "LTC",
-      amount: 2,
-      status: "pending",
-      createdAt: new Date()
+      referrals: 0,
+      earnings: 0,
+      referredBy: ref || null
     });
 
+    // 5. DELETE APPROVAL (ONE-TIME USE EMAIL)
+    await deleteDoc(doc(db, "approvedEmails", email));
+
     msg.style.color = "green";
-    msg.innerText = "Payment submitted. Wait for approval.";
+    msg.innerText = "Account created successfully";
 
-  } catch (e) {
-    msg.style.color = "red";
-    msg.innerText = e.message;
-  }
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 1200);
 
-});
-
-// LOGIN
-document.getElementById("loginBtn").addEventListener("click", async () => {
-
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-  const msg = document.getElementById("loginMsg");
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
   } catch (e) {
     msg.style.color = "red";
     msg.innerText = e.message;
@@ -141,4 +124,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
