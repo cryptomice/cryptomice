@@ -9,9 +9,7 @@
 
 <h2>Create Account</h2>
 
-<p style="color:gray;">
-Only approved payments can create an account.
-</p>
+<p id="status" style="font-weight:bold;"></p>
 
 <input id="email" type="email" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
@@ -50,11 +48,31 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// GET REFERRAL
+const status = document.getElementById("status");
+
+// referral
 const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get("ref");
 
-// SIGNUP
+// SMART CHECK WHEN EMAIL TYPED
+document.getElementById("email").addEventListener("blur", async () => {
+
+  const email = document.getElementById("email").value.trim();
+  if(!email) return;
+
+  const approvedRef = doc(db, "approvedEmails", email);
+  const approvedSnap = await getDoc(approvedRef);
+
+  if (approvedSnap.exists()) {
+    status.style.color = "green";
+    status.innerText = "Payment approved. You can create your account.";
+  } else {
+    status.style.color = "red";
+    status.innerText = "Payment not approved yet. Please pay and wait for approval.";
+  }
+
+});
+
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
@@ -74,15 +92,13 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
 
     if (!approvedSnap.exists()) {
       msg.style.color = "red";
-      msg.innerText = "Payment not approved yet.";
+      msg.innerText = "You must complete payment first.";
       return;
     }
 
-    // CREATE USER
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCred.user.uid;
 
-    // SAVE USER DATA
     await setDoc(doc(db, "users", uid), {
       email: email,
       referrals: 0,
@@ -95,7 +111,7 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
 
     setTimeout(()=>{
       window.location.href = "dashboard.html";
-    },1500);
+    },1000);
 
   } catch (e) {
     msg.style.color = "red";
