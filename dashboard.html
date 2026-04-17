@@ -7,7 +7,7 @@
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
 
-<h2>Dashboard</h2>
+<h2>User Dashboard</h2>
 
 <p id="userEmail">Loading...</p>
 
@@ -16,10 +16,6 @@
 <h3>Your Referral Link</h3>
 <p id="refLink">Loading...</p>
 <button onclick="copyLink()">Copy Link</button>
-
-<p style="font-size:12px;color:gray;">
-Users must complete payment before signup.
-</p>
 
 <hr>
 
@@ -33,14 +29,13 @@ Users must complete payment before signup.
 <h3>Request Withdrawal (Litecoin)</h3>
 
 <p style="color:gray;font-size:13px;">
-Withdrawals are paid in 0. Minimum $1.
+Minimum withdrawal: $1 — paid in 0
 </p>
 
-<input id="withdrawAmount" type="number" placeholder="Minimum $1"
+<input id="withdrawAmount" type="number" placeholder="Enter amount (min $1)"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="withdrawWallet" type="text"
-placeholder="Enter your Litecoin (LTC) wallet address"
+<input id="withdrawWallet" type="text" placeholder="Enter Litecoin wallet address"
 style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="withdrawBtn" style="padding:10px;width:100%;">
@@ -58,8 +53,8 @@ import {
   doc,
   getDoc,
   updateDoc,
-  collection,
   addDoc,
+  collection,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
@@ -78,9 +73,11 @@ const db = getFirestore(app);
 
 let currentUID = null;
 
+// ---------------- AUTH CHECK ----------------
 onAuthStateChanged(auth, async (user) => {
+
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "payment.html";
     return;
   }
 
@@ -89,39 +86,33 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
 
-  // 🔥 FIXED: MUST POINT TO PAYMENT PAGE
-  const refLink =
+  // referral link ALWAYS goes through payment gate
+  document.getElementById("refLink").innerText =
     "https://cryptomice.github.io/cryptomice/payment.html?ref=" + user.uid;
-
-  document.getElementById("refLink").innerText = refLink;
 
   const snap = await getDoc(doc(db, "users", user.uid));
 
   if (snap.exists()) {
     const data = snap.data();
-
     document.getElementById("refCount").innerText = data.referrals || 0;
     document.getElementById("earnings").innerText = data.earnings || 0;
   }
 });
 
+// ---------------- COPY LINK ----------------
 window.copyLink = function () {
   navigator.clipboard.writeText(document.getElementById("refLink").innerText);
   alert("Copied!");
 };
 
+// ---------------- WITHDRAW ----------------
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
   const wallet = document.getElementById("withdrawWallet").value.trim();
   const msg = document.getElementById("withdrawMsg");
 
-  if (!amount || amount <= 0) {
-    msg.innerText = "Enter valid amount";
-    return;
-  }
-
-  if (amount < 1) {
+  if (!amount || amount < 1) {
     msg.innerText = "Minimum withdrawal is $1";
     return;
   }
@@ -134,20 +125,20 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
   try {
 
     const userRef = doc(db, "users", currentUID);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
-    const earnings = userData.earnings || 0;
+    const snap = await getDoc(userRef);
+    const data = snap.data();
+    const earnings = data.earnings || 0;
 
     if (amount > earnings) {
-      msg.innerText = "You cannot withdraw more than your earnings";
+      msg.innerText = "Insufficient balance";
       return;
     }
 
     await addDoc(collection(db, "withdrawals"), {
       userId: currentUID,
-      email: userData.email,
+      email: data.email,
       amount: amount,
-      cryptoAddress: wallet,
+      wallet: wallet,
       coin: "LTC",
       status: "pending",
       createdAt: serverTimestamp()
@@ -162,14 +153,14 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
     document.getElementById("withdrawAmount").value = "";
     document.getElementById("withdrawWallet").value = "";
 
-    msg.innerText = "Withdrawal request sent (Litecoin)";
+    msg.innerText = "Withdrawal request sent";
 
-  } catch (error) {
-    msg.innerText = error.message;
+  } catch (e) {
+    msg.innerText = e.message;
   }
 
 });
 </script>
 
 </body>
-</html>
+  </html>
