@@ -17,6 +17,10 @@
 <p id="refLink">Loading...</p>
 <button onclick="copyLink()">Copy Link</button>
 
+<p style="font-size:12px;color:gray;">
+Users must complete payment before signup.
+</p>
+
 <hr>
 
 <h3>Stats</h3>
@@ -27,14 +31,15 @@
 <hr>
 
 <h3>Request Withdrawal (Litecoin)</h3>
+
 <p style="color:gray;font-size:13px;">
-Withdrawals are paid in Litecoin (LTC). Minimum $1.
+Withdrawals are paid in 0. Minimum $1.
 </p>
 
 <input id="withdrawAmount" type="number" placeholder="Minimum $1"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="withdrawWallet" type="text" 
+<input id="withdrawWallet" type="text"
 placeholder="Enter your Litecoin (LTC) wallet address"
 style="padding:10px;width:100%;margin:5px 0;">
 
@@ -48,14 +53,14 @@ Request Withdrawal
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
+import {
+  getFirestore,
+  doc,
+  getDoc,
   updateDoc,
-  collection, 
-  addDoc, 
-  serverTimestamp 
+  collection,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -84,8 +89,9 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
 
+  // 🔥 FIXED: MUST POINT TO PAYMENT PAGE
   const refLink =
-    "https://cryptomice.github.io/cryptomice/signup.html?ref=" + user.uid;
+    "https://cryptomice.github.io/cryptomice/payment.html?ref=" + user.uid;
 
   document.getElementById("refLink").innerText = refLink;
 
@@ -147,13 +153,11 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
       createdAt: serverTimestamp()
     });
 
-    const newBalance = earnings - amount;
-
     await updateDoc(userRef, {
-      earnings: newBalance
+      earnings: earnings - amount
     });
 
-    document.getElementById("earnings").innerText = newBalance;
+    document.getElementById("earnings").innerText = earnings - amount;
 
     document.getElementById("withdrawAmount").value = "";
     document.getElementById("withdrawWallet").value = "";
@@ -168,4 +172,4 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
