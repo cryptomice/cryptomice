@@ -20,8 +20,8 @@ Approved users can log in below.
 
 <p>Send $2 in Litecoin to this address:</p>
 
-<p style="background:white;padding:10px;border:1px solid #ccc;">
-YOUR_LITECOIN_ADDRESS_HERE
+<p style="background:white;padding:10px;border:1px solid #ccc;font-weight:bold;">
+ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 </p>
 
 <input id="email" type="email" placeholder="Enter your email"
@@ -70,7 +70,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ---------------- PAYMENT ----------------
+// PAYMENT
 document.getElementById("payBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
@@ -100,7 +100,7 @@ document.getElementById("payBtn").addEventListener("click", async () => {
   }
 });
 
-// ---------------- LOGIN ----------------
+// LOGIN
 document.getElementById("loginBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("loginEmail").value;
@@ -118,4 +118,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-</html>
+  </html>
