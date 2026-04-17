@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
 
 <h2>Admin Dashboard</h2>
 
-<p id="status">Checking access...</p>
-
-<hr>
-
 <h3>Payment Requests</h3>
 <div id="payments">Loading...</div>
 
 <hr>
 
-<h3>Users</h3>
-<div id="users">Loading users...</div>
+<h3>Withdrawal Requests</h3>
+<div id="withdrawals">Loading...</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-import { 
-  getFirestore, 
-  doc, 
-  getDoc,
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
   collection,
   getDocs,
-  updateDoc
+  doc,
+  updateDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -47,119 +44,106 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const status = document.getElementById("status");
-const paymentsDiv = document.getElementById("payments");
-const usersDiv = document.getElementById("users");
+// -------- LOAD PAYMENTS --------
+async function loadPayments(){
 
-onAuthStateChanged(auth, async (user) => {
+  const container = document.getElementById("payments");
+  container.innerHTML = "";
 
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+  const querySnapshot = await getDocs(collection(db, "payments"));
 
-  const adminSnap = await getDoc(doc(db, "users", user.uid));
+  querySnapshot.forEach((docSnap) => {
 
-  if (!adminSnap.exists() || adminSnap.data().role !== "admin") {
-    status.innerText = "Access Denied";
-    return;
-  }
+    const data = docSnap.data();
 
-  status.innerText = "Admin Access Granted";
+    if(data.status !== "pending") return;
 
+    const div = document.createElement("div");
+    div.style.background = "white";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+
+    div.innerHTML = `
+      <p><b>Email:</b> ${data.email}</p>
+      <p><b>TXID:</b> ${data.txid}</p>
+      <button onclick="approvePayment('${docSnap.id}','${data.email}')">
+      Approve
+      </button>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+}
+
+window.approvePayment = async (txid, email) => {
+
+  await updateDoc(doc(db,"payments",txid),{
+    status:"approved"
+  });
+
+  // create approved email record
+  await setDoc(doc(db,"approvedEmails",email),{
+    email:email,
+    approved:true
+  });
+
+  alert("Payment Approved");
   loadPayments();
-  loadUsers();
-});
-
-// LOAD PAYMENTS
-async function loadPayments() {
-
-  const snap = await getDocs(collection(db, "payments"));
-  paymentsDiv.innerHTML = "";
-
-  if (snap.empty) {
-    paymentsDiv.innerHTML = "No payment requests";
-    return;
-  }
-
-  snap.forEach((p) => {
-    const d = p.data();
-
-    const box = document.createElement("div");
-    box.style.background = "white";
-    box.style.padding = "10px";
-    box.style.margin = "10px 0";
-
-    let actions = "";
-
-    if (d.status === "pending") {
-      actions = `
-        <button onclick="approvePayment('${p.id}')">Approve</button>
-        <button onclick="rejectPayment('${p.id}')">Reject</button>
-      `;
-    } else {
-      actions = `<b>Status:</b> ${d.status}`;
-    }
-
-    box.innerHTML = `
-      <b>Email:</b> ${d.email} <br>
-      <b>TXID:</b> ${p.id} <br>
-      <b>Coin:</b> ${d.coin} <br>
-      <b>Status:</b> ${d.status} <br><br>
-      ${actions}
-    `;
-
-    paymentsDiv.appendChild(box);
-  });
-}
-
-// LOAD USERS
-async function loadUsers() {
-
-  const snap = await getDocs(collection(db, "users"));
-  usersDiv.innerHTML = "";
-
-  snap.forEach((u) => {
-    const d = u.data();
-
-    const box = document.createElement("div");
-    box.style.background = "white";
-    box.style.padding = "10px";
-    box.style.margin = "10px 0";
-
-    box.innerHTML = `
-      <b>Email:</b> ${d.email || "N/A"} <br>
-      <b>Referrals:</b> ${d.referrals || 0} <br>
-      <b>Earnings:</b> $${d.earnings || 0}
-    `;
-
-    usersDiv.appendChild(box);
-  });
-}
-
-// APPROVE
-window.approvePayment = async function(id) {
-
-  await updateDoc(doc(db, "payments", id), {
-    status: "approved"
-  });
-
-  alert("Payment approved");
-  location.reload();
 };
 
-// REJECT
-window.rejectPayment = async function(id) {
 
-  await updateDoc(doc(db, "payments", id), {
-    status: "rejected"
+// -------- LOAD WITHDRAWALS --------
+async function loadWithdrawals(){
+
+  const container = document.getElementById("withdrawals");
+  container.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "withdrawals"));
+
+  querySnapshot.forEach((docSnap) => {
+
+    const data = docSnap.data();
+
+    if(data.status !== "pending") return;
+
+    const div = document.createElement("div");
+    div.style.background = "white";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+
+    div.innerHTML = `
+      <p><b>Email:</b> ${data.email}</p>
+      <p><b>Amount:</b> $${data.amount}</p>
+      <p><b>Wallet:</b> ${data.wallet}</p>
+      <button onclick="approveWithdraw('${docSnap.id}')">
+      Mark Paid
+      </button>
+    `;
+
+    container.appendChild(div);
+
   });
 
-  alert("Payment rejected");
-  location.reload();
+}
+
+window.approveWithdraw = async (id) => {
+
+  await updateDoc(doc(db,"withdrawals",id),{
+    status:"paid"
+  });
+
+  alert("Marked as Paid");
+  loadWithdrawals();
 };
+
+
+// LOAD DATA
+loadPayments();
+loadWithdrawals();
 
 </script>
 
 </body>
-</html>
+  </html>
