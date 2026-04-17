@@ -10,14 +10,15 @@
 <h2>Access Portal</h2>
 
 <p style="color:red;">
-Account access requires activation payment.
+Account access requires a one-time activation payment.
 </p>
 
 <hr>
 
-<h3>1. Payment Section</h3>
+<!-- 1 PAYMENT -->
+<h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
 
-<p>Send $2 Litecoin to platform address:</p>
+<p>Send <b>$2 Litecoin</b> to platform address:</p>
 
 <p style="background:white;padding:10px;border:1px solid #ccc;font-weight:bold;">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
@@ -37,7 +38,8 @@ Submit Payment
 
 <hr>
 
-<h3>2. Login</h3>
+<!-- 2 LOGIN -->
+<h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
 
 <input id="loginEmail" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
@@ -53,12 +55,21 @@ Login
 
 <hr>
 
-<h3>3. Sign Up</h3>
+<!-- 3 SIGN UP -->
+<div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
+
+<h2>3. Sign Up (After Approval)</h2>
+
+<p style="margin:5px 0;">
+If your payment has been approved, proceed to account creation.
+</p>
 
 <button onclick="window.location.href='signup.html'"
-style="padding:12px;width:100%;background:#28a745;color:white;border:none;">
-Go to Sign Up
+style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
+GO TO SIGN UP
 </button>
+
+</div>
 
 <script type="module">
 
