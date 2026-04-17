@@ -10,16 +10,17 @@
 <h2>Access Portal</h2>
 
 <p style="color:red;">
-Account requires $2 Litecoin activation.
+Account access requires a one-time activation payment.
 </p>
 
 <hr>
 
-<h3>1. Activate Account</h3>
+<!-- 1 PAYMENT -->
+<h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
 
-<p>Send <b>$2 LTC</b> to:</p>
+<p>Send <b>$2 Litecoin</b> to platform address:</p>
 
-<p style="background:white;padding:10px;border:1px solid #ccc;">
+<p style="background:white;padding:10px;border:1px solid #ccc;font-weight:bold;">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 </p>
 
@@ -29,26 +30,52 @@ style="padding:10px;width:100%;margin:5px 0;">
 <input id="txid" placeholder="Enter TXID"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<button id="submitBtn" style="padding:10px;width:100%;">
+<button id="payBtn" style="padding:10px;width:100%;">
 Submit Payment
 </button>
 
-<p id="msg"></p>
+<p id="payMsg"></p>
 
 <hr>
 
-<h3>2. Already Approved?</h3>
+<!-- 2 LOGIN -->
+<h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
+
+<input id="loginEmail" placeholder="Email"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<input id="loginPassword" placeholder="Password"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<button id="loginBtn" style="padding:10px;width:100%;">
+Login
+</button>
+
+<p id="loginMsg"></p>
+
+<hr>
+
+<!-- 3 SIGN UP -->
+<div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
+
+<h2>3. Sign Up (After Approval)</h2>
+
+<p style="margin:5px 0;">
+If your payment has been approved, proceed to account creation.
+</p>
 
 <button onclick="window.location.href='signup.html'"
-style="padding:10px;width:100%;background:#0a66c2;color:white;">
-Go to Sign Up
+style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
+GO TO SIGN UP
 </button>
+
+</div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -60,29 +87,62 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-document.getElementById("submitBtn").addEventListener("click", async () => {
+/* ---------------- PAYMENT ---------------- */
+document.getElementById("payBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
   const txid = document.getElementById("txid").value.trim();
-  const msg = document.getElementById("msg");
+  const msg = document.getElementById("payMsg");
 
-  if(!email || !txid){
+  if (!email || !txid) {
+    msg.style.color = "red";
     msg.innerText = "Fill all fields";
     return;
   }
 
-  // SAVE PAYMENT REQUEST
-  await setDoc(doc(db,"paymentRequests", email), {
-    email,
-    txid,
-    status: "pending",
-    createdAt: new Date()
-  });
+  try {
+    await setDoc(doc(db, "payments", txid), {
+      email,
+      txid,
+      coin: "LTC",
+      amount: 2,
+      status: "pending",
+      createdAt: new Date()
+    });
 
-  msg.style.color = "green";
-  msg.innerText = "Payment submitted. Wait for approval (up to 24h).";
+    msg.style.color = "green";
+    msg.innerText = "Payment submitted";
+
+  } catch (e) {
+    msg.style.color = "red";
+    msg.innerText = e.message;
+  }
+
+});
+
+/* ---------------- LOGIN ---------------- */
+document.getElementById("loginBtn").addEventListener("click", async () => {
+
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+  const msg = document.getElementById("loginMsg");
+
+  if (!email || !password) {
+    msg.style.color = "red";
+    msg.innerText = "Fill all fields";
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch (e) {
+    msg.style.color = "red";
+    msg.innerText = e.message;
+  }
 
 });
 
