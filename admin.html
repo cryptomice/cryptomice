@@ -10,7 +10,6 @@
 <h2>Admin Dashboard</h2>
 
 <p id="status">Checking access...</p>
-<p id="debug">Debug: initializing...</p>
 
 <hr>
 
@@ -25,8 +24,15 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  collection, 
+  getDocs,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -42,103 +48,84 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const status = document.getElementById("status");
-const debug = document.getElementById("debug");
 const usersDiv = document.getElementById("users");
 const withdrawalsDiv = document.getElementById("withdrawals");
 
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
-    status.innerText = "Not logged in";
     window.location.href = "login.html";
     return;
   }
 
-  debug.innerText = "User detected: " + user.email;
+  const userSnap = await getDoc(doc(db, "users", user.uid));
 
-  try {
-    const userSnap = await getDoc(doc(db, "users", user.uid));
-
-    if (!userSnap.exists()) {
-      status.innerText = "User document missing in Firestore";
-      return;
-    }
-
-    if (userSnap.data().role !== "admin") {
-      status.innerText = "Access Denied (Not Admin)";
-      return;
-    }
-
-    status.innerText = "Admin Access Granted";
-    debug.innerText = "Loading users...";
-
-    // LOAD USERS
-    const allUsers = await getDocs(collection(db, "users"));
-    usersDiv.innerHTML = "";
-
-    allUsers.forEach((u) => {
-      const data = u.data();
-
-      const div = document.createElement("div");
-      div.style.background = "white";
-      div.style.padding = "10px";
-      div.style.margin = "10px 0";
-
-      div.innerHTML = `
-        <b>Email:</b> ${data.email || "N/A"} <br>
-        <b>Referrals:</b> ${data.referrals || 0} <br>
-        <b>Earnings:</b> $${data.earnings || 0}
-      `;
-
-      usersDiv.appendChild(div);
-    });
-
-    // LOAD WITHDRAWALS
-    debug.innerText = "Loading withdrawals...";
-    const wdSnap = await getDocs(collection(db, "withdrawals"));
-    withdrawalsDiv.innerHTML = "";
-
-    if (wdSnap.empty) {
-      withdrawalsDiv.innerHTML = "<p>No withdrawal requests</p>";
-      return;
-    }
-
-    wdSnap.forEach((w) => {
-      const d = w.data();
-
-      const box = document.createElement("div");
-      box.style.background = "white";
-      box.style.padding = "10px";
-      box.style.margin = "10px 0";
-
-      box.innerHTML = `
-        <b>Email:</b> ${d.email || "N/A"} <br>
-        <b>Amount:</b> $${d.amount || 0} <br>
-        <b>Wallet:</b> ${d.cryptoAddress || "N/A"} <br>
-        <b>Status:</b> ${d.status || "pending"} <br><br>
-        <button onclick="approveWithdrawal('${w.id}')">Approve</button>
-      `;
-
-      withdrawalsDiv.appendChild(box);
-    });
-
-  } catch (error) {
-    status.innerText = "Error loading admin panel";
-    debug.innerText = error.message;
+  if (!userSnap.exists() || userSnap.data().role !== "admin") {
+    status.innerText = "Access denied";
+    return;
   }
+
+  status.innerText = "Admin Access Granted";
+
+  // LOAD USERS
+  const usersSnap = await getDocs(collection(db, "users"));
+  usersDiv.innerHTML = "";
+
+  usersSnap.forEach((u) => {
+    const data = u.data();
+
+    const div = document.createElement("div");
+    div.style.background = "white";
+    div.style.padding = "10px";
+    div.style.margin = "10px 0";
+
+    div.innerHTML = `
+      <b>Email:</b> ${data.email || "N/A"} <br>
+      <b>Referrals:</b> ${data.referrals || 0} <br>
+      <b>Earnings:</b> $${data.earnings || 0}
+    `;
+
+    usersDiv.appendChild(div);
+  });
+
+  // LOAD WITHDRAWALS
+  const wdSnap = await getDocs(collection(db, "withdrawals"));
+  withdrawalsDiv.innerHTML = "";
+
+  if (wdSnap.empty) {
+    withdrawalsDiv.innerHTML = "No pending withdrawals";
+    return;
+  }
+
+  wdSnap.forEach((w) => {
+    const d = w.data();
+
+    const box = document.createElement("div");
+    box.style.background = "white";
+    box.style.padding = "10px";
+    box.style.margin = "10px 0";
+
+    box.innerHTML = `
+      <b>Email:</b> ${d.email} <br>
+      <b>Amount:</b> $${d.amount} <br>
+      <b>Wallet:</b> ${d.cryptoAddress} <br>
+      <b>Status:</b> ${d.status} <br><br>
+      <button onclick="markPaid('${w.id}')">Mark Paid</button>
+    `;
+
+    withdrawalsDiv.appendChild(box);
+  });
 
 });
 
-window.approveWithdrawal = async function(id) {
-  try {
-    await updateDoc(doc(db, "withdrawals", id), {
-      status: "approved"
-    });
-    alert("Withdrawal approved");
-    location.reload();
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+window.markPaid = async function(id) {
+  if (!confirm("Confirm payment sent?")) return;
+
+  await deleteDoc(doc(db, "withdrawals", id));
+
+  alert("Payment completed and removed");
+
+  location.reload();
 };
 </script>
 
