@@ -15,7 +15,6 @@ Account access requires a one-time activation payment.
 
 <hr>
 
-<!-- 1 PAYMENT -->
 <h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
 
 <p>Send <b>$2 Litecoin</b> to platform address:</p>
@@ -38,7 +37,6 @@ Submit Payment
 
 <hr>
 
-<!-- 2 LOGIN -->
 <h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
 
 <input id="loginEmail" placeholder="Email"
@@ -55,14 +53,11 @@ Login
 
 <hr>
 
-<!-- 3 SIGN UP -->
 <div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
 
 <h2>3. Sign Up (After Approval)</h2>
 
-<p style="margin:5px 0;">
-If your payment has been approved, proceed to account creation.
-</p>
+<p>If your payment has been approved, proceed to account creation.</p>
 
 <button onclick="window.location.href='signup.html'"
 style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
@@ -90,7 +85,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ---------------- PAYMENT ---------------- */
+/* SAVE REFERRAL */
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
+  localStorage.setItem("referrer", ref);
+}
+
+/* PAYMENT */
 document.getElementById("payBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
@@ -103,44 +106,28 @@ document.getElementById("payBtn").addEventListener("click", async () => {
     return;
   }
 
-  try {
-    await setDoc(doc(db, "payments", txid), {
-      email,
-      txid,
-      coin: "LTC",
-      amount: 2,
-      status: "pending",
-      createdAt: new Date()
-    });
+  await setDoc(doc(db, "payments", txid), {
+    email,
+    txid,
+    status: "pending",
+    createdAt: new Date()
+  });
 
-    msg.style.color = "green";
-    msg.innerText = "Payment submitted";
-
-  } catch (e) {
-    msg.style.color = "red";
-    msg.innerText = e.message;
-  }
-
+  msg.style.color = "green";
+  msg.innerText = "Payment submitted";
 });
 
-/* ---------------- LOGIN ---------------- */
+/* LOGIN */
 document.getElementById("loginBtn").addEventListener("click", async () => {
 
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
   const msg = document.getElementById("loginMsg");
-
-  if (!email || !password) {
-    msg.style.color = "red";
-    msg.innerText = "Fill all fields";
-    return;
-  }
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
     window.location.href = "dashboard.html";
-  } catch (e) {
-    msg.style.color = "red";
+  } catch(e){
     msg.innerText = e.message;
   }
 
@@ -149,4 +136,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-</html>
+  </html>
