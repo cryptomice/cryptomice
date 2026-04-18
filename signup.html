@@ -39,7 +39,9 @@ import {
   doc,
   getDoc,
   setDoc,
-  deleteDoc
+  deleteDoc,
+  updateDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -55,10 +57,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// referral link
+/* ---------- KEEP REFERRAL SAFE ---------- */
 const urlParams = new URLSearchParams(window.location.search);
-const ref = urlParams.get("ref");
+const refParam = urlParams.get("ref");
 
+if (refParam) {
+  localStorage.setItem("referrer", refParam);
+}
+
+const ref = localStorage.getItem("referrer");
+
+/* ---------- SIGNUP ---------- */
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
@@ -73,29 +82,29 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
 
   try {
 
-    // 1. Prevent duplicate accounts
+    // prevent duplicate
     const methods = await fetchSignInMethodsForEmail(auth, email);
     if (methods.length > 0) {
       msg.style.color = "red";
-      msg.innerText = "Account already exists. Please login.";
+      msg.innerText = "Account already exists";
       return;
     }
 
-    // 2. Check approval from admin
+    // check approval
     const approvedRef = doc(db, "approvedEmails", email);
     const approvedSnap = await getDoc(approvedRef);
 
     if (!approvedSnap.exists()) {
       msg.style.color = "red";
-      msg.innerText = "Your payment is not approved yet.";
+      msg.innerText = "Payment not approved yet";
       return;
     }
 
-    // 3. Create Firebase Auth account
+    // create account
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCred.user.uid;
 
-    // 4. Save user profile
+    // save user
     await setDoc(doc(db, "users", uid), {
       email: email,
       referrals: 0,
@@ -104,7 +113,24 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
       createdAt: new Date()
     });
 
-    // 5. Remove approval so email cannot reuse signup
+    /* ---------- AUTO REFERRAL CREDIT ---------- */
+    if (ref) {
+      try {
+        const refUserRef = doc(db, "users", ref);
+        await updateDoc(refUserRef, {
+          referrals: increment(1),
+          earnings: increment(1)
+        });
+
+        // clear referral after use
+        localStorage.removeItem("referrer");
+
+      } catch (e) {
+        console.log("Referral credit failed:", e);
+      }
+    }
+
+    // delete approval
     await deleteDoc(doc(db, "approvedEmails", email));
 
     msg.style.color = "green";
@@ -120,6 +146,7 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
   }
 
 });
+
 </script>
 
 </body>
