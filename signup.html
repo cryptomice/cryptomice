@@ -29,121 +29,93 @@ Create Account
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { 
-  getAuth,
-  createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail
+getAuth,
+createUserWithEmailAndPassword,
+fetchSignInMethodsForEmail
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  deleteDoc,
-  updateDoc,
-  increment
+getFirestore,
+doc,
+getDoc,
+setDoc,
+deleteDoc,
+updateDoc,
+increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ---------- KEEP REFERRAL SAFE ---------- */
-const urlParams = new URLSearchParams(window.location.search);
-const refParam = urlParams.get("ref");
-
-if (refParam) {
-  localStorage.setItem("referrer", refParam);
-}
-
+/* GET STORED REFERRAL */
 const ref = localStorage.getItem("referrer");
 
-/* ---------- SIGNUP ---------- */
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const msg = document.getElementById("msg");
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+const msg = document.getElementById("msg");
 
-  if (!email || !password) {
-    msg.style.color = "red";
-    msg.innerText = "Fill all fields";
-    return;
-  }
+if (!email || !password){
+msg.innerText="Fill all fields";
+return;
+}
 
-  try {
+try{
 
-    // prevent duplicate
-    const methods = await fetchSignInMethodsForEmail(auth, email);
-    if (methods.length > 0) {
-      msg.style.color = "red";
-      msg.innerText = "Account already exists";
-      return;
-    }
+const methods = await fetchSignInMethodsForEmail(auth,email);
+if(methods.length>0){
+msg.innerText="Account exists";
+return;
+}
 
-    // check approval
-    const approvedRef = doc(db, "approvedEmails", email);
-    const approvedSnap = await getDoc(approvedRef);
+const approved = await getDoc(doc(db,"approvedEmails",email));
+if(!approved.exists()){
+msg.innerText="Payment not approved yet";
+return;
+}
 
-    if (!approvedSnap.exists()) {
-      msg.style.color = "red";
-      msg.innerText = "Payment not approved yet";
-      return;
-    }
+const userCred = await createUserWithEmailAndPassword(auth,email,password);
+const uid = userCred.user.uid;
 
-    // create account
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCred.user.uid;
+await setDoc(doc(db,"users",uid),{
+email,
+referrals:0,
+earnings:0,
+createdAt:new Date()
+});
 
-    // save user
-    await setDoc(doc(db, "users", uid), {
-      email: email,
-      referrals: 0,
-      earnings: 0,
-      referredBy: ref || null,
-      createdAt: new Date()
-    });
+/* CREDIT REFERRAL */
+if(ref){
+await updateDoc(doc(db,"users",ref),{
+referrals:increment(1),
+earnings:increment(1)
+});
+localStorage.removeItem("referrer");
+}
 
-    /* ---------- AUTO REFERRAL CREDIT ---------- */
-    if (ref) {
-      try {
-        const refUserRef = doc(db, "users", ref);
-        await updateDoc(refUserRef, {
-          referrals: increment(1),
-          earnings: increment(1)
-        });
+await deleteDoc(doc(db,"approvedEmails",email));
 
-        // clear referral after use
-        localStorage.removeItem("referrer");
+msg.style.color="green";
+msg.innerText="Account created";
 
-      } catch (e) {
-        console.log("Referral credit failed:", e);
-      }
-    }
+setTimeout(()=>{
+window.location.href="dashboard.html";
+},1000);
 
-    // delete approval
-    await deleteDoc(doc(db, "approvedEmails", email));
-
-    msg.style.color = "green";
-    msg.innerText = "Account created successfully";
-
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 1200);
-
-  } catch (e) {
-    msg.style.color = "red";
-    msg.innerText = e.message;
-  }
+}catch(e){
+msg.innerText=e.message;
+}
 
 });
 
