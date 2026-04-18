@@ -61,7 +61,7 @@ Activate your referral access for $2 in Litecoin and earn $1 per signup.
 <h3>How It Works</h3>
 <ol>
 <li>Create account after payment</li>
-<li>Activate for $2 in 0</li>
+<li>Activate for $2 in Litecoin</li>
 <li>Get referral link</li>
 <li>Earn per referral</li>
 </ol>
@@ -74,16 +74,22 @@ Activate your referral access for $2 in Litecoin and earn $1 per signup.
 
 <button class="secondary" onclick="goLogin()">Login</button>
 
+<!-- NEW SOCIAL BUTTON (NO STYLE CHANGE) -->
+<button onclick="joinSocials()">Join Our Socials</button>
+
 </div>
 
 <script>
 function goPayment() {
-  // ALWAYS FORCE PAYMENT PAGE FIRST
   window.location.href = "payment.html";
 }
 
 function goLogin() {
   window.location.href = "payment.html";
+}
+
+function joinSocials(){
+  window.open("https://facebook.com/groups/26936030929314307/","_blank");
 }
 </script>
 
