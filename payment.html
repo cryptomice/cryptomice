@@ -3,19 +3,91 @@
 <head>
   <title>Access Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+font-family:Arial;
+background:#f5f5f5;
+padding:20px;
+margin:0;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.notice{
+background:#fff3cd;
+padding:12px;
+border-left:4px solid #ff9800;
+margin-bottom:15px;
+font-size:14px;
+}
+
+.section{
+background:#fafafa;
+padding:15px;
+border-radius:6px;
+margin-top:15px;
+}
+
+input{
+padding:10px;
+width:100%;
+margin:5px 0;
+}
+
+button{
+padding:12px;
+width:100%;
+background:#0a66c2;
+color:white;
+border:none;
+border-radius:5px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.signup-box{
+background:#28a745;
+color:white;
+padding:15px;
+border-radius:8px;
+margin-top:15px;
+}
+
+.small{
+font-size:13px;
+color:gray;
+}
+</style>
+
 </head>
 
-<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+<body>
+
+<div class="container">
 
 <h2>Access Portal</h2>
 
-<p style="color:red;">
+<div class="notice">
+⚠ Due to high demand, activation is limited to verified participants only.
+</div>
+
+<p style="color:#555;">
 Account access requires a one-time activation payment.
 </p>
 
 <hr>
 
-<h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
+<div class="section">
+
+<h3>1. Payment Section (New Users)</h3>
 
 <p>Send <b>$2 Litecoin</b> to platform address:</p>
 
@@ -23,46 +95,54 @@ Account access requires a one-time activation payment.
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 </p>
 
-<input id="email" placeholder="Enter email"
-style="padding:10px;width:100%;margin:5px 0;">
+<input id="email" placeholder="Enter email">
 
-<input id="txid" placeholder="Enter TXID"
-style="padding:10px;width:100%;margin:5px 0;">
+<input id="txid" placeholder="Enter TXID">
 
-<button id="payBtn" style="padding:10px;width:100%;">
+<button id="payBtn">
 Submit Payment
 </button>
 
 <p id="payMsg"></p>
 
+<p class="small">
+Approval may take up to 24 hours. Early submissions are processed first.
+</p>
+
+</div>
+
 <hr>
 
-<h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
+<div class="section">
 
-<input id="loginEmail" placeholder="Email"
-style="padding:10px;width:100%;margin:5px 0;">
+<h3>2. Login (Approved Users)</h3>
 
-<input id="loginPassword" placeholder="Password"
-style="padding:10px;width:100%;margin:5px 0;">
+<input id="loginEmail" placeholder="Email">
 
-<button id="loginBtn" style="padding:10px;width:100%;">
+<input id="loginPassword" placeholder="Password">
+
+<button id="loginBtn">
 Login
 </button>
 
 <p id="loginMsg"></p>
 
+</div>
+
 <hr>
 
-<div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
+<div class="signup-box">
 
-<h2>3. Sign Up (After Approval)</h2>
+<h3>3. Sign Up (After Approval)</h3>
 
 <p>If your payment has been approved, proceed to account creation.</p>
 
 <button onclick="window.location.href='signup.html'"
-style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
+style="background:white;color:black;font-weight:bold;">
 GO TO SIGN UP
 </button>
+
+</div>
 
 </div>
 
@@ -136,4 +216,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
