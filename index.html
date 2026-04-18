@@ -8,15 +8,16 @@
 body{
 font-family: Arial, sans-serif;
 margin:0;
-background:#f5f5f5;
+background:linear-gradient(180deg,#f5f5f5,#eef4ff);
 }
 
 header{
-background:#0a66c2;
+background:linear-gradient(90deg,#0a66c2,#0047ab);
 color:white;
 padding:18px;
 text-align:center;
 box-shadow:0 2px 5px rgba(0,0,0,0.2);
+animation:fadeDown .6s ease;
 }
 
 .container{
@@ -27,10 +28,11 @@ background:white;
 margin-top:20px;
 border-radius:8px;
 box-shadow:0 2px 6px rgba(0,0,0,0.08);
+animation:fadeUp .6s ease;
 }
 
 button{
-background:#0a66c2;
+background:linear-gradient(90deg,#0a66c2,#005be3);
 color:white;
 padding:13px;
 border:none;
@@ -39,6 +41,12 @@ cursor:pointer;
 width:100%;
 margin-top:10px;
 font-weight:bold;
+transition:.2s;
+}
+
+button:hover{
+transform:translateY(-1px);
+box-shadow:0 4px 8px rgba(0,0,0,0.15);
 }
 
 button.secondary{
@@ -51,6 +59,7 @@ padding:12px;
 border-left:4px solid #ff9800;
 margin-bottom:15px;
 font-size:14px;
+animation:pulse 3s infinite;
 }
 
 .proof{
@@ -61,6 +70,21 @@ margin-top:15px;
 font-size:14px;
 }
 
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(15px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes fadeDown{
+from{opacity:0;transform:translateY(-10px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes pulse{
+0%{box-shadow:0 0 0 rgba(255,152,0,0.4);}
+50%{box-shadow:0 0 10px rgba(255,152,0,0.4);}
+100%{box-shadow:0 0 0 rgba(255,152,0,0.4);}
+}
 </style>
 </head>
 
@@ -68,33 +92,32 @@ font-size:14px;
 
 <header>
 <h2>Earn With Referrals</h2>
-<p style="margin:5px 0;font-size:14px;">Trusted by growing members worldwide</p>
+<p style="margin:5px 0;font-size:14px;">Growing member network • Instant referral earnings</p>
 </header>
 
 <div class="container">
 
 <div class="notice">
-⚠ Limited activation slots are released daily. Once filled, new registrations are paused.
+⚡ Limited activation slots available today. Early participants benefit more.
 </div>
 
 <h3>Why Join?</h3>
 <p>
-This referral platform allows approved members to earn commission by sharing a personal invite link.
-Activation requires a one-time Litecoin payment to prevent abuse and maintain quality members.
+Activate your referral access with a one-time Litecoin payment and earn for every approved signup.
 </p>
 
 <h3>How It Works</h3>
 <ol>
-<li>Activate account with a one-time payment</li>
-<li>Receive your personal referral link</li>
+<li>Activate account after payment</li>
+<li>Receive your referral link</li>
 <li>Share with others</li>
-<li>Earn commission for every approved signup</li>
+<li>Earn per referral</li>
 </ol>
 
 <div class="proof">
-✔ Members are already earning from simple referrals<br>
-✔ One-time activation (no recurring fees)<br>
-✔ Withdraw earnings anytime after minimum reached
+✔ One-time activation<br>
+✔ Instant referral credit<br>
+✔ Withdraw anytime
 </div>
 
 <hr>
@@ -102,14 +125,7 @@ Activation requires a one-time Litecoin payment to prevent abuse and maintain qu
 <h3>Start Here</h3>
 
 <button onclick="goPayment()">Activate & Create Account</button>
-
 <button class="secondary" onclick="goLogin()">Member Login</button>
-
-<button onclick="joinSocials()">Join Our Socials</button>
-
-<p style="font-size:13px;color:gray;margin-top:15px;">
-Access is restricted to maintain payout sustainability. Early participants benefit most.
-</p>
 
 </div>
 
@@ -120,10 +136,6 @@ function goPayment() {
 
 function goLogin() {
   window.location.href = "payment.html";
-}
-
-function joinSocials(){
-  window.open("https://facebook.com/groups/26936030929314307/","_blank");
 }
 </script>
 
