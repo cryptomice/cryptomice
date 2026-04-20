@@ -25,15 +25,15 @@ Create Account
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDocs, collection, query, where, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -42,7 +42,7 @@ const db = getFirestore(app);
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
-const email = document.getElementById("email").value.trim();
+const email = document.getElementById("email").value.trim().toLowerCase();
 const password = document.getElementById("password").value.trim();
 const msg = document.getElementById("msg");
 
@@ -51,28 +51,30 @@ msg.innerText = "Fill all fields";
 return;
 }
 
-/* FIND APPROVED PAYMENT */
-const q = query(
-  collection(db,"payments"),
-  where("email","==",email),
-  where("status","==","approved")
-);
+/* FIND APPROVED PAYMENT SAFELY */
+const payments = await getDocs(collection(db,"payments"));
 
-const snap = await getDocs(q);
+let paymentDoc = null;
+let referrer = null;
 
-if(snap.empty){
+payments.forEach(d => {
+const data = d.data();
+
+if(
+data.email === email &&
+data.status === "approved"
+){
+paymentDoc = d.id;
+referrer = data.referrer;
+}
+});
+
+if(!paymentDoc){
 msg.innerText = "No approved payment found";
 return;
 }
 
-let referrer = null;
-let paymentDocId = null;
-
-snap.forEach(d=>{
-referrer = d.data().referrer;
-paymentDocId = d.id;
-});
-
+/* CREATE USER */
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
@@ -91,8 +93,8 @@ earnings: increment(1)
 });
 }
 
-/* PREVENT DOUBLE USE */
-await updateDoc(doc(db,"payments",paymentDocId),{
+/* MARK PAYMENT USED */
+await updateDoc(doc(db,"payments",paymentDoc),{
 status:"used"
 });
 
