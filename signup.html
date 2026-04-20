@@ -9,11 +9,9 @@
 
 <h2>Create Account</h2>
 
-<p style="color:gray;">
-Only approved users can create an account.
-</p>
+<p style="color:gray;">Only approved users can create an account.</p>
 
-<input id="email" type="email" placeholder="Enter approved email"
+<input id="email" placeholder="Enter email"
 style="padding:10px;width:100%;margin:5px 0;">
 
 <input id="password" type="password" placeholder="Create password"
@@ -26,81 +24,54 @@ Create Account
 <p id="msg"></p>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import {
-getAuth,
-createUserWithEmailAndPassword,
-fetchSignInMethodsForEmail
+  getAuth,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-deleteDoc,
-updateDoc,
-increment
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  addDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-authDomain: "cryptomice-635eb.firebaseapp.com",
-projectId: "cryptomice-635eb",
-storageBucket: "cryptomice-635eb.firebasestorage.app",
-messagingSenderId: "831908710470",
-appId: "1:831908710470:web:e95e1bdacb90309a046247"
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* SAFE REF */
-let ref = null;
-try {
-  ref = localStorage.getItem("referrer");
-} catch (e) {
-  console.error("Ref load error:", e);
-}
+const ref = localStorage.getItem("referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
-const emailEl = document.getElementById("email");
-const passwordEl = document.getElementById("password");
+const email = document.getElementById("email").value.trim().toLowerCase();
+const password = document.getElementById("password").value.trim();
 const msg = document.getElementById("msg");
 
-const email = (emailEl.value || "").trim().toLowerCase();
-const password = (passwordEl.value || "").trim();
-
-if (!email || !password){
-msg.innerText="Fill all fields";
-return;
+if (!email || !password) {
+  msg.innerText = "Fill all fields";
+  return;
 }
 
 try {
 
-/* CHECK IF ACCOUNT EXISTS */
-const methods = await fetchSignInMethodsForEmail(auth,email);
-if(methods.length>0){
-msg.innerText="Account exists";
-return;
-}
-
-/* CHECK APPROVAL SAFELY */
-const approvedSnap = await getDoc(doc(db,"approvedEmails",email));
-
-if(!approvedSnap.exists()){
-msg.innerText="Payment not approved yet";
-return;
-}
-
-/* CREATE USER */
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
-/* CREATE USER PROFILE */
+/* CREATE USER */
 await setDoc(doc(db,"users",uid),{
 email,
 referrals:0,
@@ -108,24 +79,24 @@ earnings:0,
 createdAt:new Date()
 });
 
-/* SAFE REFERRAL CREDIT */
-if(ref){
-
-try {
-  const refUserRef = doc(db,"users",ref);
-  await updateDoc(refUserRef,{
-    referrals:increment(1),
-    earnings:increment(1)
+/* STORE REFERRAL (NEW SYSTEM CORE) */
+if (ref) {
+  await addDoc(collection(db,"referrals"),{
+    referrerId: ref,
+    newUserId: uid,
+    email,
+    createdAt: new Date(),
+    credited: true
   });
-} catch(e){
-  console.error("Referral credit failed:", e);
-}
 
-localStorage.removeItem("referrer");
-}
+  /* DIRECT CREDIT (FIXED GAP) */
+  await setDoc(doc(db,"users",ref),{
+    referrals: increment(1),
+    earnings: increment(1)
+  }, { merge:true });
 
-/* REMOVE APPROVED EMAIL */
-await deleteDoc(doc(db,"approvedEmails",email));
+  localStorage.removeItem("referrer");
+}
 
 msg.style.color="green";
 msg.innerText="Account created";
@@ -135,12 +106,10 @@ window.location.href="dashboard.html";
 },1000);
 
 }catch(e){
-console.error(e);
-msg.innerText="Signup failed: "+e.message;
+msg.innerText=e.message;
 }
 
 });
-
 </script>
 
 </body>
