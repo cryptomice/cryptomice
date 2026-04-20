@@ -1,3 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Access Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+
+<h2>Access Portal</h2>
+
+<p style="color:red;">
+Account access requires a one-time activation payment.
+</p>
+
+<hr>
+
+<h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
+
+<p>Send <b>$2 Litecoin</b> to platform address:</p>
+
+<p style="background:white;padding:10px;border:1px solid #ccc;font-weight:bold;">
+ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
+</p>
+
+<input id="email" placeholder="Enter email"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<input id="txid" placeholder="Enter TXID"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<button id="payBtn" style="padding:10px;width:100%;">
+Submit Payment
+</button>
+
+<p id="payMsg"></p>
+
+<hr>
+
+<h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
+
+<input id="loginEmail" placeholder="Email"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<input id="loginPassword" placeholder="Password"
+style="padding:10px;width:100%;margin:5px 0;">
+
+<button id="loginBtn" style="padding:10px;width:100%;">
+Login
+</button>
+
+<p id="loginMsg"></p>
+
+<hr>
+
+<div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
+
+<h2>3. Sign Up (After Approval)</h2>
+
+<p>If your payment has been approved, proceed to account creation.</p>
+
+<button onclick="window.location.href='signup.html'"
+style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
+GO TO SIGN UP
+</button>
+
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -13,85 +81,104 @@ const firebaseConfig = {
   appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+let app, auth, db;
 
-/* SAFE INIT (prevents white screen crash) */
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (e) {
+  console.error("Firebase init error:", e);
+}
+
+/* ---------------- REFERRAL SAFE STORAGE ---------------- */
+try {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("ref");
+
+  if (ref && !ref.includes("http")) {
+    localStorage.setItem("referrer", ref);
+    sessionStorage.setItem("referrer", ref);
+  }
+} catch (e) {
+  console.error("Referral error:", e);
+}
+
+/* ---------------- WAIT FOR PAGE ---------------- */
 window.addEventListener("DOMContentLoaded", () => {
 
-  try {
+  /* PAYMENT */
+  const payBtn = document.getElementById("payBtn");
 
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get("ref");
+  if (payBtn) {
+    payBtn.addEventListener("click", async () => {
 
-    if (ref && !ref.includes("http")) {
-      sessionStorage.setItem("referrer", ref);
-      localStorage.setItem("referrer", ref);
-    }
+      const emailEl = document.getElementById("email");
+      const txidEl = document.getElementById("txid");
+      const msg = document.getElementById("payMsg");
 
-    const payBtn = document.getElementById("payBtn");
+      if (!emailEl || !txidEl || !msg) return;
 
-    if (payBtn) {
-      payBtn.addEventListener("click", async () => {
+      const email = emailEl.value.trim().toLowerCase();
+      const txid = txidEl.value.trim();
 
-        const emailEl = document.getElementById("email");
-        const txidEl = document.getElementById("txid");
-        const msg = document.getElementById("payMsg");
+      if (!email || !txid) {
+        msg.style.color = "red";
+        msg.innerText = "Fill all fields";
+        return;
+      }
 
-        if (!emailEl || !txidEl || !msg) return;
+      const referrer =
+        localStorage.getItem("referrer") ||
+        sessionStorage.getItem("referrer") ||
+        null;
 
-        const email = emailEl.value.trim().toLowerCase();
-        const txid = txidEl.value.trim();
-
-        if (!email || !txid) {
-          msg.style.color = "red";
-          msg.innerText = "Fill all fields";
-          return;
+      try {
+        if (db) {
+          await setDoc(doc(db, "payments", txid), {
+            email,
+            txid,
+            referrer,
+            status: "pending",
+            createdAt: new Date()
+          });
         }
-
-        const referrer =
-          sessionStorage.getItem("referrer") ||
-          localStorage.getItem("referrer") ||
-          null;
-
-        await setDoc(doc(db, "payments", txid), {
-          email,
-          txid,
-          referrer,
-          status: "pending",
-          createdAt: new Date()
-        });
 
         msg.style.color = "green";
         msg.innerText = "Payment submitted";
 
-      });
-    }
+      } catch (e) {
+        msg.style.color = "red";
+        msg.innerText = "Error submitting payment";
+        console.error(e);
+      }
 
-    const loginBtn = document.getElementById("loginBtn");
+    });
+  }
 
-    if (loginBtn) {
-      loginBtn.addEventListener("click", async () => {
+  /* LOGIN */
+  const loginBtn = document.getElementById("loginBtn");
 
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
-        const msg = document.getElementById("loginMsg");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", async () => {
 
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          window.location.href = "dashboard.html";
-        } catch (e) {
-          msg.innerText = e.message;
-        }
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      const msg = document.getElementById("loginMsg");
 
-      });
-    }
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        msg.innerText = e.message;
+      }
 
-  } catch (err) {
-    console.error("Page init error:", err);
+    });
   }
 
 });
 
-          </script>
+</script>
+
+</body>
+  </html>
