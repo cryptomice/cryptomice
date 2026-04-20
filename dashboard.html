@@ -29,7 +29,7 @@
 <h3>Request Withdrawal (Litecoin)</h3>
 
 <p style="color:gray;font-size:13px;">
-Minimum withdrawal: $1 — paid in Litecoin (LTC)
+Minimum withdrawal: $1 — paid in LTC
 </p>
 
 <input id="withdrawAmount" type="number" placeholder="Enter amount (min $1)"
@@ -56,7 +56,8 @@ import {
   updateDoc,
   addDoc,
   collection,
-  serverTimestamp
+  serverTimestamp,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -74,7 +75,7 @@ const db = getFirestore(app);
 
 let currentUID = null;
 
-// ---------------- AUTH ----------------
+/* ---------------- AUTH ---------------- */
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -87,28 +88,35 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
 
-  // SAFE REFERRAL LINK (CONSISTENT SYSTEM)
-  const baseURL = window.location.origin + window.location.pathname.replace("dashboard.html","");
-
+  /* SAFE REF LINK */
   document.getElementById("refLink").innerText =
-    baseURL + "payment.html?ref=" + currentUID;
+    "https://cryptomice.github.io/cryptomice/payment.html?ref=" + user.uid;
 
-  const snap = await getDoc(doc(db, "users", currentUID));
+  try {
 
-  if (snap.exists()) {
-    const data = snap.data();
-    document.getElementById("refCount").innerText = data.referrals || 0;
-    document.getElementById("earnings").innerText = data.earnings || 0;
+    const snap = await getDoc(doc(db, "users", user.uid));
+
+    if (snap.exists()) {
+      const data = snap.data();
+
+      document.getElementById("refCount").innerText = data.referrals ?? 0;
+      document.getElementById("earnings").innerText = data.earnings ?? 0;
+    }
+
+  } catch (e) {
+    console.error("User fetch error:", e);
   }
+
 });
 
-// ---------------- COPY ----------------
+/* ---------------- COPY LINK ---------------- */
 window.copyLink = function () {
-  navigator.clipboard.writeText(document.getElementById("refLink").innerText);
+  const link = document.getElementById("refLink").innerText;
+  navigator.clipboard.writeText(link);
   alert("Copied!");
 };
 
-// ---------------- WITHDRAW ----------------
+/* ---------------- WITHDRAW ---------------- */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -129,8 +137,13 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
     const userRef = doc(db, "users", currentUID);
     const snap = await getDoc(userRef);
-    const data = snap.data();
 
+    if (!snap.exists()) {
+      msg.innerText = "User not found";
+      return;
+    }
+
+    const data = snap.data();
     const earnings = data.earnings || 0;
 
     if (amount > earnings) {
@@ -160,10 +173,12 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
     msg.innerText = "Withdrawal request sent";
 
   } catch (e) {
-    msg.innerText = e.message;
+    console.error(e);
+    msg.innerText = "Withdrawal failed";
   }
 
 });
+
 </script>
 
 </body>
