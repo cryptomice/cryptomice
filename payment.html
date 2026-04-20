@@ -17,60 +17,81 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ✅ FIX: store referral safely in BOTH memory + session fallback */
-const params = new URLSearchParams(window.location.search);
-const ref = params.get("ref");
-
-if (ref && !ref.includes("http")) {
-  sessionStorage.setItem("referrer", ref);
-  localStorage.setItem("referrer", ref);
-}
-
-/* PAYMENT */
-document.getElementById("payBtn").addEventListener("click", async () => {
-
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const txid = document.getElementById("txid").value.trim();
-  const msg = document.getElementById("payMsg");
-
-  if (!email || !txid) {
-    msg.style.color = "red";
-    msg.innerText = "Fill all fields";
-    return;
-  }
-
-  /* SAFER REF RETRIEVAL */
-  const referrer =
-    sessionStorage.getItem("referrer") ||
-    localStorage.getItem("referrer") ||
-    null;
-
-  await setDoc(doc(db, "payments", txid), {
-    email,
-    txid,
-    referrer,
-    status: "pending",
-    createdAt: new Date()
-  });
-
-  msg.style.color = "green";
-  msg.innerText = "Payment submitted";
-});
-
-/* LOGIN */
-document.getElementById("loginBtn").addEventListener("click", async () => {
-
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-  const msg = document.getElementById("loginMsg");
+/* SAFE INIT (prevents white screen crash) */
+window.addEventListener("DOMContentLoaded", () => {
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
-  } catch(e){
-    msg.innerText = e.message;
+
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+
+    if (ref && !ref.includes("http")) {
+      sessionStorage.setItem("referrer", ref);
+      localStorage.setItem("referrer", ref);
+    }
+
+    const payBtn = document.getElementById("payBtn");
+
+    if (payBtn) {
+      payBtn.addEventListener("click", async () => {
+
+        const emailEl = document.getElementById("email");
+        const txidEl = document.getElementById("txid");
+        const msg = document.getElementById("payMsg");
+
+        if (!emailEl || !txidEl || !msg) return;
+
+        const email = emailEl.value.trim().toLowerCase();
+        const txid = txidEl.value.trim();
+
+        if (!email || !txid) {
+          msg.style.color = "red";
+          msg.innerText = "Fill all fields";
+          return;
+        }
+
+        const referrer =
+          sessionStorage.getItem("referrer") ||
+          localStorage.getItem("referrer") ||
+          null;
+
+        await setDoc(doc(db, "payments", txid), {
+          email,
+          txid,
+          referrer,
+          status: "pending",
+          createdAt: new Date()
+        });
+
+        msg.style.color = "green";
+        msg.innerText = "Payment submitted";
+
+      });
+    }
+
+    const loginBtn = document.getElementById("loginBtn");
+
+    if (loginBtn) {
+      loginBtn.addEventListener("click", async () => {
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+        const msg = document.getElementById("loginMsg");
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          window.location.href = "dashboard.html";
+        } catch (e) {
+          msg.innerText = e.message;
+        }
+
+      });
+    }
+
+  } catch (err) {
+    console.error("Page init error:", err);
   }
 
 });
 
-    </script>
+          </script>
