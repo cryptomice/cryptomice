@@ -9,8 +9,6 @@
 
 <h2>Create Account</h2>
 
-<p>Create your account after payment approval.</p>
-
 <input id="email" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
 
@@ -26,35 +24,21 @@ Create Account
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-setDoc,
-getDoc,
-updateDoc,
-increment
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDocs, collection, query, where, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-authDomain: "cryptomice-635eb.firebaseapp.com",
-projectId: "cryptomice-635eb",
-storageBucket: "cryptomice-635eb.firebasestorage.app",
-messagingSenderId: "831908710470",
-appId: "1:831908710470:web:e95e1bdacb90309a046247"
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-/* READ REFERRAL (PERSISTENT) */
-const referrer =
-localStorage.getItem("referrer") ||
-sessionStorage.getItem("referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
@@ -67,50 +51,57 @@ msg.innerText = "Fill all fields";
 return;
 }
 
-try{
+/* FIND APPROVED PAYMENT */
+const q = query(
+  collection(db,"payments"),
+  where("email","==",email),
+  where("status","==","approved")
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+msg.innerText = "No approved payment found";
+return;
+}
+
+let referrer = null;
+let paymentDocId = null;
+
+snap.forEach(d=>{
+referrer = d.data().referrer;
+paymentDocId = d.id;
+});
 
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
-/* CREATE USER */
 await setDoc(doc(db,"users",uid),{
-email: email,
-referrals: 0,
-earnings: 0,
-createdAt: new Date()
+email,
+referrals:0,
+earnings:0,
+createdAt:serverTimestamp()
 });
 
 /* CREDIT REFERRER */
 if(referrer){
-
-const refDoc = doc(db,"users",referrer);
-const snap = await getDoc(refDoc);
-
-if(snap.exists()){
-
-await updateDoc(refDoc,{
+await updateDoc(doc(db,"users",referrer),{
 referrals: increment(1),
 earnings: increment(1)
 });
-
 }
 
-/* CLEAR REFERRAL AFTER CREDIT */
-localStorage.removeItem("referrer");
-sessionStorage.removeItem("referrer");
-
-}
+/* PREVENT DOUBLE USE */
+await updateDoc(doc(db,"payments",paymentDocId),{
+status:"used"
+});
 
 msg.style.color="green";
-msg.innerText="Account created successfully";
+msg.innerText="Account created";
 
 setTimeout(()=>{
 window.location.href="dashboard.html";
 },1500);
-
-}catch(e){
-msg.innerText = e.message;
-}
 
 });
 
