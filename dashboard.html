@@ -73,6 +73,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUID = null;
+let currentUserEmail = null;
 
 /* ---------------- AUTH ---------------- */
 onAuthStateChanged(auth, async (user) => {
@@ -83,6 +84,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   currentUID = user.uid;
+  currentUserEmail = user.email;
 
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
@@ -114,7 +116,7 @@ window.copyLink = function () {
   alert("Copied!");
 };
 
-/* ---------------- WITHDRAW (FIXED) ---------------- */
+/* ---------------- WITHDRAW FIXED ---------------- */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -157,10 +159,12 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
       return;
     }
 
-    /* CREATE WITHDRAW REQUEST */
+    /* SAFE EMAIL FIX (THIS FIXES YOUR ERROR) */
+    const safeEmail = data.email || currentUserEmail || "unknown";
+
     await addDoc(collection(db, "withdrawals"), {
       userId: currentUID,
-      email: data.email,
+      email: safeEmail,
       amount: amount,
       wallet: wallet,
       coin: "LTC",
@@ -168,7 +172,6 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
       createdAt: serverTimestamp()
     });
 
-    /* UPDATE BALANCE */
     await updateDoc(userRef, {
       earnings: earnings - amount
     });
