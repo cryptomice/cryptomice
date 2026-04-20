@@ -26,19 +26,16 @@ Create Account
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { 
-getAuth, 
-createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-import { 
-getFirestore, 
-doc, 
-setDoc, 
-getDoc, 
+import {
+getFirestore,
+doc,
+setDoc,
+getDoc,
 updateDoc,
-deleteDoc,
-increment 
+increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -54,8 +51,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* READ REFERRAL (SURVIVES APPROVAL GAP) */
-const referrer = localStorage.getItem("referrer");
+/* READ REFERRAL (PERSISTENT) */
+const referrer =
+localStorage.getItem("referrer") ||
+sessionStorage.getItem("referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
@@ -70,11 +69,10 @@ return;
 
 try{
 
-/* CREATE AUTH ACCOUNT */
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
-/* CREATE USER RECORD */
+/* CREATE USER */
 await setDoc(doc(db,"users",uid),{
 email: email,
 referrals: 0,
@@ -82,7 +80,7 @@ earnings: 0,
 createdAt: new Date()
 });
 
-/* CREDIT REFERRER IF EXISTS */
+/* CREDIT REFERRER */
 if(referrer){
 
 const refDoc = doc(db,"users",referrer);
@@ -97,8 +95,9 @@ earnings: increment(1)
 
 }
 
-/* IMPORTANT: REMOVE ONLY AFTER CREDIT */
+/* CLEAR REFERRAL AFTER CREDIT */
 localStorage.removeItem("referrer");
+sessionStorage.removeItem("referrer");
 
 }
 
