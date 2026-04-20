@@ -56,8 +56,7 @@ import {
   updateDoc,
   addDoc,
   collection,
-  serverTimestamp,
-  increment
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -88,7 +87,6 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
 
-  /* SAFE REF LINK */
   document.getElementById("refLink").innerText =
     "https://cryptomice.github.io/cryptomice/payment.html?ref=" + user.uid;
 
@@ -99,12 +97,12 @@ onAuthStateChanged(auth, async (user) => {
     if (snap.exists()) {
       const data = snap.data();
 
-      document.getElementById("refCount").innerText = data.referrals ?? 0;
-      document.getElementById("earnings").innerText = data.earnings ?? 0;
+      document.getElementById("refCount").innerText = data.referrals || 0;
+      document.getElementById("earnings").innerText = data.earnings || 0;
     }
 
   } catch (e) {
-    console.error("User fetch error:", e);
+    console.error("User load error:", e);
   }
 
 });
@@ -116,24 +114,32 @@ window.copyLink = function () {
   alert("Copied!");
 };
 
-/* ---------------- WITHDRAW ---------------- */
+/* ---------------- WITHDRAW (FIXED) ---------------- */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
   const wallet = document.getElementById("withdrawWallet").value.trim();
   const msg = document.getElementById("withdrawMsg");
 
-  if (!amount || amount < 1) {
-    msg.innerText = "Minimum withdrawal is $1";
-    return;
-  }
-
-  if (!wallet) {
-    msg.innerText = "Enter Litecoin wallet address";
-    return;
-  }
-
   try {
+
+    msg.style.color = "black";
+    msg.innerText = "Processing...";
+
+    if (!currentUID) {
+      msg.innerText = "User not authenticated";
+      return;
+    }
+
+    if (!amount || amount < 1) {
+      msg.innerText = "Minimum withdrawal is $1";
+      return;
+    }
+
+    if (!wallet) {
+      msg.innerText = "Enter Litecoin wallet address";
+      return;
+    }
 
     const userRef = doc(db, "users", currentUID);
     const snap = await getDoc(userRef);
@@ -151,16 +157,18 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
       return;
     }
 
+    /* CREATE WITHDRAW REQUEST */
     await addDoc(collection(db, "withdrawals"), {
       userId: currentUID,
       email: data.email,
-      amount,
-      wallet,
+      amount: amount,
+      wallet: wallet,
       coin: "LTC",
       status: "pending",
       createdAt: serverTimestamp()
     });
 
+    /* UPDATE BALANCE */
     await updateDoc(userRef, {
       earnings: earnings - amount
     });
@@ -170,11 +178,13 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
     document.getElementById("withdrawAmount").value = "";
     document.getElementById("withdrawWallet").value = "";
 
+    msg.style.color = "green";
     msg.innerText = "Withdrawal request sent";
 
   } catch (e) {
-    console.error(e);
-    msg.innerText = "Withdrawal failed";
+    console.error("WITHDRAW ERROR:", e);
+    msg.style.color = "red";
+    msg.innerText = e.message;
   }
 
 });
