@@ -9,10 +9,14 @@
 
 <h2>Create Account</h2>
 
-<input id="email" placeholder="Email"
+<p style="color:gray;">
+Only approved users can create an account.
+</p>
+
+<input id="email" type="email" placeholder="Enter approved email"
 style="padding:10px;width:100%;margin:5px 0;">
 
-<input id="password" type="password" placeholder="Password"
+<input id="password" type="password" placeholder="Create password"
 style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="signupBtn" style="padding:10px;width:100%;">
@@ -24,8 +28,21 @@ Create Account
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { 
+getAuth,
+createUserWithEmailAndPassword,
+fetchSignInMethodsForEmail
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+deleteDoc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -40,41 +57,34 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* GET STORED REFERRAL */
+const ref = localStorage.getItem("referrer");
+
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
-const email = document.getElementById("email").value.trim().toLowerCase();
+const email = document.getElementById("email").value.trim();
 const password = document.getElementById("password").value.trim();
 const msg = document.getElementById("msg");
 
-if(!email || !password){
-msg.innerText = "Fill all fields";
+if (!email || !password){
+msg.innerText="Fill all fields";
 return;
 }
 
-/* FIND APPROVED PAYMENT SAFELY */
-const payments = await getDocs(collection(db,"payments"));
+try{
 
-let paymentDoc = null;
-let referrer = null;
-
-payments.forEach(d => {
-const data = d.data();
-
-if(
-data.email === email &&
-data.status === "approved"
-){
-paymentDoc = d.id;
-referrer = data.referrer;
-}
-});
-
-if(!paymentDoc){
-msg.innerText = "No approved payment found";
+const methods = await fetchSignInMethodsForEmail(auth,email);
+if(methods.length>0){
+msg.innerText="Account exists";
 return;
 }
 
-/* CREATE USER */
+const approved = await getDoc(doc(db,"approvedEmails",email));
+if(!approved.exists()){
+msg.innerText="Payment not approved yet";
+return;
+}
+
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
@@ -82,28 +92,30 @@ await setDoc(doc(db,"users",uid),{
 email,
 referrals:0,
 earnings:0,
-createdAt:serverTimestamp()
+createdAt:new Date()
 });
 
-/* CREDIT REFERRER */
-if(referrer){
-await updateDoc(doc(db,"users",referrer),{
-referrals: increment(1),
-earnings: increment(1)
+/* CREDIT REFERRAL */
+if(ref){
+await updateDoc(doc(db,"users",ref),{
+referrals:increment(1),
+earnings:increment(1)
 });
+localStorage.removeItem("referrer");
 }
 
-/* MARK PAYMENT USED */
-await updateDoc(doc(db,"payments",paymentDoc),{
-status:"used"
-});
+await deleteDoc(doc(db,"approvedEmails",email));
 
 msg.style.color="green";
 msg.innerText="Account created";
 
 setTimeout(()=>{
 window.location.href="dashboard.html";
-},1500);
+},1000);
+
+}catch(e){
+msg.innerText=e.message;
+}
 
 });
 
