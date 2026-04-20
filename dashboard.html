@@ -29,7 +29,7 @@
 <h3>Request Withdrawal (Litecoin)</h3>
 
 <p style="color:gray;font-size:13px;">
-Minimum withdrawal: $1 — paid in 0
+Minimum withdrawal: $1 — paid in Litecoin (LTC)
 </p>
 
 <input id="withdrawAmount" type="number" placeholder="Enter amount (min $1)"
@@ -45,6 +45,7 @@ Request Withdrawal
 <p id="withdrawMsg"></p>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
@@ -73,7 +74,7 @@ const db = getFirestore(app);
 
 let currentUID = null;
 
-// ---------------- AUTH CHECK ----------------
+// ---------------- AUTH ----------------
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -86,11 +87,13 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("userEmail").innerText =
     "Logged in as: " + user.email;
 
-  // referral link ALWAYS goes through payment gate
-  document.getElementById("refLink").innerText =
-    "https://cryptomice.github.io/cryptomice/payment.html?ref=" + user.uid;
+  // SAFE REFERRAL LINK (CONSISTENT SYSTEM)
+  const baseURL = window.location.origin + window.location.pathname.replace("dashboard.html","");
 
-  const snap = await getDoc(doc(db, "users", user.uid));
+  document.getElementById("refLink").innerText =
+    baseURL + "payment.html?ref=" + currentUID;
+
+  const snap = await getDoc(doc(db, "users", currentUID));
 
   if (snap.exists()) {
     const data = snap.data();
@@ -99,7 +102,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ---------------- COPY LINK ----------------
+// ---------------- COPY ----------------
 window.copyLink = function () {
   navigator.clipboard.writeText(document.getElementById("refLink").innerText);
   alert("Copied!");
@@ -127,6 +130,7 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
     const userRef = doc(db, "users", currentUID);
     const snap = await getDoc(userRef);
     const data = snap.data();
+
     const earnings = data.earnings || 0;
 
     if (amount > earnings) {
@@ -137,8 +141,8 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
     await addDoc(collection(db, "withdrawals"), {
       userId: currentUID,
       email: data.email,
-      amount: amount,
-      wallet: wallet,
+      amount,
+      wallet,
       coin: "LTC",
       status: "pending",
       createdAt: serverTimestamp()
@@ -163,4 +167,4 @@ document.getElementById("withdrawBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-  </html>
+</html>
