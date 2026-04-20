@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Access Portal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Access Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body style="font-family:Arial;background:#f5f5f5;padding:20px;">
@@ -15,7 +15,7 @@ Account access requires a one-time activation payment.
 
 <hr>
 
-<h3>1. Payment Section (New Users)</h3>
+<h2 style="background:#fff;padding:10px;">1. Payment Section (New Users)</h2>
 
 <p>Send <b>$2 Litecoin</b> to platform address:</p>
 
@@ -30,14 +30,14 @@ style="padding:10px;width:100%;margin:5px 0;">
 style="padding:10px;width:100%;margin:5px 0;">
 
 <button id="payBtn" style="padding:10px;width:100%;">
-Submit Payment Proof
+Submit Payment
 </button>
 
 <p id="payMsg"></p>
 
 <hr>
 
-<h3>2. Login (Approved Users)</h3>
+<h2 style="background:#fff;padding:10px;">2. Login (Approved Users)</h2>
 
 <input id="loginEmail" placeholder="Email"
 style="padding:10px;width:100%;margin:5px 0;">
@@ -53,71 +53,83 @@ Login
 
 <hr>
 
-<h3>3. Sign Up (After Approval)</h3>
+<div style="background:#28a745;color:white;padding:15px;border-radius:8px;">
+
+<h2>3. Sign Up (After Approval)</h2>
+
+<p>If your payment has been approved, proceed to account creation.</p>
 
 <button onclick="window.location.href='signup.html'"
-style="padding:12px;width:100%;background:#0a66c2;color:white;border:none;">
+style="padding:12px;width:100%;background:white;color:black;border:none;font-weight:bold;">
 GO TO SIGN UP
 </button>
 
+</div>
+
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-authDomain: "cryptomice-635eb.firebaseapp.com",
-projectId: "cryptomice-635eb",
-storageBucket: "cryptomice-635eb.firebasestorage.app",
-messagingSenderId: "831908710470",
-appId: "1:831908710470:web:e95e1bdacb90309a046247"
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* SAVE REFERRAL */
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
+  localStorage.setItem("referrer", ref);
+}
+
 /* PAYMENT */
 document.getElementById("payBtn").addEventListener("click", async () => {
 
-const email = document.getElementById("email").value.trim();
-const txid = document.getElementById("txid").value.trim();
-const msg = document.getElementById("payMsg");
+  const email = document.getElementById("email").value.trim();
+  const txid = document.getElementById("txid").value.trim();
+  const msg = document.getElementById("payMsg");
 
-const ref = new URLSearchParams(window.location.search).get("ref") || null;
+  if (!email || !txid) {
+    msg.style.color = "red";
+    msg.innerText = "Fill all fields";
+    return;
+  }
 
-if(!email || !txid){
-msg.innerText = "Fill all fields";
-msg.style.color = "red";
-return;
-}
+  await setDoc(doc(db, "payments", txid), {
+    email,
+    txid,
+    status: "pending",
+    createdAt: new Date()
+  });
 
-await setDoc(doc(db,"payments",txid),{
-email: email.toLowerCase(),
-txid,
-referrer: ref,
-status: "pending",
-createdAt: serverTimestamp()
-});
-
-msg.innerText = "Payment submitted";
-msg.style.color = "green";
+  msg.style.color = "green";
+  msg.innerText = "Payment submitted";
 });
 
 /* LOGIN */
 document.getElementById("loginBtn").addEventListener("click", async () => {
 
-const email = document.getElementById("loginEmail").value;
-const password = document.getElementById("loginPassword").value;
-const msg = document.getElementById("loginMsg");
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const msg = document.getElementById("loginMsg");
 
-try {
-await signInWithEmailAndPassword(auth,email,password);
-window.location.href="dashboard.html";
-} catch(e){
-msg.innerText = e.message;
-}
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch(e){
+    msg.innerText = e.message;
+  }
 
 });
 
