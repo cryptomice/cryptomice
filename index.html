@@ -1,114 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Cryptomice Dashboard</title>
+<title>Cryptomice</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:system-ui, Arial, sans-serif;
+font-family:Arial, sans-serif;
 background:#05070c;
-color:#fff;
+color:white;
 overflow-x:hidden;
 }
 
-/* BACKGROUND GLOW */
+/* BACKGROUND EFFECT */
 body::before{
 content:"";
 position:fixed;
-top:-200px;
-left:-200px;
-width:500px;
-height:500px;
-background:radial-gradient(circle,#00ffcc33,transparent 60%);
-filter:blur(60px);
-z-index:-1;
+width:200%;
+height:200%;
+background:radial-gradient(circle,#d4af37 0%,transparent 60%);
+opacity:0.05;
+top:-50%;
+left:-50%;
+animation:moveBg 15s linear infinite;
 }
 
+@keyframes moveBg{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+/* HEADER */
 .hero{
 text-align:center;
-padding:40px 20px 10px;
-background:linear-gradient(180deg,#081225,#05070c);
+padding:30px 20px 10px;
 }
 
 .logo{
 font-size:26px;
-font-weight:800;
-letter-spacing:3px;
-color:#00ffd5;
-text-shadow:0 0 15px #00ffd555;
+font-weight:bold;
+letter-spacing:2px;
+background:linear-gradient(90deg,#ffd700,#ffcc00,#d4af37);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 15px rgba(255,215,0,0.4);
 }
 
 .tag{
 font-size:13px;
 opacity:0.7;
-margin-top:6px;
+margin-top:5px;
 }
 
-/* CARD */
-.card{
+/* DASHBOARD PREVIEW */
+.preview{
 margin:20px;
-padding:22px;
-border-radius:18px;
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(14px);
-box-shadow:0 10px 40px rgba(0,0,0,0.6);
-border:1px solid rgba(255,255,255,0.08);
+padding:20px;
+border-radius:15px;
+background:rgba(255,215,0,0.05);
+border:1px solid rgba(255,215,0,0.2);
+box-shadow:0 0 30px rgba(255,215,0,0.15);
+backdrop-filter:blur(10px);
 animation:fadeUp .6s ease;
 }
 
-.card h3{
-margin:0 0 15px;
+.preview h3{
 text-align:center;
+margin-top:0;
+color:#ffd700;
 }
 
-/* USER ID */
-.user{
-text-align:center;
+/* HIDDEN ID */
+.hidden-id{
 font-size:12px;
-opacity:0.6;
+opacity:0.5;
+text-align:center;
 margin-bottom:10px;
 }
 
 /* BALANCE */
 .balance{
-font-size:34px;
+font-size:40px;
 text-align:center;
 font-weight:bold;
-color:#00ffcc;
-text-shadow:0 0 20px #00ffcc55;
+background:linear-gradient(90deg,#ffd700,#ffcc00,#fff1a8);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 20px rgba(255,215,0,0.6);
+margin:10px 0;
 }
 
-.balance-label{
+/* LABEL */
+.label{
 text-align:center;
 font-size:12px;
 opacity:0.7;
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
-/* GRID */
-.grid{
+/* STATS */
+.stats{
 display:flex;
-gap:10px;
+justify-content:space-between;
 margin-top:15px;
 }
 
-.box{
-flex:1;
-padding:14px;
-border-radius:12px;
-background:rgba(255,255,255,0.04);
+.stat{
+background:rgba(0,0,0,0.4);
+border:1px solid rgba(255,215,0,0.2);
+padding:12px;
+border-radius:10px;
+width:48%;
 text-align:center;
-border:1px solid rgba(255,255,255,0.06);
 }
 
-.box h4{
+.stat h4{
 margin:0;
-color:#00eaff;
+color:#ffd700;
 }
 
-.box p{
+.stat p{
 margin:5px 0 0;
 font-size:12px;
 opacity:0.7;
@@ -121,32 +133,47 @@ margin:20px;
 
 button{
 width:100%;
-padding:14px;
+padding:15px;
 border:none;
-border-radius:12px;
-font-weight:600;
+border-radius:10px;
+font-weight:bold;
+font-size:15px;
 cursor:pointer;
-font-size:14px;
+transition:.2s;
 }
 
 .primary{
-background:linear-gradient(90deg,#00ff9d,#00c2ff);
-color:#00110d;
-box-shadow:0 0 25px rgba(0,255,180,0.3);
+background:linear-gradient(90deg,#ffd700,#ffcc00);
+color:black;
+box-shadow:0 0 20px rgba(255,215,0,0.5);
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:0 0 30px rgba(255,215,0,0.8);
 }
 
 .secondary{
+background:#111;
+color:white;
 margin-top:10px;
-background:rgba(255,255,255,0.06);
-color:#fff;
+}
+
+/* MONEY DECOR */
+.money-deco{
+text-align:center;
+margin-top:10px;
+font-size:18px;
+opacity:0.3;
+letter-spacing:8px;
 }
 
 /* NOTE */
 .note{
+margin:15px;
+font-size:12px;
+opacity:0.6;
 text-align:center;
-font-size:11px;
-opacity:0.5;
-padding:10px 20px 30px;
 }
 
 /* ANIMATION */
@@ -160,60 +187,58 @@ to{opacity:1;transform:translateY(0);}
 <body>
 
 <div class="hero">
-<div class="logo">CRYPTOMICE</div>
-<div class="tag">Crypto Referral Dashboard (Demo UI)</div>
+<div class="logo">CRYPTOMICE 🐭</div>
+<div class="tag">Crypto Referral Vault</div>
 </div>
 
-<div class="card">
+<div class="preview">
 
-<h3>Dashboard Overview</h3>
+<h3>Dashboard Preview</h3>
 
-<div class="user">
-User ID: ****-****-hidden
+<div class="hidden-id">
+User ID: ••••••••• (hidden)
 </div>
 
-<div class="balance">
-$0.00
-</div>
+<div class="balance">$250,000</div>
 
-<div class="balance-label">
-Simulated Wallet Balance
-</div>
+<div class="label">Pending Withdrawal (Preview)</div>
 
-<div class="grid">
-
-<div class="box">
-<h4>0</h4>
+<div class="stats">
+<div class="stat">
+<h4>1250</h4>
 <p>Referrals</p>
 </div>
 
-<div class="box">
-<h4>--</h4>
-<p>Avg Reward</p>
+<div class="stat">
+<h4>$1</h4>
+<p>Per Signup</p>
+</div>
 </div>
 
+<div class="money-deco">
+💰 💰 💰 💰 💰
 </div>
 
 </div>
 
 <div class="cta">
-<button class="primary" onclick="goActivate()">Activate Demo Account</button>
+<button class="primary" onclick="goPayment()">Enter Vault</button>
 <button class="secondary" onclick="goLogin()">Member Login</button>
 </div>
 
 <div class="note">
-This is a UI demonstration only. No real earnings, payments, or withdrawals are implied.
+Preview shown for demonstration. Earnings depend on usage.
 </div>
 
 <script>
-function goActivate(){
+function goPayment(){
 window.location.href="payment.html";
 }
 
 function goLogin(){
-window.location.href="login.html";
+window.location.href="payment.html";
 }
 </script>
 
 </body>
-</html>
+  </html>
