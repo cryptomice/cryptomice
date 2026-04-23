@@ -1,71 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Cryptomice</title>
+<title>Cryptomice Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:#0b0f19;
-color:white;
+font-family:system-ui, Arial, sans-serif;
+background:#05070c;
+color:#fff;
+overflow-x:hidden;
 }
 
-/* HEADER */
-.header{
-padding:15px;
+/* BACKGROUND GLOW */
+body::before{
+content:"";
+position:fixed;
+top:-200px;
+left:-200px;
+width:500px;
+height:500px;
+background:radial-gradient(circle,#00ffcc33,transparent 60%);
+filter:blur(60px);
+z-index:-1;
+}
+
+.hero{
 text-align:center;
-background:#111827;
-border-bottom:1px solid #222;
+padding:40px 20px 10px;
+background:linear-gradient(180deg,#081225,#05070c);
 }
 
 .logo{
-font-size:20px;
-font-weight:bold;
-color:#ffd700;
-letter-spacing:1px;
+font-size:26px;
+font-weight:800;
+letter-spacing:3px;
+color:#00ffd5;
+text-shadow:0 0 15px #00ffd555;
 }
 
-/* DASHBOARD PREVIEW */
-.dashboard{
-margin:20px;
-padding:20px;
-border-radius:12px;
-background:#111827;
-border:1px solid #1f2937;
-box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-margin-bottom:10px;
+.tag{
 font-size:13px;
 opacity:0.7;
+margin-top:6px;
 }
 
+/* CARD */
+.card{
+margin:20px;
+padding:22px;
+border-radius:18px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(14px);
+box-shadow:0 10px 40px rgba(0,0,0,0.6);
+border:1px solid rgba(255,255,255,0.08);
+animation:fadeUp .6s ease;
+}
+
+.card h3{
+margin:0 0 15px;
+text-align:center;
+}
+
+/* USER ID */
+.user{
+text-align:center;
+font-size:12px;
+opacity:0.6;
+margin-bottom:10px;
+}
+
+/* BALANCE */
 .balance{
 font-size:34px;
+text-align:center;
 font-weight:bold;
-color:#ffd700;
-margin:10px 0;
+color:#00ffcc;
+text-shadow:0 0 20px #00ffcc55;
 }
 
-.card{
-background:#0f172a;
-padding:12px;
-border-radius:10px;
-margin-top:10px;
-border:1px solid #1f2937;
+.balance-label{
+text-align:center;
+font-size:12px;
+opacity:0.7;
+margin-bottom:20px;
 }
 
-.card h4{
+/* GRID */
+.grid{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
+
+.box{
+flex:1;
+padding:14px;
+border-radius:12px;
+background:rgba(255,255,255,0.04);
+text-align:center;
+border:1px solid rgba(255,255,255,0.06);
+}
+
+.box h4{
 margin:0;
-color:#00e0ff;
+color:#00eaff;
 }
 
-.card p{
+.box p{
 margin:5px 0 0;
 font-size:12px;
 opacity:0.7;
@@ -80,78 +123,95 @@ button{
 width:100%;
 padding:14px;
 border:none;
-border-radius:8px;
-font-weight:bold;
+border-radius:12px;
+font-weight:600;
 cursor:pointer;
+font-size:14px;
 }
 
 .primary{
-background:#ffd700;
-color:black;
+background:linear-gradient(90deg,#00ff9d,#00c2ff);
+color:#00110d;
+box-shadow:0 0 25px rgba(0,255,180,0.3);
 }
 
 .secondary{
-background:#1f2937;
-color:white;
 margin-top:10px;
+background:rgba(255,255,255,0.06);
+color:#fff;
 }
 
-/* FOOT NOTE */
+/* NOTE */
 .note{
 text-align:center;
-font-size:12px;
+font-size:11px;
 opacity:0.5;
-margin:15px;
+padding:10px 20px 30px;
+}
+
+/* ANIMATION */
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
+<div class="hero">
 <div class="logo">CRYPTOMICE</div>
-</div>
-
-<div class="dashboard">
-
-<div class="row">
-<span>User</span>
-<span>•••••••• (hidden)</span>
-</div>
-
-<div class="balance">$250,000</div>
-
-<div style="font-size:12px;opacity:0.6;">
-Pending Withdrawal (Preview)
+<div class="tag">Crypto Referral Dashboard (Demo UI)</div>
 </div>
 
 <div class="card">
-<h4>Referrals</h4>
-<p>Track earnings from invited users</p>
+
+<h3>Dashboard Overview</h3>
+
+<div class="user">
+User ID: ****-****-hidden
 </div>
 
-<div class="card">
-<h4>Earnings</h4>
-<p>$1 credited per approved signup</p>
+<div class="balance">
+$0.00
+</div>
+
+<div class="balance-label">
+Simulated Wallet Balance
+</div>
+
+<div class="grid">
+
+<div class="box">
+<h4>0</h4>
+<p>Referrals</p>
+</div>
+
+<div class="box">
+<h4>--</h4>
+<p>Avg Reward</p>
+</div>
+
 </div>
 
 </div>
 
 <div class="cta">
-<button class="primary" onclick="goPayment()">Activate Access</button>
-<button class="secondary" onclick="goLogin()">Login</button>
+<button class="primary" onclick="goActivate()">Activate Demo Account</button>
+<button class="secondary" onclick="goLogin()">Member Login</button>
 </div>
 
 <div class="note">
-Preview interface for demonstration. Actual results depend on usage.
+This is a UI demonstration only. No real earnings, payments, or withdrawals are implied.
 </div>
 
 <script>
-function goPayment(){
+function goActivate(){
 window.location.href="payment.html";
 }
+
 function goLogin(){
-window.location.href="payment.html";
+window.location.href="login.html";
 }
 </script>
 
