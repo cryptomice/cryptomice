@@ -7,124 +7,179 @@
 <style>
 body{
 margin:0;
-font-family: Arial, sans-serif;
-background:#070b14;
+font-family:Arial, sans-serif;
+background:#05070c;
 color:white;
 overflow-x:hidden;
 }
 
-/* HERO */
+/* BACKGROUND EFFECT */
+body::before{
+content:"";
+position:fixed;
+width:200%;
+height:200%;
+background:radial-gradient(circle,#d4af37 0%,transparent 60%);
+opacity:0.05;
+top:-50%;
+left:-50%;
+animation:moveBg 15s linear infinite;
+}
+
+@keyframes moveBg{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+/* HEADER */
 .hero{
-padding:40px 20px;
 text-align:center;
-background:radial-gradient(circle at top,#0a66c2 0%,#070b14 60%);
+padding:30px 20px 10px;
 }
 
 .logo{
 font-size:26px;
 font-weight:bold;
 letter-spacing:2px;
-margin-bottom:10px;
+background:linear-gradient(90deg,#ffd700,#ffcc00,#d4af37);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 15px rgba(255,215,0,0.4);
 }
 
 .tag{
 font-size:13px;
-opacity:0.8;
+opacity:0.7;
+margin-top:5px;
 }
 
-/* BIG MONEY DISPLAY */
-.money{
-font-size:42px;
+/* DASHBOARD PREVIEW */
+.preview{
+margin:20px;
+padding:20px;
+border-radius:15px;
+background:rgba(255,215,0,0.05);
+border:1px solid rgba(255,215,0,0.2);
+box-shadow:0 0 30px rgba(255,215,0,0.15);
+backdrop-filter:blur(10px);
+animation:fadeUp .6s ease;
+}
+
+.preview h3{
+text-align:center;
+margin-top:0;
+color:#ffd700;
+}
+
+/* HIDDEN ID */
+.hidden-id{
+font-size:12px;
+opacity:0.5;
+text-align:center;
+margin-bottom:10px;
+}
+
+/* BALANCE */
+.balance{
+font-size:40px;
+text-align:center;
 font-weight:bold;
-margin:25px 0 5px;
-color:#00ffcc;
-text-shadow:0 0 15px rgba(0,255,200,0.6);
+background:linear-gradient(90deg,#ffd700,#ffcc00,#fff1a8);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 20px rgba(255,215,0,0.6);
+margin:10px 0;
 }
 
-.sub{
-font-size:13px;
+/* LABEL */
+.label{
+text-align:center;
+font-size:12px;
+opacity:0.7;
+margin-bottom:15px;
+}
+
+/* STATS */
+.stats{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+}
+
+.stat{
+background:rgba(0,0,0,0.4);
+border:1px solid rgba(255,215,0,0.2);
+padding:12px;
+border-radius:10px;
+width:48%;
+text-align:center;
+}
+
+.stat h4{
+margin:0;
+color:#ffd700;
+}
+
+.stat p{
+margin:5px 0 0;
+font-size:12px;
 opacity:0.7;
 }
 
-/* LIVE BAR */
-.live-bar{
-margin:20px auto;
-background:rgba(255,255,255,0.05);
-padding:10px;
-border-radius:30px;
-max-width:320px;
-font-size:12px;
-animation:glow 2s infinite;
-}
-
-/* CARD */
-.card{
-margin:20px;
-padding:20px;
-background:rgba(255,255,255,0.05);
-border-radius:15px;
-backdrop-filter:blur(10px);
-box-shadow:0 10px 30px rgba(0,0,0,0.5);
-}
-
-/* STEPS */
-.step{
-margin-bottom:12px;
-font-size:14px;
-display:flex;
-align-items:center;
-}
-
-.step span{
-background:#0a66c2;
-width:22px;
-height:22px;
-display:inline-flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
-margin-right:10px;
-font-size:12px;
-}
-
 /* BUTTONS */
+.cta{
+margin:20px;
+}
+
 button{
 width:100%;
 padding:15px;
 border:none;
 border-radius:10px;
-margin-top:10px;
-font-size:15px;
 font-weight:bold;
+font-size:15px;
 cursor:pointer;
+transition:.2s;
 }
 
 .primary{
-background:linear-gradient(90deg,#00c853,#00ff95);
+background:linear-gradient(90deg,#ffd700,#ffcc00);
 color:black;
-box-shadow:0 0 20px rgba(0,255,150,0.4);
+box-shadow:0 0 20px rgba(255,215,0,0.5);
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:0 0 30px rgba(255,215,0,0.8);
 }
 
 .secondary{
-background:#1e1e1e;
+background:#111;
 color:white;
+margin-top:10px;
 }
 
-/* URGENCY STRIP */
-.urgency{
+/* MONEY DECOR */
+.money-deco{
+text-align:center;
+margin-top:10px;
+font-size:18px;
+opacity:0.3;
+letter-spacing:8px;
+}
+
+/* NOTE */
+.note{
 margin:15px;
-padding:12px;
-background:rgba(255,0,0,0.1);
-border-left:4px solid red;
-font-size:13px;
-border-radius:6px;
+font-size:12px;
+opacity:0.6;
+text-align:center;
 }
 
-/* ANIMATIONS */
-@keyframes glow{
-0%{box-shadow:0 0 0 rgba(0,255,200,0.2);}
-50%{box-shadow:0 0 15px rgba(0,255,200,0.5);}
-100%{box-shadow:0 0 0 rgba(0,255,200,0.2);}
+/* ANIMATION */
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:translateY(0);}
 }
 </style>
 </head>
@@ -132,49 +187,47 @@ border-radius:6px;
 <body>
 
 <div class="hero">
+<div class="logo">CRYPTOMICE 🐭</div>
+<div class="tag">Crypto Referral Vault</div>
+</div>
 
-<div class="logo">CRYPTOMICE</div>
-<div class="tag">Private Network • Invite-Based Earnings</div>
+<div class="preview">
 
-<div class="money">$250,000+</div>
-<div class="sub">Total Member Earnings Generated</div>
+<h3>Dashboard Preview</h3>
 
-<div class="live-bar">
-🔥 18 users joined today • 💰 $420 paid out
+<div class="hidden-id">
+User ID: ••••••••• (hidden)
+</div>
+
+<div class="balance">$250,000</div>
+
+<div class="label">Pending Withdrawal (Preview)</div>
+
+<div class="stats">
+<div class="stat">
+<h4>1250</h4>
+<p>Referrals</p>
+</div>
+
+<div class="stat">
+<h4>$1</h4>
+<p>Per Signup</p>
+</div>
+</div>
+
+<div class="money-deco">
+💰 💰 💰 💰 💰
 </div>
 
 </div>
 
-<div class="urgency">
-⚠ Access is restricted. New registrations may close at any time.
+<div class="cta">
+<button class="primary" onclick="goPayment()">Enter Vault</button>
+<button class="secondary" onclick="goLogin()">Member Login</button>
 </div>
 
-<div class="card">
-
-<h3>How It Works</h3>
-
-<div class="step"><span>1</span>Activate your account</div>
-<div class="step"><span>2</span>Get your private referral link</div>
-<div class="step"><span>3</span>Invite others</div>
-<div class="step"><span>4</span>Earn instantly per signup</div>
-
-</div>
-
-<div class="card">
-
-<h3>Why Members Join</h3>
-
-<p style="font-size:14px;opacity:0.85;">
-Members inside Cryptomice generate earnings through controlled access and referral activation. Once inside, your position is secured.
-</p>
-
-</div>
-
-<div class="card">
-
-<button class="primary" onclick="goPayment()">Activate Now</button>
-<button class="secondary" onclick="goLogin()">Already a Member</button>
-
+<div class="note">
+Preview shown for demonstration. Earnings depend on usage.
 </div>
 
 <script>
