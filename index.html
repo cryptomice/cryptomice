@@ -49,7 +49,7 @@ animation:blink 1s infinite;
 100%{opacity:1;}
 }
 
-/* HERO IMAGE (APP STYLE BANNER) */
+/* HERO IMAGE */
 .banner{
 margin:15px;
 border-radius:12px;
@@ -62,7 +62,7 @@ width:100%;
 display:block;
 }
 
-/* DARK OVERLAY */
+/* OVERLAY */
 .banner::after{
 content:"";
 position:absolute;
@@ -73,7 +73,7 @@ height:100%;
 background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));
 }
 
-/* BALANCE CARD */
+/* CARD */
 .card{
 margin:15px;
 padding:15px;
@@ -92,14 +92,6 @@ margin:10px 0;
 .chart{
 height:120px;
 margin-top:10px;
-position:relative;
-}
-
-.line{
-position:absolute;
-width:100%;
-height:100%;
-background:linear-gradient(to top,rgba(255,215,0,0.1),transparent);
 }
 
 svg{
@@ -119,31 +111,6 @@ animation:draw 4s linear infinite;
 @keyframes draw{
 0%{stroke-dashoffset:400;}
 100%{stroke-dashoffset:0;}
-}
-
-/* BUTTONS */
-.actions{
-margin:15px;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:8px;
-margin-top:10px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.primary{
-background:#ffd700;
-color:black;
-}
-
-.secondary{
-background:#1f2937;
-color:white;
 }
 
 /* STATS */
@@ -173,6 +140,31 @@ font-size:11px;
 opacity:0.6;
 }
 
+/* BUTTONS */
+.actions{
+margin:15px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+margin-top:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.primary{
+background:#ffd700;
+color:black;
+}
+
+.secondary{
+background:#1f2937;
+color:white;
+}
+
 /* FOOT NOTE */
 .note{
 text-align:center;
@@ -185,23 +177,19 @@ margin:15px;
 
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
 <div class="logo">CRYPTOMICE</div>
 <div class="status"><div class="dot"></div>Connected</div>
 </div>
 
-<!-- HERO IMAGE -->
 <div class="banner">
-<img src="hero.png">
+<img src="file_00000000957871f5933ba799b9ea7eb1.png">
 </div>
 
-<!-- BALANCE -->
 <div class="card">
 <div style="font-size:12px;opacity:0.6;">Portfolio Value</div>
 <div class="balance">$250,000</div>
 
-<!-- CHART -->
 <div class="chart">
 <svg viewBox="0 0 100 50">
 <path d="M0 40 L10 35 L20 38 L30 30 L40 32 L50 20 L60 25 L70 15 L80 18 L90 10 L100 5"/>
@@ -210,7 +198,6 @@ margin:15px;
 
 </div>
 
-<!-- STATS -->
 <div class="stats">
 <div class="stat">
 <h4>1250</h4>
@@ -226,7 +213,6 @@ margin:15px;
 </div>
 </div>
 
-<!-- ACTIONS -->
 <div class="actions">
 <button class="primary" onclick="goPayment()">Activate Account</button>
 <button class="secondary" onclick="goLogin()">Login</button>
@@ -246,4 +232,4 @@ window.location.href="payment.html";
 </script>
 
 </body>
-  </html>
+</html>
