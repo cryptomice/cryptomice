@@ -7,136 +7,229 @@
 <style>
 body{
 margin:0;
-background:#000;
-overflow:hidden;
 font-family:Arial, sans-serif;
+background:#0b0f19;
+color:white;
 }
 
-/* FULL IMAGE */
-.hero{
-position:relative;
-width:100vw;
-height:100vh;
+/* TOP BAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:#111827;
+border-bottom:1px solid #1f2937;
+}
+
+.logo{
+font-weight:bold;
+color:#ffd700;
+}
+
+/* STATUS */
+.status{
+font-size:12px;
+display:flex;
+align-items:center;
+}
+
+.dot{
+width:8px;
+height:8px;
+background:#00ff66;
+border-radius:50%;
+margin-right:5px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1;}
+50%{opacity:0.2;}
+100%{opacity:1;}
+}
+
+/* HERO IMAGE */
+.banner{
+margin:15px;
+border-radius:12px;
 overflow:hidden;
+position:relative;
 }
 
-.hero img{
+.banner img{
 width:100%;
-height:100%;
-object-fit:cover;
-
-/* subtle movement */
-animation:zoomMove 14s ease-in-out infinite;
+display:block;
 }
 
-/* zoom animation */
-@keyframes zoomMove{
-0%{transform:scale(1) translate(0,0);}
-50%{transform:scale(1.04) translate(-1%,1%);}
-100%{transform:scale(1) translate(0,0);}
-}
-
-/* shimmer */
-.shimmer{
+/* OVERLAY */
+.banner::after{
+content:"";
 position:absolute;
 top:0;
-left:-100%;
-width:200%;
+left:0;
+width:100%;
 height:100%;
-background:linear-gradient(
-120deg,
-transparent,
-rgba(255,255,255,0.07),
-transparent
-);
-animation:shine 7s infinite;
-pointer-events:none;
+background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));
 }
 
-@keyframes shine{
-0%{left:-100%;}
-100%{left:100%;}
+/* CARD */
+.card{
+margin:15px;
+padding:15px;
+background:#111827;
+border-radius:12px;
+border:1px solid #1f2937;
 }
 
-/* CLICK AREA */
-.click-area{
-position:absolute;
-bottom:14%;
-left:50%;
-transform:translateX(-50%);
-width:75%;
-height:65px;
+.balance{
+font-size:28px;
+color:#ffd700;
+margin:10px 0;
+}
+
+/* CHART */
+.chart{
+height:120px;
+margin-top:10px;
+}
+
+svg{
+width:100%;
+height:100%;
+}
+
+path{
+fill:none;
+stroke:#ffd700;
+stroke-width:2;
+stroke-dasharray:400;
+stroke-dashoffset:400;
+animation:draw 4s linear infinite;
+}
+
+@keyframes draw{
+0%{stroke-dashoffset:400;}
+100%{stroke-dashoffset:0;}
+}
+
+/* STATS */
+.stats{
+display:flex;
+justify-content:space-between;
+margin:15px;
+}
+
+.stat{
+background:#111827;
+padding:10px;
 border-radius:10px;
+width:32%;
+text-align:center;
+border:1px solid #1f2937;
+}
+
+.stat h4{
+margin:0;
+color:#00e0ff;
+}
+
+.stat p{
+margin:5px 0 0;
+font-size:11px;
+opacity:0.6;
+}
+
+/* BUTTONS */
+.actions{
+margin:15px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+margin-top:10px;
+font-weight:bold;
 cursor:pointer;
 }
 
-/* subtle glow */
-.click-area::after{
-content:"";
-position:absolute;
-width:100%;
-height:100%;
-border-radius:10px;
-box-shadow:0 0 0 rgba(255,215,0,0.3);
-animation:pulse 2.2s infinite;
+.primary{
+background:#ffd700;
+color:black;
 }
 
-@keyframes pulse{
-0%{box-shadow:0 0 0 rgba(255,215,0,0);}
-50%{box-shadow:0 0 25px rgba(255,215,0,0.25);}
-100%{box-shadow:0 0 0 rgba(255,215,0,0);}
+.secondary{
+background:#1f2937;
+color:white;
 }
 
-/* TAP EFFECT */
-.ripple{
-position:absolute;
-border-radius:50%;
-background:rgba(255,255,255,0.3);
-transform:scale(0);
-animation:rippleAnim 0.6s linear;
-pointer-events:none;
-}
-
-@keyframes rippleAnim{
-to{
-transform:scale(4);
-opacity:0;
-}
+/* FOOT NOTE */
+.note{
+text-align:center;
+font-size:11px;
+opacity:0.5;
+margin:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="hero">
+<div class="topbar">
+<div class="logo">CRYPTOMICE</div>
+<div class="status"><div class="dot"></div>Connected</div>
+</div>
 
+<div class="banner">
 <img src="file_00000000957871f5933ba799b9ea7eb1.png">
+</div>
 
-<div class="shimmer"></div>
+<div class="card">
+<div style="font-size:12px;opacity:0.6;">Portfolio Value</div>
+<div class="balance">$250,000</div>
 
-<div class="click-area" onclick="handleClick(event)"></div>
+<div class="chart">
+<svg viewBox="0 0 100 50">
+<path d="M0 40 L10 35 L20 38 L30 30 L40 32 L50 20 L60 25 L70 15 L80 18 L90 10 L100 5"/>
+</svg>
+</div>
 
 </div>
 
+<div class="stats">
+<div class="stat">
+<h4>1250</h4>
+<p>Referrals</p>
+</div>
+<div class="stat">
+<h4>$1</h4>
+<p>Per Signup</p>
+</div>
+<div class="stat">
+<h4>Secure</h4>
+<p>Status</p>
+</div>
+</div>
+
+<div class="actions">
+<button class="primary" onclick="goPayment()">Activate Account</button>
+<button class="secondary" onclick="goLogin()">Login</button>
+</div>
+
+<div class="note">
+Demo interface preview • earnings depend on usage
+</div>
+
 <script>
-function handleClick(e){
-
-// ripple effect
-const ripple = document.createElement("span");
-ripple.classList.add("ripple");
-
-const rect = e.target.getBoundingClientRect();
-ripple.style.left = (e.clientX - rect.left) + "px";
-ripple.style.top = (e.clientY - rect.top) + "px";
-
-e.target.appendChild(ripple);
-
-setTimeout(()=>{
-ripple.remove();
+function goPayment(){
 window.location.href="payment.html";
-},300);
+}
+function goLogin(){
+window.location.href="payment.html";
 }
 </script>
 
 </body>
-</html>
+  </html>
