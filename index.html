@@ -7,15 +7,16 @@
 <style>
 body{
 margin:0;
+overflow:hidden;
 background:black;
 }
 
-/* IMAGE CONTAINER */
-.hero{
+/* FULL IMAGE */
+.bg{
 position:relative;
-width:100%;
+width:100vw;
 height:100vh;
-background:url("file_00000000957871f5933ba799b9ea7eb1.png") no-repeat center center;
+background:url("hero.png") no-repeat center center;
 background-size:cover;
 }
 
@@ -27,31 +28,25 @@ cursor:pointer;
 
 /* ACTIVATE BUTTON AREA */
 .activate{
-top:48%;
-left:6%;
+top:42%;   /* adjust if needed */
+left:8%;
 width:28%;
 height:8%;
 }
 
 /* LOGIN BUTTON AREA */
 .login{
-top:58%;
-left:6%;
+top:52%;
+left:8%;
 width:28%;
 height:8%;
-}
-
-/* OPTIONAL HOVER (for testing alignment) */
-.btn:hover{
-outline:2px solid rgba(255,215,0,0.7);
-border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="hero">
+<div class="bg">
 
 <!-- ACTIVATE -->
 <div class="btn activate" onclick="goPayment()"></div>
@@ -63,11 +58,11 @@ border-radius:8px;
 
 <script>
 function goPayment(){
-window.location.href = "payment.html";
+window.location.href="payment.html";
 }
 
 function goLogin(){
-window.location.href = "payment.html";
+window.location.href="payment.html";
 }
 </script>
 
