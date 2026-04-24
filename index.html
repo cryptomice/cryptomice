@@ -5,261 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
+html,body{
 margin:0;
+padding:0;
+height:100%;
+background:black;
 font-family:Arial, sans-serif;
-background:#070b14;
-color:white;
 }
 
-/* HERO SECTION */
-.hero{
-display:flex;
-flex-direction:column;
-padding:20px;
-background:linear-gradient(135deg,#070b14,#0a1a3a);
-}
-
-/* LOGO */
-.logo{
-font-size:22px;
-font-weight:bold;
-color:#ffd700;
-}
-
-/* TITLE */
-.title{
-font-size:32px;
-font-weight:bold;
-margin:20px 0 10px;
-line-height:1.2;
-}
-
-.highlight{
-color:#ffd700;
-}
-
-/* TEXT */
-.desc{
-font-size:14px;
-opacity:0.8;
-margin-bottom:20px;
-}
-
-/* BUTTONS */
-.buttons button{
+/* IMAGE WRAPPER */
+.wrapper{
+position:relative;
 width:100%;
-padding:14px;
-border:none;
-border-radius:8px;
-font-weight:bold;
-margin-bottom:10px;
+height:100vh;
+overflow:hidden;
+}
+
+/* IMAGE */
+.wrapper img{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+}
+
+/* CLICKABLE AREAS */
+.btn{
+position:absolute;
 cursor:pointer;
 }
 
+/* ACTIVATE BUTTON (AUTO-SCALED) */
 .activate{
-background:linear-gradient(90deg,#ffd700,#ffcc00);
-color:black;
+top:48%;
+left:6%;
+width:30%;
+height:9%;
 }
 
+/* LOGIN BUTTON (AUTO-SCALED) */
 .login{
-background:#1e293b;
-color:white;
+top:59%;
+left:6%;
+width:30%;
+height:9%;
 }
 
-/* STATS BAR */
-.stats{
-display:flex;
-justify-content:space-around;
-padding:15px;
-background:#0b1220;
-border-top:1px solid #1f2937;
-border-bottom:1px solid #1f2937;
+/* TOUCH FEEDBACK */
+.btn:active{
+background:rgba(255,255,255,0.1);
 }
 
-.stat{
-text-align:center;
+/* DEBUG MODE (TURN ON IF NEEDED) */
+/*
+.btn{
+background:rgba(255,0,0,0.2);
 }
+*/
 
-.stat h3{
-margin:0;
-color:#ffd700;
-}
-
-.stat p{
-margin:5px 0 0;
-font-size:12px;
-opacity:0.6;
-}
-
-/* DASHBOARD PREVIEW */
-.dashboard{
-margin:20px;
-padding:15px;
-background:#0b1220;
-border-radius:12px;
-border:1px solid #1f2937;
-}
-
-.balance{
-font-size:28px;
-color:#ffd700;
-margin:10px 0;
-}
-
-.small{
-font-size:12px;
-opacity:0.6;
-}
-
-/* FEATURES */
-.features{
-margin:20px;
-}
-
-.feature{
-display:flex;
-margin-bottom:15px;
-}
-
-.icon{
-width:40px;
-height:40px;
-background:#111827;
-border-radius:10px;
-display:flex;
-align-items:center;
-justify-content:center;
-margin-right:10px;
-color:#ffd700;
-}
-
-.feature h4{
-margin:0;
-}
-
-.feature p{
-margin:5px 0 0;
-font-size:12px;
-opacity:0.7;
-}
-
-/* FOOTER */
-.footer{
-text-align:center;
-font-size:12px;
-opacity:0.5;
-margin:20px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
-<div class="hero">
+<div class="wrapper">
 
-<div class="logo">🐭 CRYPTOMICE</div>
+<img src="file_00000000957871f5933ba799b9ea7eb1.png">
 
-<div class="title">
-Turn referrals into real <span class="highlight">crypto wealth</span>
-</div>
+<!-- ACTIVATE -->
+<div class="btn activate" onclick="goPayment()"></div>
 
-<div class="desc">
-Join Cryptomice and earn instantly per approved signup.
-</div>
+<!-- LOGIN -->
+<div class="btn login" onclick="goLogin()"></div>
 
-<div class="buttons">
-<button class="activate" onclick="goPayment()">Activate Account</button>
-<button class="login" onclick="goLogin()">Member Login</button>
-</div>
-
-</div>
-
-<!-- STATS -->
-<div class="stats">
-<div class="stat">
-<h3>1250+</h3>
-<p>Members</p>
-</div>
-
-<div class="stat">
-<h3>$250K+</h3>
-<p>Earned</p>
-</div>
-
-<div class="stat">
-<h3>$25K+</h3>
-<p>Paid</p>
-</div>
-
-<div class="stat">
-<h3>$1</h3>
-<p>Per Signup</p>
-</div>
-</div>
-
-<!-- DASHBOARD PREVIEW -->
-<div class="dashboard">
-
-<div class="small">Pending Withdrawal</div>
-
-<div class="balance">$250,000</div>
-
-<div class="small">User ID: ••••••• (hidden)</div>
-
-</div>
-
-<!-- FEATURES -->
-<div class="features">
-
-<div class="feature">
-<div class="icon">⚡</div>
-<div>
-<h4>Instant Earnings</h4>
-<p>Get credited for every approved referral</p>
-</div>
-</div>
-
-<div class="feature">
-<div class="icon">🔒</div>
-<div>
-<h4>Secure System</h4>
-<p>Your data and earnings are protected</p>
-</div>
-</div>
-
-<div class="feature">
-<div class="icon">💸</div>
-<div>
-<h4>Withdraw Anytime</h4>
-<p>Fast withdrawal processing</p>
-</div>
-</div>
-
-<div class="feature">
-<div class="icon">👥</div>
-<div>
-<h4>Limited Access</h4>
-<p>Private system for serious users</p>
-</div>
-</div>
-
-</div>
-
-<div class="footer">
-© Cryptomice
 </div>
 
 <script>
 function goPayment(){
-window.location.href="payment.html";
+window.location.href = "payment.html";
 }
 
 function goLogin(){
-window.location.href="payment.html";
+window.location.href = "payment.html";
 }
 </script>
 
 </body>
-  </html>
+</html>
