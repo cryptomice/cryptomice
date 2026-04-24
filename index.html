@@ -5,100 +5,215 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-html, body{
+body{
 margin:0;
-padding:0;
-height:100%;
-background:black;
-overflow:hidden;
+font-family:Arial, sans-serif;
+background:radial-gradient(circle at top,#0d1b2a,#02040a);
+color:white;
+overflow-x:hidden;
 }
 
-/* WRAPPER */
-.wrapper{
-position:relative;
+/* GOLD GLOW BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+width:300px;
+height:300px;
+background:radial-gradient(circle,#ffd700,transparent);
+top:20%;
+left:70%;
+opacity:0.15;
+filter:blur(60px);
+}
+
+/* HEADER */
+.header{
+padding:20px;
+text-align:center;
+}
+
+.logo{
+font-size:24px;
+font-weight:bold;
+color:#ffd700;
+letter-spacing:2px;
+}
+
+/* HERO */
+.hero{
+padding:20px;
+text-align:left;
+}
+
+.title{
+font-size:32px;
+font-weight:bold;
+line-height:1.2;
+}
+
+.highlight{
+color:#ffd700;
+text-shadow:0 0 15px rgba(255,215,0,0.7);
+}
+
+.desc{
+margin-top:10px;
+font-size:14px;
+opacity:0.7;
+}
+
+/* BUTTONS */
+.buttons{
+margin-top:20px;
+}
+
+button{
 width:100%;
-height:100vh;
-}
-
-/* IMAGE */
-.wrapper img{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-object-fit:cover;
-z-index:1;
-pointer-events:none; /* IMPORTANT: allows clicks to pass through */
-}
-
-/* BUTTON LAYER */
-.btn{
-position:absolute;
-z-index:10;
+padding:14px;
+border:none;
+border-radius:10px;
+font-weight:bold;
 cursor:pointer;
-border-radius:12px;
+margin-bottom:10px;
 transition:0.2s;
 }
 
-/* ACTIVATE AREA */
 .activate{
-top:47%;
-left:5%;
-width:32%;
-height:10%;
+background:linear-gradient(90deg,#ffd700,#ffcc00);
+color:black;
+box-shadow:0 0 20px rgba(255,215,0,0.5);
 }
 
-/* LOGIN AREA */
 .login{
-top:60%;
-left:5%;
-width:32%;
-height:10%;
+background:#111827;
+color:white;
 }
 
-/* TAP FEEDBACK */
-.btn:active{
-background:rgba(255,255,255,0.15);
-transform:scale(0.98);
+button:hover{
+transform:translateY(-2px);
 }
 
-/* OPTIONAL HOVER (DESKTOP) */
-@media (hover:hover){
-.btn:hover{
-box-shadow:0 0 20px rgba(255,215,0,0.6);
-}
+/* CRYPTO MOUSE CARD */
+.mouse-card{
+margin:20px;
+padding:20px;
+border-radius:15px;
+background:linear-gradient(135deg,#0b1220,#111827);
+border:1px solid #1f2937;
+box-shadow:0 10px 30px rgba(0,0,0,0.6);
+text-align:center;
 }
 
-/* DEBUG MODE (UNCOMMENT IF NEEDED) */
-/*
-.btn{
-background:rgba(255,0,0,0.25);
+/* MOUSE ICON (CSS DRAWN SIMPLE) */
+.mouse{
+font-size:50px;
+margin-bottom:10px;
 }
-*/
+
+/* BALANCE */
+.balance{
+font-size:30px;
+color:#ffd700;
+font-weight:bold;
+text-shadow:0 0 20px rgba(255,215,0,0.7);
+}
+
+.small{
+font-size:12px;
+opacity:0.6;
+}
+
+/* STATS */
+.stats{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+}
+
+.stat{
+background:#0f172a;
+padding:10px;
+border-radius:10px;
+width:48%;
+}
+
+.stat h4{
+margin:0;
+color:#00e0ff;
+}
+
+.stat p{
+margin:5px 0 0;
+font-size:12px;
+opacity:0.7;
+}
+
+/* FOOTER */
+.footer{
+text-align:center;
+font-size:12px;
+opacity:0.5;
+margin:20px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
+<div class="header">
+<div class="logo">🐭 CRYPTOMICE</div>
+</div>
 
-<img src="file_00000000957871f5933ba799b9ea7eb1.png" alt="Cryptomice UI">
+<div class="hero">
+<div class="title">
+Earn crypto with <span class="highlight">referrals</span>
+</div>
 
-<div class="btn activate" onclick="goPayment()"></div>
-<div class="btn login" onclick="goLogin()"></div>
+<div class="desc">
+Activate your account and start earning instantly per signup.
+</div>
 
+<div class="buttons">
+<button class="activate" onclick="goPayment()">Activate Account</button>
+<button class="login" onclick="goLogin()">Member Login</button>
+</div>
+</div>
+
+<div class="mouse-card">
+
+<div class="mouse">🐭💰</div>
+
+<div class="balance">$250,000</div>
+
+<div class="small">Pending Withdrawal (Preview)</div>
+
+<div class="stats">
+<div class="stat">
+<h4>1250</h4>
+<p>Referrals</p>
+</div>
+
+<div class="stat">
+<h4>$1</h4>
+<p>Per Signup</p>
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+Cryptomice • Crypto Referral Platform
 </div>
 
 <script>
 function goPayment(){
-window.location.href = "payment.html";
+window.location.href="payment.html";
 }
 
 function goLogin(){
-window.location.href = "payment.html";
+window.location.href="payment.html";
 }
 </script>
 
 </body>
-</html>
+  </html>
