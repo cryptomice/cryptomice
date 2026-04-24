@@ -3,25 +3,123 @@
 <head>
 <title>Create Account</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#070b14;
+color:white;
+}
+
+/* HEADER */
+.header{
+padding:15px;
+text-align:center;
+background:#111827;
+border-bottom:1px solid #1f2937;
+}
+
+.header h2{
+margin:0;
+color:#ffd700;
+}
+
+/* CONTAINER */
+.container{
+max-width:500px;
+margin:20px auto;
+padding:15px;
+}
+
+/* CARD */
+.card{
+background:#0b1220;
+border:1px solid #1f2937;
+border-radius:12px;
+padding:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* TEXT */
+.note{
+font-size:13px;
+opacity:0.7;
+margin-bottom:15px;
+}
+
+/* INPUTS */
+input{
+width:100%;
+padding:12px;
+margin:6px 0;
+border-radius:8px;
+border:1px solid #1f2937;
+background:#111827;
+color:white;
+}
+
+/* BUTTON */
+button{
+width:100%;
+padding:13px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+background:linear-gradient(90deg,#ffd700,#ffcc00);
+color:black;
+}
+
+/* MESSAGE */
+.msg{
+margin-top:10px;
+font-size:13px;
+}
+
+/* SMALL FOOT */
+.footer{
+text-align:center;
+font-size:12px;
+opacity:0.5;
+margin-top:20px;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+<body>
 
-<h2>Create Account</h2>
+<div class="header">
+<h2>🐭 CRYPTOMICE</h2>
+</div>
 
-<p style="color:gray;">Only approved users can create an account.</p>
+<div class="container">
 
-<input id="email" placeholder="Enter email"
-style="padding:10px;width:100%;margin:5px 0;">
+<div class="card">
 
-<input id="password" type="password" placeholder="Create password"
-style="padding:10px;width:100%;margin:5px 0;">
+<h3 style="color:#ffd700;margin-top:0;">Create Account</h3>
 
-<button id="signupBtn" style="padding:10px;width:100%;">
+<p class="note">
+Only approved users can create an account.
+</p>
+
+<input id="email" placeholder="Enter approved email">
+<input id="password" type="password" placeholder="Create password">
+
+<button id="signupBtn">
 Create Account
 </button>
 
-<p id="msg"></p>
+<p id="msg" class="msg"></p>
+
+</div>
+
+<div class="footer">
+Secure account creation • Referral system active
+</div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -33,7 +131,6 @@ import {
 import {
   getFirestore,
   doc,
-  getDoc,
   setDoc,
   collection,
   addDoc,
@@ -63,6 +160,7 @@ const msg = document.getElementById("msg");
 
 if (!email || !password) {
   msg.innerText = "Fill all fields";
+  msg.style.color = "red";
   return;
 }
 
@@ -79,7 +177,7 @@ earnings:0,
 createdAt:new Date()
 });
 
-/* STORE REFERRAL (NEW SYSTEM CORE) */
+/* STORE REFERRAL */
 if (ref) {
   await addDoc(collection(db,"referrals"),{
     referrerId: ref,
@@ -89,7 +187,6 @@ if (ref) {
     credited: true
   });
 
-  /* DIRECT CREDIT (FIXED GAP) */
   await setDoc(doc(db,"users",ref),{
     referrals: increment(1),
     earnings: increment(1)
@@ -98,7 +195,7 @@ if (ref) {
   localStorage.removeItem("referrer");
 }
 
-msg.style.color="green";
+msg.style.color="#00ff99";
 msg.innerText="Account created";
 
 setTimeout(()=>{
@@ -106,6 +203,7 @@ window.location.href="dashboard.html";
 },1000);
 
 }catch(e){
+msg.style.color="red";
 msg.innerText=e.message;
 }
 
