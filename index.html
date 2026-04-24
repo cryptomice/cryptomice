@@ -8,133 +8,125 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:radial-gradient(circle at top,#0d1b2a,#02040a);
+background:#0b0f19;
 color:white;
-overflow-x:hidden;
 }
 
-/* GOLD GLOW BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-width:300px;
-height:300px;
-background:radial-gradient(circle,#ffd700,transparent);
-top:20%;
-left:70%;
-opacity:0.15;
-filter:blur(60px);
-}
-
-/* HEADER */
-.header{
-padding:20px;
-text-align:center;
+/* TOP BAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:#111827;
+border-bottom:1px solid #1f2937;
 }
 
 .logo{
-font-size:24px;
 font-weight:bold;
 color:#ffd700;
-letter-spacing:2px;
 }
 
-/* HERO */
-.hero{
-padding:20px;
-text-align:left;
-}
-
-.title{
-font-size:32px;
-font-weight:bold;
-line-height:1.2;
-}
-
-.highlight{
-color:#ffd700;
-text-shadow:0 0 15px rgba(255,215,0,0.7);
-}
-
-.desc{
-margin-top:10px;
-font-size:14px;
-opacity:0.7;
-}
-
-/* BUTTONS */
-.buttons{
-margin-top:20px;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
-margin-bottom:10px;
-transition:0.2s;
-}
-
-.activate{
-background:linear-gradient(90deg,#ffd700,#ffcc00);
-color:black;
-box-shadow:0 0 20px rgba(255,215,0,0.5);
-}
-
-.login{
-background:#111827;
-color:white;
-}
-
-button:hover{
-transform:translateY(-2px);
-}
-
-/* CRYPTO MOUSE CARD */
-.mouse-card{
-margin:20px;
-padding:20px;
-border-radius:15px;
-background:linear-gradient(135deg,#0b1220,#111827);
-border:1px solid #1f2937;
-box-shadow:0 10px 30px rgba(0,0,0,0.6);
-text-align:center;
-}
-
-/* MOUSE ICON (CSS DRAWN SIMPLE) */
-.mouse{
-font-size:50px;
-margin-bottom:10px;
-}
-
-/* BALANCE */
-.balance{
-font-size:30px;
-color:#ffd700;
-font-weight:bold;
-text-shadow:0 0 20px rgba(255,215,0,0.7);
-}
-
-.small{
+/* STATUS */
+.status{
 font-size:12px;
-opacity:0.6;
+display:flex;
+align-items:center;
+}
+
+.dot{
+width:8px;
+height:8px;
+background:#00ff66;
+border-radius:50%;
+margin-right:5px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1;}
+50%{opacity:0.2;}
+100%{opacity:1;}
+}
+
+/* HERO IMAGE */
+.banner{
+margin:15px;
+border-radius:12px;
+overflow:hidden;
+position:relative;
+}
+
+.banner img{
+width:100%;
+display:block;
+}
+
+/* OVERLAY */
+.banner::after{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));
+}
+
+/* CARD */
+.card{
+margin:15px;
+padding:15px;
+background:#111827;
+border-radius:12px;
+border:1px solid #1f2937;
+}
+
+.balance{
+font-size:28px;
+color:#ffd700;
+margin:10px 0;
+}
+
+/* CHART */
+.chart{
+height:120px;
+margin-top:10px;
+}
+
+svg{
+width:100%;
+height:100%;
+}
+
+path{
+fill:none;
+stroke:#ffd700;
+stroke-width:2;
+stroke-dasharray:400;
+stroke-dashoffset:400;
+animation:draw 4s linear infinite;
+}
+
+@keyframes draw{
+0%{stroke-dashoffset:400;}
+100%{stroke-dashoffset:0;}
 }
 
 /* STATS */
 .stats{
 display:flex;
 justify-content:space-between;
-margin-top:15px;
+margin:15px;
 }
 
 .stat{
-background:#0f172a;
+background:#111827;
 padding:10px;
 border-radius:10px;
-width:48%;
+width:32%;
+text-align:center;
+border:1px solid #1f2937;
 }
 
 .stat h4{
@@ -144,76 +136,100 @@ color:#00e0ff;
 
 .stat p{
 margin:5px 0 0;
-font-size:12px;
-opacity:0.7;
+font-size:11px;
+opacity:0.6;
 }
 
-/* FOOTER */
-.footer{
+/* BUTTONS */
+.actions{
+margin:15px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+margin-top:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.primary{
+background:#ffd700;
+color:black;
+}
+
+.secondary{
+background:#1f2937;
+color:white;
+}
+
+/* FOOT NOTE */
+.note{
 text-align:center;
-font-size:12px;
+font-size:11px;
 opacity:0.5;
-margin:20px;
+margin:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div class="logo">🐭 CRYPTOMICE</div>
+<div class="topbar">
+<div class="logo">CRYPTOMICE</div>
+<div class="status"><div class="dot"></div>Connected</div>
 </div>
 
-<div class="hero">
-<div class="title">
-Earn crypto with <span class="highlight">referrals</span>
+<div class="banner">
+<img src="file_00000000957871f5933ba799b9ea7eb1.png">
 </div>
 
-<div class="desc">
-Activate your account and start earning instantly per signup.
-</div>
-
-<div class="buttons">
-<button class="activate" onclick="goPayment()">Activate Account</button>
-<button class="login" onclick="goLogin()">Member Login</button>
-</div>
-</div>
-
-<div class="mouse-card">
-
-<div class="mouse">🐭💰</div>
-
+<div class="card">
+<div style="font-size:12px;opacity:0.6;">Portfolio Value</div>
 <div class="balance">$250,000</div>
 
-<div class="small">Pending Withdrawal (Preview)</div>
+<div class="chart">
+<svg viewBox="0 0 100 50">
+<path d="M0 40 L10 35 L20 38 L30 30 L40 32 L50 20 L60 25 L70 15 L80 18 L90 10 L100 5"/>
+</svg>
+</div>
+
+</div>
 
 <div class="stats">
 <div class="stat">
 <h4>1250</h4>
 <p>Referrals</p>
 </div>
-
 <div class="stat">
 <h4>$1</h4>
 <p>Per Signup</p>
 </div>
+<div class="stat">
+<h4>Secure</h4>
+<p>Status</p>
+</div>
 </div>
 
+<div class="actions">
+<button class="primary" onclick="goPayment()">Activate Account</button>
+<button class="secondary" onclick="goLogin()">Login</button>
 </div>
 
-<div class="footer">
-Cryptomice • Crypto Referral Platform
+<div class="note">
+Demo interface preview • earnings depend on usage
 </div>
 
 <script>
 function goPayment(){
 window.location.href="payment.html";
 }
-
 function goLogin(){
 window.location.href="payment.html";
 }
 </script>
 
 </body>
-  </html>
+</html>
