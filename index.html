@@ -8,76 +8,95 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:#0b0f19;
+background:#070b14;
 color:white;
 }
 
-/* TOP BAR */
-.topbar{
+/* HERO SECTION */
+.hero{
 display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px;
-background:#111827;
-border-bottom:1px solid #1f2937;
+flex-direction:column;
+padding:20px;
+background:linear-gradient(135deg,#070b14,#0a1a3a);
 }
 
+/* LOGO */
 .logo{
+font-size:22px;
 font-weight:bold;
 color:#ffd700;
 }
 
-/* STATUS */
-.status{
-font-size:12px;
+/* TITLE */
+.title{
+font-size:32px;
+font-weight:bold;
+margin:20px 0 10px;
+line-height:1.2;
+}
+
+.highlight{
+color:#ffd700;
+}
+
+/* TEXT */
+.desc{
+font-size:14px;
+opacity:0.8;
+margin-bottom:20px;
+}
+
+/* BUTTONS */
+.buttons button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+margin-bottom:10px;
+cursor:pointer;
+}
+
+.activate{
+background:linear-gradient(90deg,#ffd700,#ffcc00);
+color:black;
+}
+
+.login{
+background:#1e293b;
+color:white;
+}
+
+/* STATS BAR */
+.stats{
 display:flex;
-align-items:center;
-}
-
-.dot{
-width:8px;
-height:8px;
-background:#00ff66;
-border-radius:50%;
-margin-right:5px;
-animation:blink 1s infinite;
-}
-
-@keyframes blink{
-0%{opacity:1;}
-50%{opacity:0.2;}
-100%{opacity:1;}
-}
-
-/* HERO IMAGE */
-.banner{
-margin:15px;
-border-radius:12px;
-overflow:hidden;
-position:relative;
-}
-
-.banner img{
-width:100%;
-display:block;
-}
-
-/* OVERLAY */
-.banner::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));
-}
-
-/* CARD */
-.card{
-margin:15px;
+justify-content:space-around;
 padding:15px;
-background:#111827;
+background:#0b1220;
+border-top:1px solid #1f2937;
+border-bottom:1px solid #1f2937;
+}
+
+.stat{
+text-align:center;
+}
+
+.stat h3{
+margin:0;
+color:#ffd700;
+}
+
+.stat p{
+margin:5px 0 0;
+font-size:12px;
+opacity:0.6;
+}
+
+/* DASHBOARD PREVIEW */
+.dashboard{
+margin:20px;
+padding:15px;
+background:#0b1220;
 border-radius:12px;
 border:1px solid #1f2937;
 }
@@ -88,144 +107,155 @@ color:#ffd700;
 margin:10px 0;
 }
 
-/* CHART */
-.chart{
-height:120px;
-margin-top:10px;
-}
-
-svg{
-width:100%;
-height:100%;
-}
-
-path{
-fill:none;
-stroke:#ffd700;
-stroke-width:2;
-stroke-dasharray:400;
-stroke-dashoffset:400;
-animation:draw 4s linear infinite;
-}
-
-@keyframes draw{
-0%{stroke-dashoffset:400;}
-100%{stroke-dashoffset:0;}
-}
-
-/* STATS */
-.stats{
-display:flex;
-justify-content:space-between;
-margin:15px;
-}
-
-.stat{
-background:#111827;
-padding:10px;
-border-radius:10px;
-width:32%;
-text-align:center;
-border:1px solid #1f2937;
-}
-
-.stat h4{
-margin:0;
-color:#00e0ff;
-}
-
-.stat p{
-margin:5px 0 0;
-font-size:11px;
+.small{
+font-size:12px;
 opacity:0.6;
 }
 
-/* BUTTONS */
-.actions{
-margin:15px;
+/* FEATURES */
+.features{
+margin:20px;
 }
 
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:8px;
-margin-top:10px;
-font-weight:bold;
-cursor:pointer;
+.feature{
+display:flex;
+margin-bottom:15px;
 }
 
-.primary{
-background:#ffd700;
-color:black;
+.icon{
+width:40px;
+height:40px;
+background:#111827;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-right:10px;
+color:#ffd700;
 }
 
-.secondary{
-background:#1f2937;
-color:white;
+.feature h4{
+margin:0;
 }
 
-/* FOOT NOTE */
-.note{
+.feature p{
+margin:5px 0 0;
+font-size:12px;
+opacity:0.7;
+}
+
+/* FOOTER */
+.footer{
 text-align:center;
-font-size:11px;
+font-size:12px;
 opacity:0.5;
-margin:15px;
+margin:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-<div class="logo">CRYPTOMICE</div>
-<div class="status"><div class="dot"></div>Connected</div>
+<!-- HERO -->
+<div class="hero">
+
+<div class="logo">🐭 CRYPTOMICE</div>
+
+<div class="title">
+Turn referrals into real <span class="highlight">crypto wealth</span>
 </div>
 
-<div class="banner">
-<img src="file_00000000957871f5933ba799b9ea7eb1.png">
+<div class="desc">
+Join Cryptomice and earn instantly per approved signup.
 </div>
 
-<div class="card">
-<div style="font-size:12px;opacity:0.6;">Portfolio Value</div>
-<div class="balance">$250,000</div>
-
-<div class="chart">
-<svg viewBox="0 0 100 50">
-<path d="M0 40 L10 35 L20 38 L30 30 L40 32 L50 20 L60 25 L70 15 L80 18 L90 10 L100 5"/>
-</svg>
+<div class="buttons">
+<button class="activate" onclick="goPayment()">Activate Account</button>
+<button class="login" onclick="goLogin()">Member Login</button>
 </div>
 
 </div>
 
+<!-- STATS -->
 <div class="stats">
 <div class="stat">
-<h4>1250</h4>
-<p>Referrals</p>
+<h3>1250+</h3>
+<p>Members</p>
 </div>
+
 <div class="stat">
-<h4>$1</h4>
+<h3>$250K+</h3>
+<p>Earned</p>
+</div>
+
+<div class="stat">
+<h3>$25K+</h3>
+<p>Paid</p>
+</div>
+
+<div class="stat">
+<h3>$1</h3>
 <p>Per Signup</p>
 </div>
-<div class="stat">
-<h4>Secure</h4>
-<p>Status</p>
+</div>
+
+<!-- DASHBOARD PREVIEW -->
+<div class="dashboard">
+
+<div class="small">Pending Withdrawal</div>
+
+<div class="balance">$250,000</div>
+
+<div class="small">User ID: ••••••• (hidden)</div>
+
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+
+<div class="feature">
+<div class="icon">⚡</div>
+<div>
+<h4>Instant Earnings</h4>
+<p>Get credited for every approved referral</p>
 </div>
 </div>
 
-<div class="actions">
-<button class="primary" onclick="goPayment()">Activate Account</button>
-<button class="secondary" onclick="goLogin()">Login</button>
+<div class="feature">
+<div class="icon">🔒</div>
+<div>
+<h4>Secure System</h4>
+<p>Your data and earnings are protected</p>
+</div>
 </div>
 
-<div class="note">
-Demo interface preview • earnings depend on usage
+<div class="feature">
+<div class="icon">💸</div>
+<div>
+<h4>Withdraw Anytime</h4>
+<p>Fast withdrawal processing</p>
+</div>
+</div>
+
+<div class="feature">
+<div class="icon">👥</div>
+<div>
+<h4>Limited Access</h4>
+<p>Private system for serious users</p>
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+© Cryptomice
 </div>
 
 <script>
 function goPayment(){
 window.location.href="payment.html";
 }
+
 function goLogin(){
 window.location.href="payment.html";
 }
