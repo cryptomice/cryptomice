@@ -8,80 +8,100 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:#02040a;
+background:#03060c;
 color:white;
 overflow-x:hidden;
 }
 
-/* GLOBAL GOLD BACKGROUND */
+/* ✨ GOLD SPARKLE BACKGROUND */
 body::before{
 content:"";
 position:fixed;
-top:0;left:0;
-width:100%;height:100%;
+top:0;
+left:0;
+width:100%;
+height:100%;
 background:
-radial-gradient(circle at 20% 30%, rgba(255,215,0,0.12), transparent 40%),
-radial-gradient(circle at 80% 70%, rgba(255,255,255,0.06), transparent 45%),
-radial-gradient(circle at 50% 90%, rgba(255,215,0,0.08), transparent 50%);
-animation:bgMove 10s infinite alternate ease-in-out;
+radial-gradient(circle at 20% 30%, rgba(255,215,0,0.15), transparent 40%),
+radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08), transparent 45%),
+radial-gradient(circle at 40% 80%, rgba(255,215,0,0.10), transparent 50%);
+animation:moveSparkles 8s infinite alternate ease-in-out;
 pointer-events:none;
 z-index:0;
 }
 
-@keyframes bgMove{
+@keyframes moveSparkles{
 0%{transform:scale(1) rotate(0deg);}
-100%{transform:scale(1.15) rotate(3deg);}
+100%{transform:scale(1.2) rotate(3deg);}
 }
 
-/* LAYERS */
-*{position:relative;z-index:1;}
+/* GLOBAL */
+*{
+position:relative;
+z-index:1;
+}
 
-/* HEADER */
+/* HERO */
 .hero{
+display:flex;
+flex-direction:column;
 padding:20px;
-text-align:center;
-background:radial-gradient(circle at top,#0b1f3a,#02040a);
+background:radial-gradient(circle at top,#0b1f3a,#03060c);
 }
 
+/* LOGO */
 .logo{
 font-size:26px;
 font-weight:bold;
 color:#ffd84d;
-text-shadow:0 0 10px #ffd84d,0 0 30px rgba(255,215,0,0.6);
-animation:pulse 2s infinite alternate;
+text-align:center;
+text-shadow:
+0 0 8px #ffd84d,
+0 0 20px #ffcc00,
+0 0 40px rgba(255,215,0,0.6),
+0 0 80px rgba(255,215,0,0.3);
+animation:goldPulse 2s infinite alternate;
 }
 
-@keyframes pulse{
-from{transform:scale(1);}
-to{transform:scale(1.05);filter:brightness(1.3);}
+@keyframes goldPulse{
+from{transform:scale(1); filter:brightness(1);}
+to{transform:scale(1.05); filter:brightness(1.4);}
 }
 
 /* IMAGE */
 .hero-img{
 width:100%;
-max-width:380px;
+max-width:400px;
 margin:20px auto;
+display:block;
 border-radius:15px;
-box-shadow:0 0 40px rgba(255,215,0,0.25);
+box-shadow:
+0 0 30px rgba(255,215,0,0.25),
+0 0 60px rgba(255,215,0,0.15);
 animation:float 4s ease-in-out infinite;
-}
-
-@keyframes float{
-0%{transform:translateY(0);}
-50%{transform:translateY(-8px);}
-100%{transform:translateY(0);}
 }
 
 /* TITLE */
 .title{
-font-size:28px;
+font-size:30px;
 font-weight:bold;
-margin-top:10px;
+margin:15px 0 10px;
+text-align:center;
 }
 
 .highlight{
 color:#ffd84d;
-text-shadow:0 0 15px #ffd84d,0 0 40px rgba(255,215,0,0.6);
+text-shadow:
+0 0 10px #ffd84d,
+0 0 25px rgba(255,215,0,0.8),
+0 0 60px rgba(255,215,0,0.4);
+}
+
+/* TEXT */
+.desc{
+font-size:14px;
+opacity:0.9;
+text-align:center;
 }
 
 /* BUTTONS */
@@ -90,27 +110,37 @@ width:100%;
 padding:14px;
 border:none;
 border-radius:12px;
-margin-top:10px;
 font-weight:bold;
+margin-top:10px;
 cursor:pointer;
 transition:.3s;
 }
 
+/* GOLD BUTTON */
 .activate{
 background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
 color:black;
-box-shadow:0 0 25px rgba(255,215,0,0.6);
+box-shadow:
+0 0 15px rgba(255,215,0,0.6),
+0 0 35px rgba(255,215,0,0.3);
 }
 
 .activate:hover{
 transform:scale(1.05);
-box-shadow:0 0 45px rgba(255,215,0,0.9);
+box-shadow:
+0 0 25px rgba(255,215,0,0.9),
+0 0 60px rgba(255,215,0,0.5);
 }
 
+/* LOGIN */
 .login{
 background:#0f172a;
 color:white;
 box-shadow:0 0 15px rgba(0,140,255,0.3);
+}
+
+.login:hover{
+box-shadow:0 0 25px rgba(0,140,255,0.8);
 }
 
 /* STATS */
@@ -124,91 +154,76 @@ border-bottom:1px solid #1f2937;
 }
 
 .stat h3{
+margin:0;
 color:#ffd84d;
-text-shadow:0 0 12px #ffd84d;
+text-shadow:0 0 15px #ffd84d;
 }
 
-/* DASHBOARD */
+.stat p{
+font-size:12px;
+opacity:0.6;
+}
+
+/* DASHBOARD (NOW CLEAN EMPTY STYLE) */
 .dashboard{
 margin:20px;
-padding:20px;
+padding:25px;
+background:rgba(11,18,32,0.9);
 border-radius:12px;
-background:rgba(11,18,32,0.85);
 border:1px solid rgba(255,215,0,0.2);
-box-shadow:0 0 30px rgba(255,215,0,0.1);
-overflow:hidden;
-}
-
-/* LIVE EARNINGS */
-.balance{
-font-size:34px;
+box-shadow:
+0 0 25px rgba(255,215,0,0.08),
+inset 0 0 20px rgba(255,215,0,0.05);
 text-align:center;
-color:#ffd84d;
-text-shadow:0 0 20px #ffd84d;
-margin-bottom:10px;
-}
-
-/* PROGRESS BAR */
-.progress{
-height:10px;
-background:#111827;
-border-radius:20px;
-overflow:hidden;
-margin:10px 0;
-}
-
-.progress-bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-box-shadow:0 0 15px #ffd84d;
-transition:width 1s ease;
-}
-
-/* SPINNING COIN */
-.coin{
-width:60px;
-height:60px;
-margin:10px auto;
-border-radius:50%;
-background:radial-gradient(circle,#ffd84d,#ffb700);
-box-shadow:0 0 25px #ffd84d;
-animation:spin 3s linear infinite;
-}
-
-@keyframes spin{
-0%{transform:rotateY(0deg);}
-100%{transform:rotateY(360deg);}
+min-height:60px;
 }
 
 /* FEATURES */
-.features{margin:20px;}
+.features{
+margin:20px;
+}
+
 .feature{
 display:flex;
+margin-bottom:15px;
 padding:12px;
-margin-bottom:12px;
-background:#0b1220;
 border-radius:10px;
+background:#0b1220;
+transition:.3s;
+}
+
+.feature:hover{
+box-shadow:0 0 30px rgba(255,215,0,0.25);
+transform:translateY(-3px);
 }
 
 .icon{
-width:40px;height:40px;
+width:40px;
+height:40px;
+background:#111827;
+border-radius:10px;
 display:flex;
 align-items:center;
 justify-content:center;
-background:#111827;
-color:#ffd84d;
-border-radius:10px;
 margin-right:10px;
-box-shadow:0 0 10px rgba(255,215,0,0.3);
+color:#ffd84d;
+box-shadow:0 0 15px rgba(255,215,0,0.4);
 }
 
-/* TRUST */
+/* TRUST IMAGE */
+.trust-section{
+margin:30px 20px;
+text-align:center;
+}
+
 .trust-img{
 width:100%;
 max-width:600px;
 border-radius:15px;
-box-shadow:0 0 40px rgba(255,215,0,0.4);
+box-shadow:
+0 0 40px rgba(255,215,0,0.4),
+0 0 80px rgba(255,215,0,0.15);
+animation:goldPulse 3s infinite alternate;
 }
 
 /* FOOTER */
@@ -218,81 +233,106 @@ font-size:12px;
 opacity:0.5;
 margin:20px;
 }
+
+/* FLOAT */
+@keyframes float{
+0%{transform:translateY(0);}
+50%{transform:translateY(-8px);}
+100%{transform:translateY(0);}
+}
 </style>
 </head>
 
 <body>
 
 <div class="hero">
+
 <div class="logo">🐭 CRYPTOMICE</div>
 
 <img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img">
 
 <div class="title">
-Turn referrals into <span class="highlight">crypto wealth</span>
+Turn referrals into real <span class="highlight">crypto wealth</span>
+</div>
+
+<div class="desc">
+Join Cryptomice and earn instantly per approved signup.
 </div>
 
 <div class="buttons">
 <button class="activate" onclick="goPayment()">Activate Account</button>
 <button class="login" onclick="goLogin()">Member Login</button>
 </div>
+
 </div>
 
 <div class="stats">
-<div><h3>10m+</h3><p>Users</p></div>
-<div><h3>$250m+</h3><p>Earned</p></div>
-<div><h3>$125m+</h3><p>Paid</p></div>
-<div><h3>$1</h3><p>Per Signup</p></div>
+<div class="stat">
+<h3>10m+</h3>
+<p>Members</p>
+</div>
+<div class="stat">
+<h3>$250m+</h3>
+<p>Earned</p>
+</div>
+<div class="stat">
+<h3>$125m+</h3>
+<p>Paid</p>
+</div>
+<div class="stat">
+<h3>$1</h3>
+<p>Per Signup</p>
+</div>
 </div>
 
 <div class="dashboard">
-
-<div class="coin"></div>
-
-<div class="balance" id="earnings">$0</div>
-
-<div class="progress">
-<div class="progress-bar" id="bar"></div>
-</div>
-
 </div>
 
 <div class="features">
+
 <div class="feature">
-<div class="icon">⚡</div><div><h4>Instant Earnings</h4></div>
+<div class="icon">⚡</div>
+<div>
+<h4>Instant Earnings</h4>
+<p>Get credited for every approved referral</p>
+</div>
 </div>
 
 <div class="feature">
-<div class="icon">🔒</div><div><h4>Secure System</h4></div>
+<div class="icon">🔒</div>
+<div>
+<h4>Secure System</h4>
+<p>Your data and earnings are protected</p>
+</div>
 </div>
 
 <div class="feature">
-<div class="icon">💸</div><div><h4>Withdraw Anytime</h4></div>
+<div class="icon">💸</div>
+<div>
+<h4>Withdraw Anytime</h4>
+<p>Fast withdrawal processing</p>
 </div>
 </div>
 
-<div style="text-align:center;margin:20px;">
+<div class="feature">
+<div class="icon">👥</div>
+<div>
+<h4>Limited Access</h4>
+<p>Private system for serious users</p>
+</div>
+</div>
+
+</div>
+
+<div class="trust-section">
 <img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="trust-img">
 </div>
 
-<div class="footer">© Cryptomice</div>
+<div class="footer">
+© Cryptomice
+</div>
 
 <script>
-/* LIVE EARNINGS COUNTER */
-let earnings = 0;
-setInterval(()=>{
-earnings += Math.floor(Math.random()*5);
-document.getElementById("earnings").innerText = "$" + earnings;
-},1000);
-
-/* PROGRESS BAR ANIMATION */
-let bar = 0;
-setInterval(()=>{
-bar += 2;
-if(bar > 100) bar = 0;
-document.getElementById("bar").style.width = bar + "%";
-},500);
-
 function goPayment(){
 window.location.href="payment.html";
 }
@@ -303,4 +343,4 @@ window.location.href="payment.html";
 </script>
 
 </body>
-</html>
+  </html>
