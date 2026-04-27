@@ -1,288 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Cryptomice Access</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#050812;
-color:white;
-overflow-x:hidden;
-}
-
-/* ✨ MOVING GOLD LIGHT BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 40%),
-radial-gradient(circle at 80% 40%, rgba(255,215,0,0.10), transparent 45%),
-radial-gradient(circle at 50% 80%, rgba(255,255,255,0.06), transparent 50%);
-animation:floatGlow 8s infinite alternate ease-in-out;
-pointer-events:none;
-z-index:0;
-}
-
-@keyframes floatGlow{
-0%{transform:scale(1) rotate(0deg);}
-100%{transform:scale(1.15) rotate(2deg);}
-}
-
-/* GLOBAL LAYER */
-*{
-position:relative;
-z-index:1;
-}
-
-/* HEADER */
-.header{
-padding:15px;
-text-align:center;
-background:rgba(17,24,39,0.8);
-border-bottom:1px solid rgba(255,215,0,0.15);
-box-shadow:0 0 20px rgba(255,215,0,0.1);
-}
-
-.header h2{
-margin:0;
-color:#ffd84d;
-text-shadow:0 0 15px #ffd84d;
-animation:pulseText 2s infinite alternate;
-}
-
-@keyframes pulseText{
-from{filter:brightness(1);}
-to{filter:brightness(1.5);}
-}
-
-/* CONTAINER */
-.container{
-max-width:500px;
-margin:20px auto;
-padding:15px;
-}
-
-/* CARD */
-.card{
-background:rgba(11,18,32,0.9);
-border:1px solid rgba(255,215,0,0.15);
-border-radius:14px;
-padding:15px;
-margin-bottom:20px;
-box-shadow:
-0 0 25px rgba(255,215,0,0.05),
-inset 0 0 15px rgba(255,215,0,0.03);
-transition:0.3s;
-animation:cardGlow 4s infinite alternate;
-}
-
-@keyframes cardGlow{
-from{box-shadow:0 0 20px rgba(255,215,0,0.05);}
-to{box-shadow:0 0 35px rgba(255,215,0,0.15);}
-}
-
-.card:hover{
-transform:translateY(-3px);
-box-shadow:0 0 40px rgba(255,215,0,0.2);
-}
-
-/* TITLES */
-.card h3{
-margin-top:0;
-color:#ffd84d;
-text-shadow:0 0 10px #ffd84d;
-}
-
-/* NOTICE */
-.notice{
-background:rgba(255,0,0,0.08);
-border-left:4px solid red;
-padding:10px;
-margin-bottom:15px;
-font-size:13px;
-animation:warningPulse 2s infinite alternate;
-}
-
-@keyframes warningPulse{
-from{opacity:0.7;}
-to{opacity:1;}
-}
-
-/* INPUTS */
-input{
-width:100%;
-padding:12px;
-margin:6px 0;
-border-radius:8px;
-border:1px solid rgba(255,215,0,0.15);
-background:#0f172a;
-color:white;
-transition:0.3s;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-}
-
-input:focus{
-outline:none;
-border:1px solid #ffd84d;
-box-shadow:0 0 15px rgba(255,215,0,0.4);
-}
-
-/* BUTTONS */
-button{
-width:100%;
-padding:13px;
-border:none;
-border-radius:8px;
-font-weight:bold;
-cursor:pointer;
-margin-top:10px;
-transition:0.3s;
-}
-
-.primary{
-background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
-color:black;
-box-shadow:0 0 20px rgba(255,215,0,0.4);
-}
-
-.primary:hover{
-transform:scale(1.04);
-box-shadow:0 0 35px rgba(255,215,0,0.8);
-}
-
-.secondary{
-background:#1f2937;
-color:white;
-box-shadow:0 0 10px rgba(0,140,255,0.2);
-}
-
-.secondary:hover{
-box-shadow:0 0 25px rgba(0,140,255,0.6);
-transform:scale(1.02);
-}
-
-/* ADDRESS BOX */
-.address{
-background:#0f172a;
-padding:10px;
-border-radius:8px;
-border:1px solid rgba(255,215,0,0.15);
-font-weight:bold;
-word-break:break-all;
-box-shadow:inset 0 0 10px rgba(255,215,0,0.05);
-}
-
-/* MSG */
-.msg{
-font-size:13px;
-margin-top:8px;
-}
-
-/* SIGNUP */
-.signup{
-background:linear-gradient(135deg,#0f3d1f,#0b1220);
-padding:15px;
-border-radius:10px;
-text-align:center;
-box-shadow:0 0 25px rgba(0,255,120,0.1);
-}
-
-.signup button{
-background:white;
-color:black;
-}
-
-/* FLOATING PARTICLES */
-.particle{
-position:fixed;
-width:6px;
-height:6px;
-background:rgba(255,215,0,0.6);
-border-radius:50%;
-animation:rise 6s linear infinite;
-opacity:0.5;
-}
-
-@keyframes rise{
-from{transform:translateY(100vh) scale(0);}
-to{transform:translateY(-10vh) scale(1.2);}
-}
-</style>
-</head>
-
-<body>
-
-<div class="header">
-<h2>🐭 CRYPTOMICE</h2>
-</div>
-
-<div class="container">
-
-<div class="notice">
-⚠ Account access requires a one-time activation payment.
-</div>
-
-<!-- PAYMENT -->
-<div class="card">
-<h3>1. Activate Access</h3>
-
-<p>Send <b>$2 Litecoin (LTC)</b> to:</p>
-
-<div class="address">
-ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
-</div>
-
-<input id="email" placeholder="Enter email">
-<input id="txid" placeholder="Enter TXID">
-
-<button id="payBtn" class="primary">Submit Payment Proof</button>
-
-<p id="payMsg" class="msg"></p>
-</div>
-
-<!-- LOGIN -->
-<div class="card">
-<h3>2. Member Login</h3>
-
-<input id="loginEmail" placeholder="Email">
-<input id="loginPassword" type="password" placeholder="Password">
-
-<button id="loginBtn" class="secondary">Login</button>
-
-<p id="loginMsg" class="msg"></p>
-</div>
-
-<!-- SIGNUP -->
-<div class="card signup">
-<h3>3. Create Account</h3>
-
-<p>If your payment is approved, continue to account creation.</p>
-
-<button onclick="window.location.href='signup.html'">
-GO TO SIGN UP
-</button>
-</div>
-
-</div>
-
-<!-- ✨ FLOATING GOLD PARTICLES -->
-<script>
-for(let i=0;i<20;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*100+"vw";
-p.style.animationDuration=(3+Math.random()*5)+"s";
-document.body.appendChild(p);
-}
-</script>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
@@ -301,10 +16,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* REF */
+/* ✅ IMPROVED REFERRAL HANDLING */
 const params = new URLSearchParams(window.location.search);
-const ref = params.get("ref");
-if (ref) localStorage.setItem("referrer", ref);
+const urlRef = params.get("ref");
+const storedRef = localStorage.getItem("referrer");
+
+/* Only set if not already stored */
+if (urlRef && !storedRef) {
+  localStorage.setItem("referrer", urlRef);
+}
+
+/* Debug (you can remove later) */
+console.log("Referral in storage:", localStorage.getItem("referrer"));
 
 /* PAYMENT */
 document.getElementById("payBtn").addEventListener("click", async () => {
@@ -321,16 +44,25 @@ document.getElementById("payBtn").addEventListener("click", async () => {
 
   const referrer = localStorage.getItem("referrer") || null;
 
-  await setDoc(doc(db, "payments", txid), {
-    email,
-    txid,
-    referrer,
-    status: "pending",
-    createdAt: new Date()
-  });
+  try {
 
-  msg.style.color = "#ffd84d";
-  msg.innerText = "Payment submitted";
+    await setDoc(doc(db, "payments", txid), {
+      email,
+      txid,
+      referrer,
+      status: "pending",
+      createdAt: new Date()
+    });
+
+    msg.style.color = "#ffd84d";
+    msg.innerText = "Payment submitted";
+
+    console.log("Saved payment with referrer:", referrer);
+
+  } catch (e) {
+    msg.style.color = "red";
+    msg.innerText = e.message;
+  }
 });
 
 /* LOGIN */
@@ -345,7 +77,4 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     document.getElementById("loginMsg").innerText = e.message;
   }
 });
-</script>
-
-</body>
-  </html>
+  </script>
