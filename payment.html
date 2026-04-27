@@ -1,3 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cryptomice Access</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#050812;
+color:white;
+overflow-x:hidden;
+}
+
+/* BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 40%),
+radial-gradient(circle at 80% 40%, rgba(255,215,0,0.10), transparent 45%),
+radial-gradient(circle at 50% 80%, rgba(255,255,255,0.06), transparent 50%);
+animation:floatGlow 8s infinite alternate ease-in-out;
+pointer-events:none;
+z-index:0;
+}
+
+@keyframes floatGlow{
+0%{transform:scale(1);}
+100%{transform:scale(1.15);}
+}
+
+*{position:relative;z-index:1;}
+
+/* HEADER */
+.header{
+padding:15px;
+text-align:center;
+background:rgba(17,24,39,0.8);
+border-bottom:1px solid rgba(255,215,0,0.15);
+}
+
+.header h2{
+margin:0;
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
+
+/* CONTAINER */
+.container{
+max-width:500px;
+margin:20px auto;
+padding:15px;
+}
+
+/* CARD */
+.card{
+background:rgba(11,18,32,0.9);
+border:1px solid rgba(255,215,0,0.15);
+border-radius:14px;
+padding:15px;
+margin-bottom:20px;
+}
+
+/* INPUT */
+input{
+width:100%;
+padding:12px;
+margin:6px 0;
+border-radius:8px;
+border:1px solid rgba(255,215,0,0.15);
+background:#0f172a;
+color:white;
+}
+
+/* BUTTON */
+button{
+width:100%;
+padding:13px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+.primary{
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+}
+
+.secondary{
+background:#1f2937;
+color:white;
+}
+
+/* ADDRESS */
+.address{
+background:#0f172a;
+padding:10px;
+border-radius:8px;
+border:1px solid rgba(255,215,0,0.15);
+font-weight:bold;
+word-break:break-all;
+}
+
+.msg{
+font-size:13px;
+margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>🐭 CRYPTOMICE</h2>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h3>1. Activate Access</h3>
+
+<p>Send <b>$2 Litecoin (LTC)</b> to:</p>
+
+<div class="address">
+ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
+</div>
+
+<input id="email" placeholder="Enter email">
+<input id="txid" placeholder="Enter TXID">
+
+<button id="payBtn" class="primary">Submit Payment</button>
+
+<p id="payMsg" class="msg"></p>
+</div>
+
+<div class="card">
+<h3>2. Member Login</h3>
+
+<input id="loginEmail" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+
+<button id="loginBtn" class="secondary">Login</button>
+
+<p id="loginMsg" class="msg"></p>
+</div>
+
+<div class="card">
+<h3>3. Create Account</h3>
+
+<p>If approved, continue to signup.</p>
+
+<button onclick="window.location.href='signup.html'">
+GO TO SIGN UP
+</button>
+</div>
+
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
@@ -16,18 +182,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ✅ IMPROVED REFERRAL HANDLING */
+/* REFERRAL SYSTEM */
 const params = new URLSearchParams(window.location.search);
 const urlRef = params.get("ref");
 const storedRef = localStorage.getItem("referrer");
 
-/* Only set if not already stored */
 if (urlRef && !storedRef) {
   localStorage.setItem("referrer", urlRef);
 }
-
-/* Debug (you can remove later) */
-console.log("Referral in storage:", localStorage.getItem("referrer"));
 
 /* PAYMENT */
 document.getElementById("payBtn").addEventListener("click", async () => {
@@ -45,7 +207,6 @@ document.getElementById("payBtn").addEventListener("click", async () => {
   const referrer = localStorage.getItem("referrer") || null;
 
   try {
-
     await setDoc(doc(db, "payments", txid), {
       email,
       txid,
@@ -56,8 +217,6 @@ document.getElementById("payBtn").addEventListener("click", async () => {
 
     msg.style.color = "#ffd84d";
     msg.innerText = "Payment submitted";
-
-    console.log("Saved payment with referrer:", referrer);
 
   } catch (e) {
     msg.style.color = "red";
@@ -77,4 +236,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     document.getElementById("loginMsg").innerText = e.message;
   }
 });
-  </script>
+</script>
+
+</body>
+  </html>
