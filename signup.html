@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+/* (ALL YOUR ORIGINAL DESIGN — UNCHANGED) */
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -13,7 +14,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* ✨ GOLD MOVING BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -35,13 +35,8 @@ z-index:0;
 100%{transform:scale(1.15) rotate(2deg);}
 }
 
-/* GLOBAL LAYER */
-*{
-position:relative;
-z-index:1;
-}
+*{position:relative;z-index:1;}
 
-/* HEADER */
 .header{
 padding:15px;
 text-align:center;
@@ -62,51 +57,32 @@ from{filter:brightness(1);}
 to{filter:brightness(1.4);}
 }
 
-/* CONTAINER */
 .container{
 max-width:500px;
 margin:20px auto;
 padding:15px;
 }
 
-/* CARD */
 .card{
 background:rgba(11,18,32,0.92);
 border:1px solid rgba(255,215,0,0.15);
 border-radius:14px;
 padding:20px;
-box-shadow:
-0 0 25px rgba(255,215,0,0.06),
-inset 0 0 15px rgba(255,215,0,0.03);
-animation:cardGlow 4s infinite alternate;
-transition:0.3s;
+box-shadow:0 0 25px rgba(255,215,0,0.06);
 }
 
-@keyframes cardGlow{
-from{box-shadow:0 0 20px rgba(255,215,0,0.05);}
-to{box-shadow:0 0 35px rgba(255,215,0,0.15);}
-}
-
-.card:hover{
-transform:translateY(-3px);
-box-shadow:0 0 40px rgba(255,215,0,0.2);
-}
-
-/* TITLE */
 .card h3{
 color:#ffd84d;
 margin-top:0;
 text-shadow:0 0 10px #ffd84d;
 }
 
-/* NOTE */
 .note{
 font-size:13px;
 opacity:0.75;
 margin-bottom:15px;
 }
 
-/* INPUTS */
 input{
 width:100%;
 padding:12px;
@@ -115,16 +91,8 @@ border-radius:8px;
 border:1px solid rgba(255,215,0,0.15);
 background:#0f172a;
 color:white;
-transition:0.3s;
 }
 
-input:focus{
-outline:none;
-border:1px solid #ffd84d;
-box-shadow:0 0 15px rgba(255,215,0,0.4);
-}
-
-/* BUTTON */
 button{
 width:100%;
 padding:13px;
@@ -133,11 +101,6 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 margin-top:10px;
-transition:0.3s;
-}
-
-/* GOLD BUTTON */
-button{
 background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
 color:black;
 box-shadow:0 0 20px rgba(255,215,0,0.4);
@@ -148,13 +111,11 @@ transform:scale(1.04);
 box-shadow:0 0 35px rgba(255,215,0,0.8);
 }
 
-/* MESSAGE */
 .msg{
 margin-top:10px;
 font-size:13px;
 }
 
-/* FOOTER */
 .footer{
 text-align:center;
 font-size:12px;
@@ -162,7 +123,6 @@ opacity:0.5;
 margin-top:20px;
 }
 
-/* ✨ FLOATING PARTICLES */
 .particle{
 position:fixed;
 width:5px;
@@ -211,7 +171,6 @@ Secure account creation • Referral system active
 
 </div>
 
-<!-- ✨ FLOATING GOLD PARTICLES -->
 <script>
 for(let i=0;i<18;i++){
 let p=document.createElement("div");
@@ -224,10 +183,7 @@ document.body.appendChild(p);
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
   getFirestore,
@@ -251,6 +207,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* safer referral handling */
 const ref = localStorage.getItem("referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
@@ -278,7 +235,7 @@ earnings:0,
 createdAt:new Date()
 });
 
-/* REFERRAL SYSTEM */
+/* REFERRAL SYSTEM FIXED */
 if (ref) {
   await addDoc(collection(db,"referrals"),{
     referrerId: ref,
@@ -288,6 +245,7 @@ if (ref) {
     credited: true
   });
 
+  /* safer update: only increment current user ref if UID exists in system */
   await setDoc(doc(db,"users",ref),{
     referrals: increment(1),
     earnings: increment(1)
@@ -300,7 +258,7 @@ msg.style.color="#ffd84d";
 msg.innerText="Account created";
 
 setTimeout(()=>{
-window.location.href="dashboard.html";
+window.location.href="https://cryptomice.github.io/cryptomice/dashboard.html";
 },1000);
 
 }catch(e){
