@@ -157,7 +157,7 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 
 <p>If approved, continue to signup.</p>
 
-<button onclick="window.location.href='signup.html'">
+<button onclick="goSignup()">
 GO TO SIGN UP
 </button>
 </div>
@@ -231,12 +231,17 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
+    window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
   } catch (e) {
     document.getElementById("loginMsg").innerText = e.message;
   }
 });
+
+/* SIGNUP NAV FIX */
+function goSignup(){
+  window.location.href = "https://cryptomice.github.io/cryptomice/signup.html";
+}
 </script>
 
 </body>
-  </html>
+</html>
