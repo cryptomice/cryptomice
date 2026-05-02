@@ -13,7 +13,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* (ALL YOUR ORIGINAL CSS — FULLY PRESERVED) */
+/* ================= LOADING SCREEN ================= */
+#splash{
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:#03060c;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+z-index:99999;
+color:#ffd84d;
+text-align:center;
+}
+
+#bar{
+width:60%;
+height:6px;
+background:#111827;
+border-radius:10px;
+overflow:hidden;
+margin-top:20px;
+}
+
+#fill{
+width:0%;
+height:100%;
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+animation:loadbar 2.5s forwards;
+}
+
+@keyframes loadbar{
+from{width:0%;}
+to{width:100%;}
+}
+
+/* ================= YOUR ORIGINAL CSS ================= */
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -22,7 +59,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* ✨ GOLD SPARKLE BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -44,10 +80,7 @@ z-index:0;
 100%{transform:scale(1.2) rotate(3deg);}
 }
 
-*{
-position:relative;
-z-index:1;
-}
+*{position:relative;z-index:1;}
 
 .hero{
 display:flex;
@@ -61,17 +94,13 @@ font-size:26px;
 font-weight:bold;
 color:#ffd84d;
 text-align:center;
-text-shadow:
-0 0 8px #ffd84d,
-0 0 20px #ffcc00,
-0 0 40px rgba(255,215,0,0.6),
-0 0 80px rgba(255,215,0,0.3);
+text-shadow:0 0 8px #ffd84d,0 0 20px #ffcc00,0 0 40px rgba(255,215,0,0.6);
 animation:goldPulse 2s infinite alternate;
 }
 
 @keyframes goldPulse{
-from{transform:scale(1); filter:brightness(1);}
-to{transform:scale(1.05); filter:brightness(1.4);}
+from{transform:scale(1);filter:brightness(1);}
+to{transform:scale(1.05);filter:brightness(1.4);}
 }
 
 .hero-img{
@@ -80,32 +109,22 @@ max-width:400px;
 margin:20px auto;
 display:block;
 border-radius:15px;
-box-shadow:
-0 0 30px rgba(255,215,0,0.25),
-0 0 60px rgba(255,215,0,0.15);
+box-shadow:0 0 30px rgba(255,215,0,0.25);
 animation:float 4s ease-in-out infinite;
 }
 
 .title{
 font-size:30px;
 font-weight:bold;
-margin:15px 0 10px;
 text-align:center;
 }
 
 .highlight{
 color:#ffd84d;
-text-shadow:
-0 0 10px #ffd84d,
-0 0 25px rgba(255,215,0,0.8),
-0 0 60px rgba(255,215,0,0.4);
+text-shadow:0 0 10px #ffd84d;
 }
 
-.desc{
-font-size:14px;
-opacity:0.9;
-text-align:center;
-}
+.desc{text-align:center;font-size:14px;opacity:0.9;}
 
 .buttons button{
 width:100%;
@@ -115,32 +134,16 @@ border-radius:12px;
 font-weight:bold;
 margin-top:10px;
 cursor:pointer;
-transition:.3s;
 }
 
 .activate{
-background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
-box-shadow:
-0 0 15px rgba(255,215,0,0.6),
-0 0 35px rgba(255,215,0,0.3);
-}
-
-.activate:hover{
-transform:scale(1.05);
-box-shadow:
-0 0 25px rgba(255,215,0,0.9),
-0 0 60px rgba(255,215,0,0.5);
 }
 
 .login{
 background:#0f172a;
 color:white;
-box-shadow:0 0 15px rgba(0,140,255,0.3);
-}
-
-.login:hover{
-box-shadow:0 0 25px rgba(0,140,255,0.8);
 }
 
 .stats{
@@ -148,69 +151,29 @@ display:flex;
 justify-content:space-around;
 padding:15px;
 background:#0b1220;
-border-top:1px solid #1f2937;
-border-bottom:1px solid #1f2937;
 }
 
-.stat h3{
-margin:0;
-color:#ffd84d;
-text-shadow:0 0 15px #ffd84d;
-}
-
-.stat p{
-font-size:12px;
-opacity:0.6;
-}
+.stat h3{color:#ffd84d;}
 
 .dashboard{
 margin:20px;
 padding:18px;
-background:rgba(11,18,32,0.9);
+background:#0b1220;
 border-radius:12px;
-border:1px solid rgba(255,215,0,0.2);
-box-shadow:
-0 0 25px rgba(255,215,0,0.08),
-inset 0 0 20px rgba(255,215,0,0.05);
 text-align:center;
 }
 
 .balance{
 font-size:28px;
 color:#ffd84d;
-text-shadow:
-0 0 10px #ffd84d,
-0 0 25px rgba(255,215,0,0.8),
-0 0 60px rgba(255,215,0,0.4);
 }
 
-.small{
-font-size:12px;
-opacity:0.7;
-margin-top:5px;
-}
+.features{margin:20px;}
 
-.features{
-margin:20px;
-}
-
-.feature{
-display:flex;
-margin-bottom:15px;
-padding:12px;
-border-radius:10px;
-background:#0b1220;
-transition:.3s;
-}
-
-.feature:hover{
-box-shadow:0 0 30px rgba(255,215,0,0.25);
-transform:translateY(-3px);
-}
+.feature{display:flex;margin-bottom:15px;}
 
 .icon{
-width:40px;
-height:40px;
+width:40px;height:40px;
 background:#111827;
 border-radius:10px;
 display:flex;
@@ -218,30 +181,11 @@ align-items:center;
 justify-content:center;
 margin-right:10px;
 color:#ffd84d;
-box-shadow:0 0 15px rgba(255,215,0,0.4);
 }
 
-.trust-section{
-margin:30px 20px;
-text-align:center;
-}
+.trust-img{width:100%;border-radius:15px;}
 
-.trust-img{
-width:100%;
-max-width:600px;
-border-radius:15px;
-box-shadow:
-0 0 40px rgba(255,215,0,0.4),
-0 0 80px rgba(255,215,0,0.15);
-animation:goldPulse 3s infinite alternate;
-}
-
-.footer{
-text-align:center;
-font-size:12px;
-opacity:0.5;
-margin:20px;
-}
+.footer{text-align:center;font-size:12px;opacity:0.5;margin:20px;}
 
 @keyframes float{
 0%{transform:translateY(0);}
@@ -253,6 +197,17 @@ margin:20px;
 
 <body>
 
+<!-- 🔥 SPLASH SCREEN -->
+<div id="splash">
+<div style="font-size:28px;font-weight:bold;">🐭 CRYPTOMICE</div>
+<div style="margin-top:10px;">Loading your earnings system...</div>
+
+<div id="bar">
+<div id="fill"></div>
+</div>
+</div>
+
+<!-- MAIN CONTENT -->
 <div class="hero">
 
 <div class="logo">🐭 CRYPTOMICE</div>
@@ -263,13 +218,7 @@ margin:20px;
 Turn referrals into real <span class="highlight">crypto wealth</span>
 </div>
 
-<p class="desc">
-Earn crypto online through referrals and simple digital rewards.
-</p>
-
-<div class="desc">
-Join Cryptomice and earn instantly per approved signup.
-</div>
+<p class="desc">Earn crypto online through referrals and rewards.</p>
 
 <div class="buttons">
 <button class="activate" onclick="goPayment()">Activate Account</button>
@@ -288,14 +237,13 @@ Join Cryptomice and earn instantly per approved signup.
 
 <div class="dashboard">
 <div class="balance">10m+ Members</div>
-<div class="small">Growing global network</div>
 </div>
 
 <div class="features">
-<div class="feature"><div class="icon">⚡</div><div><h4>Instant Earnings</h4><p>Get credited for every approved referral</p></div></div>
-<div class="feature"><div class="icon">🔒</div><div><h4>Secure System</h4><p>Your data and earnings are protected</p></div></div>
-<div class="feature"><div class="icon">💸</div><div><h4>Withdraw Anytime</h4><p>Fast withdrawal processing</p></div></div>
-<div class="feature"><div class="icon">👥</div><div><h4>Limited Access</h4><p>Private system for serious users</p></div></div>
+<div class="feature"><div class="icon">⚡</div><div>Instant Earnings</div></div>
+<div class="feature"><div class="icon">🔒</div><div>Secure System</div></div>
+<div class="feature"><div class="icon">💸</div><div>Withdraw Anytime</div></div>
+<div class="feature"><div class="icon">👥</div><div>Limited Access</div></div>
 </div>
 
 <div class="trust-section">
@@ -303,25 +251,13 @@ Join Cryptomice and earn instantly per approved signup.
 </div>
 
 <div class="footer">
-© 2009 - 2026 Cryptomice. All rights reserved.
-</div>
-
-<div style="display:none;">
-  <a href="https://cryptomice.github.io/cryptomice/login.html">login</a>
-  <a href="https://cryptomice.github.io/cryptomice/signup.html">signup</a>
-  <a href="https://cryptomice.github.io/cryptomice/payment.html">payment</a>
-  <a href="https://cryptomice.github.io/cryptomice/dashboard.html">dashboard</a>
-  <a href="https://cryptomice.github.io/cryptomice/admin.html">admin</a>
-  <a href="https://cryptomice.github.io/cryptomice/guide.html">guide</a>
+© 2009 - 2026 Cryptomice
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const ref = params.get("ref");
-
-if(ref){
-  localStorage.setItem("referrer", ref);
-}
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+},2600);
 
 function goPayment(){
 window.location.href="https://cryptomice.github.io/cryptomice/payment.html";
@@ -333,4 +269,4 @@ window.location.href="https://cryptomice.github.io/cryptomice/payment.html";
 </script>
 
 </body>
-  </html>
+</html>
