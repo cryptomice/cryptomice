@@ -20,7 +20,7 @@ Login
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -34,6 +34,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+/* 🔐 AUTO REDIRECT IF ALREADY LOGGED IN */
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
+  }
+});
+
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -41,7 +48,11 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     document.getElementById("msg").innerText = "Login successful!";
-    window.location.href = "dashboard.html";
+
+    setTimeout(() => {
+      window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
+    }, 800);
+
   } catch (error) {
     document.getElementById("msg").innerText = error.message;
   }
