@@ -63,14 +63,12 @@ text-align:center;
 text-shadow:0 0 20px #ffd84d;
 }
 
-/* SMALL TEXT */
 .small{
 font-size:12px;
 opacity:0.7;
 text-align:center;
 }
 
-/* INPUTS */
 input{
 width:100%;
 padding:12px;
@@ -81,7 +79,6 @@ background:#0f172a;
 color:white;
 }
 
-/* BUTTONS */
 button{
 width:100%;
 padding:13px;
@@ -103,7 +100,6 @@ background:#1f2937;
 color:white;
 }
 
-/* REF LINK */
 .ref-box{
 background:#0f172a;
 padding:10px;
@@ -112,7 +108,6 @@ word-break:break-all;
 margin-bottom:10px;
 }
 
-/* STATS GRID */
 .stats{
 display:flex;
 justify-content:space-between;
@@ -124,7 +119,6 @@ color:#ffd84d;
 margin:0;
 }
 
-/* MSG */
 .msg{
 font-size:13px;
 margin-top:8px;
@@ -139,21 +133,18 @@ margin-top:8px;
 <p id="userEmail">Loading...</p>
 </div>
 
-<!-- BALANCE -->
 <div class="card">
 <div class="small">Available Earnings</div>
 <div class="balance">$<span id="earnings">0</span></div>
 <div class="small">User ID: ••••••• (hidden)</div>
 </div>
 
-<!-- REF LINK -->
 <div class="card">
 <h3>Your Referral Link</h3>
 <div id="refLink" class="ref-box">Loading...</div>
 <button class="secondary" onclick="copyLink()">Copy Link</button>
 </div>
 
-<!-- STATS -->
 <div class="card">
 <h3>Stats</h3>
 <div class="stats">
@@ -168,7 +159,6 @@ margin-top:8px;
 </div>
 </div>
 
-<!-- WITHDRAW -->
 <div class="card">
 <h3>Withdraw (Litecoin)</h3>
 
@@ -217,7 +207,7 @@ let currentUserEmail = null;
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
-window.location.href = "payment.html";
+window.location.href = "https://cryptomice.github.io/cryptomice/payment.html";
 return;
 }
 
@@ -227,7 +217,7 @@ currentUserEmail = user.email;
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
 
-/* ✅ REF LINK FIXED */
+/* REF LINK */
 document.getElementById("refLink").innerText =
 "https://cryptomice.github.io/cryptomice/index.html?ref=" + user.uid;
 
@@ -310,4 +300,4 @@ msg.innerText=e.message;
 </script>
 
 </body>
-  </html>
+</html>
