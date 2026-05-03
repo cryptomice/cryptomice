@@ -6,6 +6,7 @@
   "background_color": "#03060c",
   "theme_color": "#ffd84d",
   "orientation": "portrait",
+  "description": "Cryptomice is a referral-based earning platform where users grow their network and earn rewards through verified signups.",
   "icons": [
     {
       "src": "icon-192.png",
