@@ -120,7 +120,7 @@ margin-top:8px;
 <div class="card">
 <h3>1. Activate Access</h3>
 
-<p>Send <b>Litecoin (LTC)</b> to:</p>
+<p>Send <b>$2 Litecoin (LTC)</b> to platform address:</p>
 
 <div class="address">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
@@ -173,76 +173,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* REFERRAL SYSTEM */
-const params = new URLSearchParams(window.location.search);
-const urlRef = params.get("ref");
-const storedRef = localStorage.getItem("referrer");
-
-if (urlRef && !storedRef) {
-  localStorage.setItem("referrer", urlRef);
-}
-
-/* 🔥 GET LIVE LITECOIN PRICE */
-async function getLTCPrice() {
-  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=usd");
-  const data = await res.json();
-  return data.litecoin.usd;
-}
-
-/* PAYMENT + AUTO CONVERSION */
-document.getElementById("payBtn").addEventListener("click", async () => {
-
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const txid = document.getElementById("txid").value.trim();
-  const msg = document.getElementById("payMsg");
-
-  if (!email || !txid) {
-    msg.innerText = "Fill all fields";
-    msg.style.color = "red";
-    return;
-  }
-
-  try {
-    const ltcPrice = await getLTCPrice();
-
-    const usdAmount = 2; // your system price
-    const ltcRequired = usdAmount / ltcPrice;
-
-    const referrer = localStorage.getItem("referrer") || null;
-
-    await setDoc(doc(db, "payments", txid), {
-      email,
-      txid,
-      referrer,
-      usdAmount,
-      ltcRequired,
-      ltcPrice,
-      status: "pending",
-      createdAt: new Date()
-    });
-
-    msg.style.color = "#ffd84d";
-    msg.innerText = `Payment submitted (~${ltcRequired.toFixed(6)} LTC)`;
-
-  } catch (e) {
-    msg.style.color = "red";
-    msg.innerText = "Error: " + e.message;
-  }
-});
-
-/* LOGIN */
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
-  } catch (e) {
-    document.getElementById("loginMsg").innerText = e.message;
-  }
-});
-
 /* SIGNUP FIX */
 document.getElementById("signupBtn").addEventListener("click", function () {
   window.location.href = "signup.html";
@@ -250,4 +180,4 @@ document.getElementById("signupBtn").addEventListener("click", function () {
 </script>
 
 </body>
-</html>
+  </html>
