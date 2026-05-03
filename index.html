@@ -1,18 +1,22 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-  
-<meta name="google-site-verification" content="Gb0y1wO-vPnZaBSbM0LvemVniT-5jbJA-xfJyXmfZL0" />  
-  
-<meta name="description" content="Cryptomice is a referral-based crypto rewards platform where users earn digital rewards by inviting others online.">  
-<meta name="keywords" content="crypto referral, earn crypto online, bitcoin referral system, crypto rewards, passive crypto income">  
-<meta name="robots" content="index, follow">  
-  
-<title>Cryptomice – Earn Crypto Through Referrals</title>  
-  
-<meta name="viewport" content="width=device-width, initial-scale=1">  
-  
-<style>  
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="google-site-verification" content="Gb0y1wO-vPnZaBSbM0LvemVniT-5jbJA-xfJyXmfZL0" />
+
+<meta name="description" content="Cryptomice is a referral-based crypto rewards platform where users earn digital rewards by inviting others online.">
+<meta name="keywords" content="crypto referral, earn crypto online, bitcoin referral system, crypto rewards, passive crypto income">
+<meta name="robots" content="index, follow">
+
+<title>Cryptomice – Earn Crypto Through Referrals</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- PWA SUPPORT -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffd84d">
+
+<style>
 
 /* ================= LOADING SCREEN ================= */
 #splash{
@@ -51,7 +55,7 @@ from{width:0%;}
 to{width:100%;}
 }
 
-/* ================= YOUR ORIGINAL CSS ================= */
+/* ================= BASE ================= */
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -83,6 +87,7 @@ z-index:0;
 
 *{position:relative;z-index:1;}
 
+/* HERO */
 .hero{
 display:flex;
 flex-direction:column;
@@ -96,12 +101,6 @@ font-weight:bold;
 color:#ffd84d;
 text-align:center;
 text-shadow:0 0 8px #ffd84d,0 0 20px #ffcc00,0 0 40px rgba(255,215,0,0.6);
-animation:goldPulse 2s infinite alternate;
-}
-
-@keyframes goldPulse{
-from{transform:scale(1);filter:brightness(1);}
-to{transform:scale(1.05);filter:brightness(1.4);}
 }
 
 .hero-img{
@@ -111,7 +110,6 @@ margin:20px auto;
 display:block;
 border-radius:15px;
 box-shadow:0 0 30px rgba(255,215,0,0.25);
-animation:float 4s ease-in-out infinite;
 }
 
 .title{
@@ -120,10 +118,7 @@ font-weight:bold;
 text-align:center;
 }
 
-.highlight{
-color:#ffd84d;
-text-shadow:0 0 10px #ffd84d;
-}
+.highlight{color:#ffd84d;}
 
 .desc{text-align:center;font-size:14px;opacity:0.9;}
 
@@ -147,6 +142,7 @@ background:#0f172a;
 color:white;
 }
 
+/* STATS */
 .stats{
 display:flex;
 justify-content:space-around;
@@ -156,6 +152,7 @@ background:#0b1220;
 
 .stat h3{color:#ffd84d;}
 
+/* DASHBOARD */
 .dashboard{
 margin:20px;
 padding:18px;
@@ -169,9 +166,13 @@ font-size:28px;
 color:#ffd84d;
 }
 
+/* FEATURES */
 .features{margin:20px;}
 
-.feature{display:flex;margin-bottom:15px;}
+.feature{
+display:flex;
+margin-bottom:15px;
+}
 
 .icon{
 width:40px;height:40px;
@@ -184,9 +185,10 @@ margin-right:10px;
 color:#ffd84d;
 }
 
+/* TRUST */
 .trust-img{width:100%;border-radius:15px;}
 
-/* 🔥 SOCIAL SECTION */
+/* SOCIAL */
 .social{
 margin:40px 20px;
 text-align:center;
@@ -195,7 +197,6 @@ text-align:center;
 .social h2{
 color:#ffd84d;
 margin-bottom:15px;
-text-shadow:0 0 15px #ffd84d;
 }
 
 .social a{
@@ -206,105 +207,106 @@ background:linear-gradient(90deg,#1877f2,#0d5ddb);
 color:white;
 font-weight:bold;
 text-decoration:none;
-box-shadow:0 0 15px rgba(24,119,242,0.5);
-transition:0.3s;
 }
 
-.social a:hover{
-transform:scale(1.05);
-box-shadow:0 0 25px rgba(24,119,242,0.8);
+/* FOOTER */
+.footer{
+text-align:center;
+font-size:12px;
+opacity:0.5;
+margin:20px;
 }
 
-.footer{text-align:center;font-size:12px;opacity:0.5;margin:20px;}
+</style>
+</head>
 
-@keyframes float{
-0%{transform:translateY(0);}
-50%{transform:translateY(-8px);}
-100%{transform:translateY(0);}
-}
-</style>  
-</head>  
-  
-<body>  
-  
-<!-- 🔥 SPLASH SCREEN -->  
-<div id="splash">  
-<div style="font-size:28px;font-weight:bold;">🐭 CRYPTOMICE</div>  
-<div style="margin-top:10px;">Loading your earnings system...</div>  
-  
-<div id="bar">  
-<div id="fill"></div>  
-</div>  
-</div>  
-  
-<!-- MAIN CONTENT -->  
-<div class="hero">  
-  
-<div class="logo">🐭 CRYPTOMICE</div>  
-  
-<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img">  
-  
-<div class="title">  
-Turn referrals into real <span class="highlight">crypto wealth</span>  
-</div>  
-  
-<p class="desc">Earn crypto online through referrals and rewards.</p>  
-  
-<div class="buttons">  
-<button class="activate" onclick="goPayment()">Activate Account</button>  
-<button class="login" onclick="goLogin()">Member Login</button>  
-<button class="login" onclick="window.location.href='https://cryptomice.github.io/cryptomice/guide.html'">How it works</button>  
-</div>  
-  
-</div>  
-  
-<div class="stats">  
-<div class="stat"><h3>10m+</h3><p>Members</p></div>  
-<div class="stat"><h3>$250m+</h3><p>Earned</p></div>  
-<div class="stat"><h3>$125m+</h3><p>Paid</p></div>  
-<div class="stat"><h3>$1</h3><p>Per Signup</p></div>  
-</div>  
-  
-<div class="dashboard">  
-<div class="balance">10m+ Members</div>  
-</div>  
-  
-<div class="features">  
-<div class="feature"><div class="icon">⚡</div><div>Instant Earnings</div></div>  
-<div class="feature"><div class="icon">🔒</div><div>Secure System</div></div>  
-<div class="feature"><div class="icon">💸</div><div>Withdraw Anytime</div></div>  
-<div class="feature"><div class="icon">👥</div><div>Limited Access</div></div>  
-</div>  
-  
-<div class="trust-section">  
-<img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="trust-img">  
-</div>  
+<body>
 
-<!-- 🔥 SOCIAL SECTION -->
+<!-- SPLASH -->
+<div id="splash">
+<div style="font-size:28px;font-weight:bold;">🐭 CRYPTOMICE</div>
+<div style="margin-top:10px;">Loading your system...</div>
+<div id="bar"><div id="fill"></div></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+
+<div class="logo">🐭 CRYPTOMICE</div>
+
+<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img">
+
+<div class="title">
+Turn referrals into real <span class="highlight">crypto wealth</span>
+</div>
+
+<p class="desc">Earn crypto online through referrals and rewards.</p>
+
+<div class="buttons">
+<button class="activate" onclick="goPayment()">Activate Account</button>
+<button class="login" onclick="goLogin()">Member Login</button>
+<button class="login" onclick="window.location.href='guide.html'">How it works</button>
+</div>
+
+</div>
+
+<!-- STATS -->
+<div class="stats">
+<div class="stat"><h3>10m+</h3><p>Members</p></div>
+<div class="stat"><h3>$250m+</h3><p>Earned</p></div>
+<div class="stat"><h3>$125m+</h3><p>Paid</p></div>
+<div class="stat"><h3>$1</h3><p>Per Signup</p></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+<div class="balance">10m+ Members</div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+<div class="feature"><div class="icon">⚡</div><div>Instant Earnings</div></div>
+<div class="feature"><div class="icon">🔒</div><div>Secure System</div></div>
+<div class="feature"><div class="icon">💸</div><div>Withdraw Anytime</div></div>
+<div class="feature"><div class="icon">👥</div><div>Limited Access</div></div>
+</div>
+
+<!-- TRUST -->
+<img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="trust-img">
+
+<!-- SOCIAL -->
 <div class="social">
 <h2>Join thousands talking about us</h2>
 <a href="https://www.facebook.com/profile.php?id=61551847504420" target="_blank">
 Follow us on Facebook
 </a>
 </div>
-  
-<div class="footer">  
-© 2009 - 2026 Cryptomice  
-</div>  
-  
-<script>  
-setTimeout(()=>{  
-document.getElementById("splash").style.display="none";  
-},2600);  
-  
-function goPayment(){  
-window.location.href="https://cryptomice.github.io/cryptomice/payment.html";  
-}  
-  
-function goLogin(){  
-window.location.href="https://cryptomice.github.io/cryptomice/payment.html";  
-}  
-</script>  
-  
-</body>  
-</html>
+
+<!-- FOOTER -->
+<div class="footer">© 2009 - 2026 Cryptomice</div>
+
+<!-- SCRIPTS -->
+<script>
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+},2500);
+
+function goPayment(){
+window.location.href="payment.html";
+}
+
+function goLogin(){
+window.location.href="payment.html";
+}
+</script>
+
+<!-- SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("Service Worker Registered"));
+}
+</script>
+
+</body>
+  </html>
