@@ -13,7 +13,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -37,7 +36,6 @@ z-index:0;
 
 *{position:relative;z-index:1;}
 
-/* HEADER */
 .header{
 padding:15px;
 text-align:center;
@@ -51,14 +49,12 @@ color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
 }
 
-/* CONTAINER */
 .container{
 max-width:500px;
 margin:20px auto;
 padding:15px;
 }
 
-/* CARD */
 .card{
 background:rgba(11,18,32,0.9);
 border:1px solid rgba(255,215,0,0.15);
@@ -67,7 +63,6 @@ padding:15px;
 margin-bottom:20px;
 }
 
-/* INPUT */
 input{
 width:100%;
 padding:12px;
@@ -78,7 +73,6 @@ background:#0f172a;
 color:white;
 }
 
-/* BUTTON */
 button{
 width:100%;
 padding:13px;
@@ -99,7 +93,6 @@ background:#1f2937;
 color:white;
 }
 
-/* ADDRESS */
 .address{
 background:#0f172a;
 padding:10px;
@@ -127,7 +120,7 @@ margin-top:8px;
 <div class="card">
 <h3>1. Activate Access</h3>
 
-<p>Send <b>$2 Litecoin (LTC)</b> to:</p>
+<p>Send <b>Litecoin (LTC)</b> to:</p>
 
 <div class="address">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
@@ -157,9 +150,7 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 
 <p>If approved, continue to signup.</p>
 
-<button onclick="goSignup()">
-GO TO SIGN UP
-</button>
+<button id="signupBtn" class="primary">GO TO SIGN UP</button>
 </div>
 
 </div>
@@ -191,7 +182,14 @@ if (urlRef && !storedRef) {
   localStorage.setItem("referrer", urlRef);
 }
 
-/* PAYMENT */
+/* 🔥 GET LIVE LITECOIN PRICE */
+async function getLTCPrice() {
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=usd");
+  const data = await res.json();
+  return data.litecoin.usd;
+}
+
+/* PAYMENT + AUTO CONVERSION */
 document.getElementById("payBtn").addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim().toLowerCase();
@@ -204,23 +202,31 @@ document.getElementById("payBtn").addEventListener("click", async () => {
     return;
   }
 
-  const referrer = localStorage.getItem("referrer") || null;
-
   try {
+    const ltcPrice = await getLTCPrice();
+
+    const usdAmount = 2; // your system price
+    const ltcRequired = usdAmount / ltcPrice;
+
+    const referrer = localStorage.getItem("referrer") || null;
+
     await setDoc(doc(db, "payments", txid), {
       email,
       txid,
       referrer,
+      usdAmount,
+      ltcRequired,
+      ltcPrice,
       status: "pending",
       createdAt: new Date()
     });
 
     msg.style.color = "#ffd84d";
-    msg.innerText = "Payment submitted";
+    msg.innerText = `Payment submitted (~${ltcRequired.toFixed(6)} LTC)`;
 
   } catch (e) {
     msg.style.color = "red";
-    msg.innerText = e.message;
+    msg.innerText = "Error: " + e.message;
   }
 });
 
@@ -231,16 +237,16 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
+    window.location.href = "dashboard.html";
   } catch (e) {
     document.getElementById("loginMsg").innerText = e.message;
   }
 });
 
-/* SIGNUP NAV FIX */
-function goSignup(){
-  window.location.href = "https://cryptomice.github.io/cryptomice/signup.html";
-}
+/* SIGNUP FIX */
+document.getElementById("signupBtn").addEventListener("click", function () {
+  window.location.href = "signup.html";
+});
 </script>
 
 </body>
