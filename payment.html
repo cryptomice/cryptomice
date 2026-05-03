@@ -157,8 +157,8 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -173,11 +173,21 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* SIGNUP FIX */
-document.getElementById("signupBtn").addEventListener("click", function () {
-  window.location.href = "signup.html";
+/* FIXED BUTTON HANDLING */
+window.addEventListener("DOMContentLoaded", () => {
+  const signupBtn = document.getElementById("signupBtn");
+
+  if (!signupBtn) {
+    console.error("Signup button not found");
+    return;
+  }
+
+  signupBtn.addEventListener("click", () => {
+    console.log("Redirecting to signup.html");
+    window.location.href = "./signup.html";
+  });
 });
 </script>
 
 </body>
-  </html>
+</html>
