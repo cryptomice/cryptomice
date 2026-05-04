@@ -1,8 +1,9 @@
 {
   "name": "Cryptomice",
   "short_name": "Cryptomice",
-  "start_url": "/cryptomice/index.html",
+  "start_url": "/cryptomice/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#03060c",
   "theme_color": "#ffd84d",
   "orientation": "portrait",
