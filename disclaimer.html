@@ -1,49 +1,183 @@
-Disclaimer – Cryptomice
+<!DOCTYPE html>
+<html>
+<head>
+<title>Disclaimer - Cryptomice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-Last Updated: 2026
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#050812;
+color:white;
+overflow-x:hidden;
+}
 
-1. No Earnings Guarantee
+/* Glow background */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 40%),
+radial-gradient(circle at 80% 40%, rgba(255,215,0,0.10), transparent 45%),
+radial-gradient(circle at 50% 80%, rgba(255,255,255,0.06), transparent 50%);
+animation:floatGlow 8s infinite alternate ease-in-out;
+pointer-events:none;
+z-index:0;
+}
 
-Cryptomice does not guarantee any level of income or earnings.
-All earnings depend on individual effort, referrals, and external factors.
+@keyframes floatGlow{
+0%{transform:scale(1);}
+100%{transform:scale(1.15);}
+}
 
-2. Not Financial Advice
+*{position:relative;z-index:1;}
 
-Cryptomice is not a financial service or investment platform.
-Nothing on this platform should be considered financial advice.
+.header{
+text-align:center;
+padding:20px;
+background:rgba(17,24,39,0.85);
+border-bottom:1px solid rgba(255,215,0,0.15);
+}
 
-3. Platform Purpose
+.header h1{
+margin:0;
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
 
-Cryptomice is a referral-based reward system where users may earn based on approved activities.
-Results may vary from user to user.
+.container{
+max-width:700px;
+margin:30px auto;
+padding:15px;
+}
 
-4. Payment Conditions
+.card{
+background:rgba(11,18,32,0.85);
+border:1px solid rgba(255,215,0,0.12);
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 0 25px rgba(0,0,0,0.4);
+backdrop-filter:blur(6px);
+}
 
-All withdrawals and earnings are subject to:
+h2{
+color:#ffd84d;
+margin-top:0;
+}
 
-- Verification
-- Fraud checks
-- Platform rules
+p{
+line-height:1.6;
+color:#e5e7eb;
+}
 
+ul{
+padding-left:20px;
+}
+
+ul li{
+margin:6px 0;
+color:#e5e7eb;
+}
+
+.date{
+text-align:center;
+font-size:13px;
+color:#9ca3af;
+margin-top:5px;
+}
+
+.footer{
+text-align:center;
+margin-top:25px;
+font-size:13px;
+color:#9ca3af;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>⚠ Disclaimer</h1>
+<div class="date">Last Updated: 2026</div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h2>1. No Earnings Guarantee</h2>
+<p>
+Cryptomice does not guarantee any level of income or earnings. All earnings depend on individual effort, referrals, and external factors.
+</p>
+</div>
+
+<div class="card">
+<h2>2. Not Financial Advice</h2>
+<p>
+Cryptomice is not a financial service or investment platform. Nothing on this platform should be considered financial advice.
+</p>
+</div>
+
+<div class="card">
+<h2>3. Platform Purpose</h2>
+<p>
+Cryptomice is a referral-based reward system where users may earn based on approved activities. Results may vary from user to user.
+</p>
+</div>
+
+<div class="card">
+<h2>4. Payment Conditions</h2>
+<p>All withdrawals and earnings are subject to:</p>
+<ul>
+<li>Verification</li>
+<li>Fraud checks</li>
+<li>Platform rules</li>
+</ul>
+<p>
 Cryptomice reserves the right to delay, review, or deny payments if suspicious activity is detected.
+</p>
+</div>
 
-5. User Responsibility
+<div class="card">
+<h2>5. User Responsibility</h2>
+<p>Users are responsible for:</p>
+<ul>
+<li>How they promote their referral links</li>
+<li>Following applicable laws and platform rules</li>
+</ul>
+</div>
 
-Users are responsible for:
+<div class="card">
+<h2>6. Limitation of Liability</h2>
+<p>
+Cryptomice is not responsible for loss of earnings, user decisions, or third-party actions.
+</p>
+</div>
 
-- How they promote their referral links
-- Ensuring they follow applicable laws and platform rules
-
-6. Limitation of Liability
-
-Cryptomice is not responsible for:
-
-- Loss of earnings
-- User decisions
-- Third-party actions
-
-7. Changes
-
+<div class="card">
+<h2>7. Changes</h2>
+<p>
 This disclaimer may be updated at any time without notice.
+</p>
+</div>
 
-By using Cryptomice, you agree to this disclaimer.
+<div class="card">
+<p style="text-align:center;color:#ffd84d;">
+By using <b>Cryptomice</b>, you agree to this disclaimer.
+</p>
+</div>
+
+<div class="footer">
+© 2026 Cryptomice. All rights reserved.
+</div>
+
+</div>
+
+</body>
+  </html>
