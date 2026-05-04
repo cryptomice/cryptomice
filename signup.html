@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
+/* ✅ SAFE GLOBAL FIX (IMPORTANT) */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -13,6 +21,7 @@ color:white;
 overflow-x:hidden;
 }
 
+/* background glow */
 body::before{
 content:"";
 position:fixed;
@@ -56,10 +65,12 @@ from{filter:brightness(1);}
 to{filter:brightness(1.4);}
 }
 
+/* ✅ FIX: prevents right overflow */
 .container{
 max-width:500px;
 margin:20px auto;
 padding:15px;
+overflow:hidden;
 }
 
 .card{
@@ -68,6 +79,7 @@ border:1px solid rgba(255,215,0,0.15);
 border-radius:14px;
 padding:20px;
 box-shadow:0 0 25px rgba(255,215,0,0.06);
+overflow:hidden;
 }
 
 .card h3{
@@ -141,6 +153,7 @@ opacity:0.5;
 margin-top:20px;
 }
 
+/* particles */
 .particle{
 position:fixed;
 width:5px;
@@ -155,6 +168,7 @@ opacity:0.5;
 from{transform:translateY(100vh) scale(0);}
 to{transform:translateY(-10vh) scale(1.2);}
 }
+
 </style>
 </head>
 
@@ -181,7 +195,6 @@ Only approved users can create an account.
 
 <p id="msg" class="msg"></p>
 
-<!-- LEGAL SECTION ADDED -->
 <div class="legal">
 By creating an account, you agree to our  
 <a href="terms.html">Terms of Use</a>,  
@@ -294,4 +307,4 @@ msg.innerText=e.message;
 </script>
 
 </body>
-  </html>
+</html>
