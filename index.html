@@ -62,6 +62,7 @@ font-family:Arial, sans-serif;
 background:#03060c;
 color:white;
 overflow-x:hidden;
+transition: opacity 0.2s ease;
 }
 
 body::before{
@@ -273,7 +274,7 @@ Turn referrals into real <span class="highlight">crypto wealth</span>
 <div class="buttons">
 <button class="activate" onclick="goPayment()">Activate Account</button>
 <button class="login" onclick="goLogin()">Member Login</button>
-<button class="login" onclick="window.location.href='guide.html'">How it works</button>
+<button class="login" onclick="navigateTo('guide.html')">How it works</button>
 </div>
 
 <!-- INSTALL BUTTON -->
@@ -331,12 +332,18 @@ setTimeout(()=>{
 document.getElementById("splash").style.display="none";
 },2500);
 
+// App-style navigation (smooth feel)
+function navigateTo(url){
+document.body.style.opacity = "0.6";
+setTimeout(()=>{ window.location.href = url; }, 150);
+}
+
 function goPayment(){
-window.location.href="payment.html";
+navigateTo("payment.html");
 }
 
 function goLogin(){
-window.location.href="payment.html";
+navigateTo("payment.html");
 }
 
 // INSTALL APP LOGIC
@@ -352,16 +359,13 @@ document.getElementById("installBtn").addEventListener("click", async () => {
   if (!deferredPrompt) return;
 
   deferredPrompt.prompt();
-
   await deferredPrompt.userChoice;
 
   deferredPrompt = null;
   document.getElementById("installBtn").style.display = "none";
 });
-</script>
 
-<!-- SERVICE WORKER -->
-<script>
+// SERVICE WORKER
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js")
     .then(() => console.log("Service Worker Registered"));
