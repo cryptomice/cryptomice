@@ -152,15 +152,20 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 
 <p>If approved, continue to signup.</p>
 
-<button id="signupBtn" class="primary">GO TO SIGN UP</button>
+<!-- ✅ FIXED BUTTON -->
+<button class="primary"
+onclick="window.location.href='https://cryptomice.github.io/cryptomice/signup.html'">
+GO TO SIGN UP
+</button>
+
 </div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -175,18 +180,41 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.addEventListener("DOMContentLoaded", () => {
-  const signupBtn = document.getElementById("signupBtn");
+/* PAYMENT */
+document.getElementById("payBtn").addEventListener("click", async () => {
 
-  if (!signupBtn) {
-    console.error("Signup button not found");
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const txid = document.getElementById("txid").value.trim();
+  const msg = document.getElementById("payMsg");
+
+  if (!email || !txid) {
+    msg.innerText = "Fill all fields";
+    msg.style.color = "red";
     return;
   }
 
-  signupBtn.addEventListener("click", () => {
-    console.log("Redirecting to signup.html");
-    window.location.href = "./signup.html";
+  await setDoc(doc(db, "payments", txid), {
+    email,
+    txid,
+    status: "pending",
+    createdAt: new Date()
   });
+
+  msg.style.color = "#ffd84d";
+  msg.innerText = "Payment submitted";
+});
+
+/* LOGIN */
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
+  } catch (e) {
+    document.getElementById("loginMsg").innerText = e.message;
+  }
 });
 </script>
 
