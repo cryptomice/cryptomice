@@ -1,43 +1,199 @@
-Terms of Use – Cryptomice
+<!DOCTYPE html>
+<html>
+<head>
+<title>Terms of Use - Cryptomice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-Last Updated: 2026
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#050812;
+color:white;
+overflow-x:hidden;
+}
 
-Welcome to Cryptomice. By accessing or using this platform, you agree to the following terms.
+/* Glow background */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 40%),
+radial-gradient(circle at 80% 40%, rgba(255,215,0,0.10), transparent 45%),
+radial-gradient(circle at 50% 80%, rgba(255,255,255,0.06), transparent 50%);
+animation:floatGlow 8s infinite alternate ease-in-out;
+pointer-events:none;
+z-index:0;
+}
 
-1. Platform Usage
+@keyframes floatGlow{
+0%{transform:scale(1);}
+100%{transform:scale(1.15);}
+}
 
-Cryptomice provides users with a referral-based earning system. Users may earn rewards based on approved referrals.
+*{position:relative;z-index:1;}
 
-2. Account Responsibility
+.header{
+text-align:center;
+padding:20px;
+background:rgba(17,24,39,0.85);
+border-bottom:1px solid rgba(255,215,0,0.15);
+}
 
+.header h1{
+margin:0;
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
+
+.container{
+max-width:800px;
+margin:30px auto;
+padding:15px;
+}
+
+.card{
+background:rgba(11,18,32,0.85);
+border:1px solid rgba(255,215,0,0.12);
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 0 25px rgba(0,0,0,0.4);
+backdrop-filter:blur(6px);
+}
+
+h2{
+color:#ffd84d;
+margin-top:0;
+}
+
+p{
+line-height:1.6;
+color:#e5e7eb;
+}
+
+ul{
+padding-left:20px;
+}
+
+ul li{
+margin:6px 0;
+color:#e5e7eb;
+}
+
+.date{
+text-align:center;
+font-size:13px;
+color:#9ca3af;
+margin-top:5px;
+}
+
+.footer{
+text-align:center;
+margin-top:25px;
+font-size:13px;
+color:#9ca3af;
+}
+
+.email{
+color:#ffd84d;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>📜 Terms of Use</h1>
+<div class="date">Last Updated: 2026</div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<p>
+Welcome to <b>Cryptomice</b>. By accessing or using this platform, you agree to the following terms.
+</p>
+</div>
+
+<div class="card">
+<h2>1. Platform Usage</h2>
+<p>
+Cryptomice provides a referral-based earning system. Users may earn rewards based on approved referrals and platform activity.
+</p>
+</div>
+
+<div class="card">
+<h2>2. Account Responsibility</h2>
+<p>
 You are responsible for maintaining the confidentiality of your account. Any activity under your account is your responsibility.
+</p>
+</div>
 
-3. Referral Rules
+<div class="card">
+<h2>3. Referral Rules</h2>
+<ul>
+<li>Fake, automated, or fraudulent referrals are strictly prohibited</li>
+<li>Suspicious activity may result in account suspension</li>
+<li>Only valid and approved signups are counted</li>
+</ul>
+</div>
 
-- Fake, automated, or fraudulent referrals are strictly prohibited
-- Any suspicious activity may result in account suspension
-- Only valid and approved signups are counted
+<div class="card">
+<h2>4. Payments & Earnings</h2>
+<ul>
+<li>Earnings are credited based on successful referrals</li>
+<li>Withdrawals are subject to review</li>
+<li>Payments may be delayed or denied in cases of fraud or abuse</li>
+</ul>
+</div>
 
-4. Payments & Earnings
+<div class="card">
+<h2>5. No Guarantees</h2>
+<p>
+Cryptomice does not guarantee any specific earnings. Results depend on user effort, referrals, and external factors.
+</p>
+</div>
 
-- Earnings are credited based on successful referrals
-- Withdrawals are subject to review
-- Cryptomice reserves the right to delay or deny payouts in cases of fraud or abuse
-
-5. No Guarantees
-
-Cryptomice does not guarantee any specific earnings. Results depend on user effort and external factors.
-
-6. Account Termination
-
+<div class="card">
+<h2>6. Account Termination</h2>
+<p>
 We reserve the right to suspend or terminate accounts that violate these terms without prior notice.
+</p>
+</div>
 
-7. Changes to Terms
-
+<div class="card">
+<h2>7. Changes to Terms</h2>
+<p>
 These terms may be updated at any time. Continued use of the platform means you accept any changes.
+</p>
+</div>
 
-8. Contact
+<div class="card">
+<h2>8. Contact</h2>
+<p>
+For support, contact:
+<br>
+<span class="email">support@cryptomice.com</span>
+</p>
+</div>
 
-For support, contact: support@cryptomice.com
+<div class="card">
+<p style="text-align:center;color:#ffd84d;">
+By using <b>Cryptomice</b>, you agree to these Terms of Use.
+</p>
+</div>
 
-By using Cryptomice, you agree to these terms.
+<div class="footer">
+© 2026 Cryptomice. All rights reserved.
+</div>
+
+</div>
+
+</body>
+  </html>
