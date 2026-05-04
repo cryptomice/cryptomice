@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* (ALL YOUR ORIGINAL DESIGN — UNCHANGED) */
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -116,6 +115,25 @@ margin-top:10px;
 font-size:13px;
 }
 
+/* LEGAL BOX */
+.legal{
+font-size:11px;
+opacity:0.7;
+margin-top:12px;
+line-height:1.5;
+border-top:1px solid rgba(255,215,0,0.15);
+padding-top:10px;
+}
+
+.legal a{
+color:#ffd84d;
+text-decoration:none;
+}
+
+.legal a:hover{
+text-decoration:underline;
+}
+
 .footer{
 text-align:center;
 font-size:12px;
@@ -163,6 +181,16 @@ Only approved users can create an account.
 
 <p id="msg" class="msg"></p>
 
+<!-- LEGAL SECTION ADDED -->
+<div class="legal">
+By creating an account, you agree to our  
+<a href="terms.html">Terms of Use</a>,  
+<a href="privacy.html">Privacy Policy</a>, and  
+<a href="disclaimer.html">Disclaimer</a>.  
+
+Cryptomice is a reward-based system and earnings are not guaranteed.
+</div>
+
 </div>
 
 <div class="footer">
@@ -207,7 +235,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* safer referral handling */
 const ref = localStorage.getItem("referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
@@ -227,7 +254,6 @@ try {
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
-/* CREATE USER */
 await setDoc(doc(db,"users",uid),{
 email,
 referrals:0,
@@ -235,7 +261,6 @@ earnings:0,
 createdAt:new Date()
 });
 
-/* REFERRAL SYSTEM FIXED */
 if (ref) {
   await addDoc(collection(db,"referrals"),{
     referrerId: ref,
@@ -245,7 +270,6 @@ if (ref) {
     credited: true
   });
 
-  /* safer update: only increment current user ref if UID exists in system */
   await setDoc(doc(db,"users",ref),{
     referrals: increment(1),
     earnings: increment(1)
@@ -270,4 +294,4 @@ msg.innerText=e.message;
 </script>
 
 </body>
-</html>
+  </html>
