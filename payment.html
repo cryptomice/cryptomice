@@ -6,7 +6,7 @@
 
 <style>
 
-/* ✅ FIX: prevents boxes from overflowing */
+/* FIX LAYOUT ISSUE */
 *{
 margin:0;
 padding:0;
@@ -73,7 +73,7 @@ box-shadow:inset 0 0 25px rgba(0,0,0,0.35);
 backdrop-filter:blur(5px);
 }
 
-/* ===== INPUT FIXED ===== */
+/* INPUTS FIXED */
 input{
 width:100%;
 padding:13px;
@@ -83,23 +83,15 @@ border:1px solid rgba(255,215,0,0.18);
 background:rgba(15,23,42,0.9);
 color:white;
 font-size:14px;
-transition:all 0.25s ease;
-box-shadow:inset 0 0 10px rgba(0,0,0,0.4);
-}
-
-input::placeholder{
-color:rgba(255,255,255,0.4);
 }
 
 input:focus{
 outline:none;
 border-color:#ffd84d;
-box-shadow:
-0 0 10px rgba(255,215,0,0.35),
-inset 0 0 12px rgba(255,215,0,0.08);
+box-shadow:0 0 10px rgba(255,215,0,0.35);
 }
 
-/* ===== BUTTONS ===== */
+/* BUTTONS RESTORED */
 button{
 width:100%;
 padding:13px;
@@ -108,6 +100,7 @@ border-radius:8px;
 font-weight:bold;
 cursor:pointer;
 margin-top:10px;
+transition:0.2s;
 }
 
 .primary{
@@ -120,7 +113,11 @@ background:#1f2937;
 color:white;
 }
 
-/* ===== ADDRESS BOX ===== */
+button:hover{
+transform:scale(1.03);
+}
+
+/* ADDRESS */
 .address{
 background:#0f172a;
 padding:10px;
@@ -130,13 +127,13 @@ font-weight:bold;
 word-break:break-all;
 }
 
-/* ===== MESSAGE ===== */
+/* MESSAGE */
 .msg{
 font-size:13px;
 margin-top:8px;
 }
 
-/* ===== FOOTER ===== */
+/* FOOTER */
 .footer{
 text-align:center;
 padding:15px;
@@ -166,6 +163,7 @@ text-decoration:underline;
 
 <div class="container">
 
+<!-- PAYMENT -->
 <div class="card">
 <h3>1. Activate Access</h3>
 
@@ -178,22 +176,24 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <input id="email" placeholder="Enter email">
 <input id="txid" placeholder="Enter TXID">
 
-<button class="primary">Submit Payment</button>
+<button id="payBtn" class="primary">Submit Payment</button>
 
-<p class="msg" id="payMsg"></p>
+<p id="payMsg" class="msg"></p>
 </div>
 
+<!-- LOGIN -->
 <div class="card">
 <h3>2. Member Login</h3>
 
 <input id="loginEmail" placeholder="Email">
 <input id="loginPassword" type="password" placeholder="Password">
 
-<button class="secondary">Login</button>
+<button id="loginBtn" class="secondary">Login</button>
 
-<p class="msg" id="loginMsg"></p>
+<p id="loginMsg" class="msg"></p>
 </div>
 
+<!-- SIGNUP -->
 <div class="card">
 <h3>3. Create Account</h3>
 
@@ -206,6 +206,7 @@ GO TO SIGN UP
 
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
 <a href="about.html">About</a> |
 <a href="terms.html">Terms</a> |
@@ -215,6 +216,65 @@ GO TO SIGN UP
 </div>
 
 </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+  authDomain: "cryptomice-635eb.firebaseapp.com",
+  projectId: "cryptomice-635eb",
+  storageBucket: "cryptomice-635eb.firebasestorage.app",
+  messagingSenderId: "831908710470",
+  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* PAYMENT FIXED */
+document.getElementById("payBtn").addEventListener("click", async () => {
+
+const email = document.getElementById("email").value.trim().toLowerCase();
+const txid = document.getElementById("txid").value.trim();
+const msg = document.getElementById("payMsg");
+
+if(!email || !txid){
+msg.innerText="Fill all fields";
+msg.style.color="red";
+return;
+}
+
+await setDoc(doc(db,"payments",txid),{
+email,
+txid,
+status:"pending",
+createdAt:new Date()
+});
+
+msg.style.color="#ffd84d";
+msg.innerText="Payment submitted";
+
+});
+
+/* LOGIN FIXED */
+document.getElementById("loginBtn").addEventListener("click", async () => {
+
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
+
+try{
+await signInWithEmailAndPassword(auth,email,password);
+window.location.href="https://cryptomice.github.io/cryptomice/dashboard.html";
+}catch(e){
+document.getElementById("loginMsg").innerText=e.message;
+}
+
+});
+</script>
 
 </body>
 </html>
