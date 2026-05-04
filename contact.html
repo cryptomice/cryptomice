@@ -1,33 +1,172 @@
-Contact Us – Cryptomice
+<!DOCTYPE html>
+<html>
+<head>
+<title>Contact Us - Cryptomice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-If you need help or have any questions, feel free to contact us.
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#050812;
+color:white;
+overflow-x:hidden;
+}
 
-📧 Email Support
+/* Glow background */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 40%),
+radial-gradient(circle at 80% 40%, rgba(255,215,0,0.10), transparent 45%),
+radial-gradient(circle at 50% 80%, rgba(255,255,255,0.06), transparent 50%);
+animation:floatGlow 8s infinite alternate ease-in-out;
+pointer-events:none;
+z-index:0;
+}
 
+@keyframes floatGlow{
+0%{transform:scale(1);}
+100%{transform:scale(1.15);}
+}
+
+*{position:relative;z-index:1;}
+
+.header{
+text-align:center;
+padding:20px;
+background:rgba(17,24,39,0.85);
+border-bottom:1px solid rgba(255,215,0,0.15);
+}
+
+.header h1{
+margin:0;
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
+
+.container{
+max-width:600px;
+margin:30px auto;
+padding:15px;
+}
+
+.card{
+background:rgba(11,18,32,0.85);
+border:1px solid rgba(255,215,0,0.12);
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 0 25px rgba(0,0,0,0.4);
+backdrop-filter:blur(6px);
+}
+
+h2{
+color:#ffd84d;
+margin-top:0;
+}
+
+p{
+line-height:1.6;
+color:#e5e7eb;
+}
+
+.email{
+display:block;
+margin-top:10px;
+padding:12px;
+background:#0f172a;
+border:1px solid rgba(255,215,0,0.15);
+border-radius:10px;
+text-align:center;
+color:#ffd84d;
+font-weight:bold;
+text-decoration:none;
+}
+
+ul{
+padding-left:20px;
+}
+
+ul li{
+margin:8px 0;
+color:#e5e7eb;
+}
+
+.warning{
+border-left:4px solid #ffd84d;
+padding-left:10px;
+color:#facc15;
+}
+
+.footer{
+text-align:center;
+margin-top:25px;
+font-size:13px;
+color:#9ca3af;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>📩 Contact Us</h1>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h2>Need Help?</h2>
+<p>If you have any questions or need support, the Cryptomice team is here to help you.</p>
+</div>
+
+<div class="card">
+<h2>📧 Email Support</h2>
+<a class="email" href="mailto:support@cryptomice.com">
 support@cryptomice.com
+</a>
+<p>We usually respond within <b>24–48 hours</b>.</p>
+</div>
 
-We aim to respond within 24–48 hours.
+<div class="card">
+<h2>💬 General Support</h2>
+<p>For issues related to:</p>
+<ul>
+<li>Payments</li>
+<li>Account access</li>
+<li>Referrals</li>
+<li>Withdrawals</li>
+</ul>
+<p>Please include your email and a clear explanation of your issue for faster support.</p>
+</div>
 
-💬 General Support
+<div class="card warning">
+<h2>⚠ Important Notice</h2>
+<p>Cryptomice will never ask you for:</p>
+<ul>
+<li>Your password</li>
+<li>Private wallet keys</li>
+</ul>
+<p>Always stay safe and avoid sharing sensitive information.</p>
+</div>
 
-For issues related to:
+<div class="card">
+<p style="text-align:center;color:#ffd84d;">
+Thank you for using <b>Cryptomice</b> 🚀
+</p>
+</div>
 
-- Payments
-- Account access
-- Referrals
-- Withdrawals
+<div class="footer">
+© 2026 Cryptomice. All rights reserved.
+</div>
 
-Please include your email and a clear description of the issue.
+</div>
 
-⚠ Important Notice
-
-Cryptomice will never ask for:
-
-- Your password
-- Private wallet keys
-
-Always stay safe and avoid sharing sensitive information.
-
----
-
-Thank you for using Cryptomice.
+</body>
+  </html>
