@@ -1,4 +1,4 @@
-const CACHE_NAME = "cryptomice-v2"; // 🔥 change version to force update
+const CACHE_NAME = "cryptomice-v3"; // updated version
 
 const urlsToCache = [
   "/cryptomice/",
@@ -7,45 +7,55 @@ const urlsToCache = [
   "/cryptomice/signup.html",
   "/cryptomice/dashboard.html",
   "/cryptomice/payment.html",
-  "/cryptomice/guide.html"
+  "/cryptomice/guide.html",
+  "/cryptomice/manifest.json"
 ];
 
 // 🔧 INSTALL
 self.addEventListener("install", event => {
-  self.skipWaiting(); // 🔥 force new version immediately
+  self.skipWaiting(); // activate new version immediately
 
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// 🔧 ACTIVATE (DELETE OLD CACHE)
+// 🔧 ACTIVATE (REMOVE OLD CACHE)
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); // 🔥 delete old cache
+            return caches.delete(key);
           }
         })
       );
     })
   );
 
-  self.clients.claim(); // 🔥 take control immediately
+  self.clients.claim(); // take control immediately
 });
 
-// 🔧 FETCH (NETWORK FIRST — VERY IMPORTANT)
+// 🔧 FETCH (SMART NETWORK-FIRST WITH CACHE FALLBACK)
 self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(event.request)
-      .then(response => {
-        return response; // always use fresh version
+      .then(networkResponse => {
+        // clone and store fresh response in cache
+        const responseClone = networkResponse.clone();
+
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseClone);
+        });
+
+        return networkResponse;
       })
       .catch(() => {
-        return caches.match(event.request); // fallback if offline
+        // fallback to cache if offline
+        return caches.match(event.request);
       })
   );
 });
