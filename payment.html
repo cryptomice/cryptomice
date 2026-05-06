@@ -113,26 +113,6 @@ background:#1f2937;
 color:white;
 }
 
-/* TXID */
-.txid-box{
-margin-top:15px;
-padding:12px;
-border:1px solid #ffd84d;
-border-radius:12px;
-background:rgba(255,215,0,0.06);
-}
-
-.txid-btn{
-width:100%;
-padding:14px;
-border:none;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-color:black;
-}
-
 /* ADDRESS */
 .address{
 background:#0f172a;
@@ -140,6 +120,30 @@ padding:10px;
 border-radius:8px;
 border:1px solid rgba(255,215,0,0.15);
 word-break:break-all;
+}
+
+/* SOCIAL */
+.social{
+margin:25px 0;
+text-align:center;
+}
+
+/* 👇 NEW SMALL TEXT */
+.social-text{
+font-size:13px;
+opacity:0.8;
+margin-bottom:10px;
+}
+
+/* FACEBOOK BUTTON */
+.social a{
+display:inline-block;
+padding:12px 20px;
+border-radius:12px;
+background:linear-gradient(90deg,#1877f2,#0d5ddb);
+color:white;
+font-weight:bold;
+text-decoration:none;
 }
 
 /* FOOTER */
@@ -159,6 +163,15 @@ margin:0 5px;
 
 .footer a:hover{
 text-decoration:underline;
+}
+
+/* TXID TEXT LINK */
+.txid-link{
+display:block;
+margin-top:10px;
+color:#ffd84d;
+text-decoration:underline;
+font-size:13px;
 }
 
 </style>
@@ -213,6 +226,19 @@ GO TO SIGN UP
 
 </div>
 
+<!-- SOCIAL -->
+<div class="social">
+
+<div class="social-text">
+Join thousands talking about us
+</div>
+
+<a href="https://www.facebook.com/profile.php?id=61551847504420" target="_blank">
+Follow us on Facebook
+</a>
+
+</div>
+
 </div>
 
 <!-- FOOTER -->
@@ -221,8 +247,12 @@ GO TO SIGN UP
 <a href="terms.html">Terms</a> |
 <a href="privacy.html">Privacy</a> |
 <a href="disclaimer.html">Disclaimer</a> |
-<a href="contact.html">Contact</a> |
-<a href="txid-guide.html">TXID Guide</a>
+<a href="contact.html">Contact</a>
+
+<a href="txid-guide.html" class="txid-link">
+📘 How to find your TXID
+</a>
+
 </div>
 
 <script type="module">
