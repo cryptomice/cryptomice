@@ -42,7 +42,7 @@ z-index:0;
 100%{transform:scale(1.15);}
 }
 
-/* FIX LAYER ORDER (IMPORTANT FIX) */
+/* LAYER FIX */
 body > *{
 position:relative;
 z-index:1;
@@ -69,7 +69,7 @@ margin:20px auto;
 padding:15px;
 }
 
-/* CARD FIX (IMPORTANT) */
+/* CARD */
 .card{
 background:rgba(11,18,32,0.90);
 border:1px solid rgba(255,215,0,0.15);
@@ -79,7 +79,7 @@ margin-bottom:20px;
 box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-/* INPUTS */
+/* INPUT */
 input{
 width:100%;
 padding:13px;
@@ -113,7 +113,7 @@ background:#1f2937;
 color:white;
 }
 
-/* TXID BOX FIX */
+/* TXID */
 .txid-box{
 margin-top:15px;
 padding:12px;
@@ -142,12 +142,6 @@ border:1px solid rgba(255,215,0,0.15);
 word-break:break-all;
 }
 
-/* MESSAGE */
-.msg{
-font-size:13px;
-margin-top:8px;
-}
-
 /* FOOTER */
 .footer{
 text-align:center;
@@ -161,6 +155,31 @@ font-size:13px;
 color:#ffd84d;
 text-decoration:none;
 margin:0 5px;
+}
+
+/* ================= FIXED BUTTON AREA ================= */
+.extra-section{
+margin:30px auto;
+max-width:500px;
+padding:20px;
+text-align:center;
+}
+
+.extra-section h3{
+color:#ffd84d;
+margin-bottom:10px;
+}
+
+.extra-btn{
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+font-weight:bold;
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+box-shadow:0 0 20px rgba(255,215,0,0.5);
+cursor:pointer;
 }
 
 </style>
@@ -199,7 +218,6 @@ onclick="window.location.href='txid-guide.html'">
 
 <button id="payBtn" class="primary">Submit Payment</button>
 
-<p id="payMsg" class="msg"></p>
 </div>
 
 <!-- LOGIN -->
@@ -211,7 +229,6 @@ onclick="window.location.href='txid-guide.html'">
 
 <button id="loginBtn" class="secondary">Login</button>
 
-<p id="loginMsg" class="msg"></p>
 </div>
 
 <!-- SIGNUP -->
@@ -227,6 +244,8 @@ GO TO SIGN UP
 
 </div>
 
+</div>
+
 <!-- FOOTER -->
 <div class="footer">
 <a href="about.html">About</a> |
@@ -236,6 +255,13 @@ GO TO SIGN UP
 <a href="contact.html">Contact</a>
 </div>
 
+<!-- ✅ BUTTON IS NOW HERE (FULLY VISIBLE ALWAYS) -->
+<div class="extra-section">
+<h3>Need Help?</h3>
+<button class="extra-btn"
+onclick="window.location.href='txid-guide.html'">
+📘 OPEN TXID GUIDE
+</button>
 </div>
 
 <script type="module">
@@ -261,11 +287,9 @@ document.getElementById("payBtn").addEventListener("click", async () => {
 
 const email = document.getElementById("email").value.trim().toLowerCase();
 const txid = document.getElementById("txid").value.trim();
-const msg = document.getElementById("payMsg");
 
 if(!email || !txid){
-msg.innerText="Fill all fields";
-msg.style.color="red";
+alert("Fill all fields");
 return;
 }
 
@@ -276,9 +300,7 @@ status:"pending",
 createdAt:new Date()
 });
 
-msg.style.color="#ffd84d";
-msg.innerText="Payment submitted";
-
+alert("Payment submitted");
 });
 
 /* LOGIN */
@@ -291,11 +313,11 @@ try{
 await signInWithEmailAndPassword(auth,email,password);
 window.location.href="https://cryptomice.github.io/cryptomice/dashboard.html";
 }catch(e){
-document.getElementById("loginMsg").innerText=e.message;
+alert(e.message);
 }
 
 });
 </script>
 
 </body>
-  </html>
+</html>
