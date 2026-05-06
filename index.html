@@ -275,6 +275,12 @@ Turn referrals into real <span class="highlight">crypto wealth</span>
 <button class="activate" onclick="goPayment()">Activate Account</button>
 <button class="login" onclick="goLogin()">Member Login</button>
 <button class="login" onclick="navigateTo('guide.html')">How it works</button>
+
+<!-- ✅ DOWNLOAD BUTTON -->
+<button class="activate" onclick="navigateTo('download.html')">
+⬇️ Download App
+</button>
+
 </div>
 
 <!-- INSTALL BUTTON -->
@@ -332,7 +338,7 @@ setTimeout(()=>{
 document.getElementById("splash").style.display="none";
 },2500);
 
-// App-style navigation (smooth feel)
+// App-style navigation
 function navigateTo(url){
 document.body.style.opacity = "0.6";
 setTimeout(()=>{ window.location.href = url; }, 150);
@@ -373,4 +379,4 @@ if ("serviceWorker" in navigator) {
 </script>
 
 </body>
-  </html>
+                                                            </html>
