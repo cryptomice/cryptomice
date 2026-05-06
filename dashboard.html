@@ -13,7 +13,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* ✨ GOLD BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -33,7 +32,6 @@ to{transform:scale(1.2);}
 
 *{position:relative;z-index:1;}
 
-/* HEADER */
 .header{
 text-align:center;
 padding:15px;
@@ -45,7 +43,6 @@ color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
 }
 
-/* CARD */
 .card{
 margin:15px;
 padding:15px;
@@ -55,7 +52,6 @@ border:1px solid rgba(255,215,0,0.2);
 box-shadow:0 0 20px rgba(255,215,0,0.1);
 }
 
-/* BALANCE */
 .balance{
 font-size:34px;
 color:#ffd84d;
@@ -135,7 +131,7 @@ margin-top:8px;
 
 <div class="card">
 <div class="small">Available Earnings</div>
-<div class="balance">$<span id="earnings">0</span></div>
+<div class="balance">LTC <span id="earnings">0</span></div>
 <div class="small">User ID: ••••••• (hidden)</div>
 </div>
 
@@ -153,7 +149,7 @@ margin-top:8px;
 <p>Referrals</p>
 </div>
 <div class="stat">
-<h3>$1</h3>
+<h3>0.01 LTC</h3>
 <p>Per Signup</p>
 </div>
 </div>
@@ -162,7 +158,7 @@ margin-top:8px;
 <div class="card">
 <h3>Withdraw (Litecoin)</h3>
 
-<p class="small">Minimum withdrawal: $1</p>
+<p class="small">Minimum withdrawal: 0.01 LTC</p>
 
 <input id="withdrawAmount" type="number" placeholder="Enter amount">
 <input id="withdrawWallet" placeholder="Enter LTC wallet">
@@ -203,7 +199,6 @@ const db = getFirestore(app);
 let currentUID = null;
 let currentUserEmail = null;
 
-/* AUTH */
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
@@ -217,7 +212,6 @@ currentUserEmail = user.email;
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
 
-/* REF LINK */
 document.getElementById("refLink").innerText =
 "https://cryptomice.github.io/cryptomice/index.html?ref=" + user.uid;
 
@@ -231,13 +225,11 @@ document.getElementById("earnings").innerText = data.earnings || 0;
 
 });
 
-/* COPY */
 window.copyLink = function(){
 navigator.clipboard.writeText(document.getElementById("refLink").innerText);
 alert("Copied!");
 };
 
-/* WITHDRAW */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -248,8 +240,8 @@ try{
 
 msg.innerText="Processing...";
 
-if(!amount || amount<1){
-msg.innerText="Minimum $1";
+if(!amount || amount<0.01){
+msg.innerText="Minimum 0.01 LTC";
 return;
 }
 
