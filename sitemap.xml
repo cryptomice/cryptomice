@@ -7,28 +7,63 @@
   </url>
 
   <url>
+    <loc>https://cryptomice.github.io/cryptomice/index.html</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
     <loc>https://cryptomice.github.io/cryptomice/guide.html</loc>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://cryptomice.github.io/cryptomice/signup.html</loc>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://cryptomice.github.io/cryptomice/login.html</loc>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://cryptomice.github.io/cryptomice/payment.html</loc>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://cryptomice.github.io/cryptomice/dashboard.html</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/about.html</loc>
     <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/contact.html</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/terms.html</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/privacy.html</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/disclaimer.html</loc>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://cryptomice.github.io/cryptomice/txid-guide.html</loc>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
