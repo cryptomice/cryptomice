@@ -91,7 +91,7 @@ border-color:#ffd84d;
 box-shadow:0 0 10px rgba(255,215,0,0.35);
 }
 
-/* BUTTONS RESTORED */
+/* BUTTONS */
 button{
 width:100%;
 padding:13px;
@@ -131,6 +131,34 @@ word-break:break-all;
 .msg{
 font-size:13px;
 margin-top:8px;
+}
+
+/* 🔥 TXID GUIDE BOX (FIXED VISIBILITY) */
+.txid-box{
+margin-top:15px;
+padding:12px;
+border:1px solid #ffd84d;
+border-radius:12px;
+background:rgba(255,215,0,0.06);
+box-shadow:0 0 15px rgba(255,215,0,0.25);
+}
+
+.txid-box p{
+font-size:12px;
+opacity:0.8;
+margin-bottom:8px;
+}
+
+.txid-btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+box-shadow:0 0 18px rgba(255,215,0,0.6);
 }
 
 /* FOOTER */
@@ -176,10 +204,13 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <input id="email" placeholder="Enter email">
 <input id="txid" placeholder="Enter TXID">
 
-<!-- 🔘 NEW BUTTON ADDED -->
-<button class="secondary" onclick="window.location.href='txid-guide.html'">
-📘 TXID Guide
+<!-- 🔥 IMPROVED TXID GUIDE -->
+<div class="txid-box">
+<p>Need help finding your TXID?</p>
+<button class="txid-btn" onclick="window.location.href='txid-guide.html'">
+📘 OPEN TXID GUIDE
 </button>
+</div>
 
 <button id="payBtn" class="primary">Submit Payment</button>
 
@@ -240,7 +271,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* PAYMENT FIXED */
+/* PAYMENT */
 document.getElementById("payBtn").addEventListener("click", async () => {
 
 const email = document.getElementById("email").value.trim().toLowerCase();
@@ -265,7 +296,7 @@ msg.innerText="Payment submitted";
 
 });
 
-/* LOGIN FIXED */
+/* LOGIN */
 document.getElementById("loginBtn").addEventListener("click", async () => {
 
 const email = document.getElementById("loginEmail").value;
@@ -282,4 +313,4 @@ document.getElementById("loginMsg").innerText=e.message;
 </script>
 
 </body>
-  </html>
+</html>
