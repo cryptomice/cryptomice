@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Download Cryptomice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#050812;
+color:white;
+text-align:center;
+overflow-x:hidden;
+}
+
+/* GOLD BACKGROUND EFFECT */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:radial-gradient(circle at 20% 20%, rgba(255,215,0,0.08), transparent),
+           radial-gradient(circle at 80% 80%, rgba(255,215,0,0.05), transparent);
+z-index:-1;
+}
+
+.container{
+padding:20px;
+max-width:400px;
+margin:auto;
+}
+
+.app-icon{
+width:100px;
+height:100px;
+border-radius:20px;
+background:gold;
+margin:20px auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:bold;
+color:black;
+}
+
+h1{
+margin:10px 0;
+}
+
+.version{
+color:#aaa;
+margin-bottom:20px;
+}
+
+.card{
+background:#0b1220;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+text-align:left;
+}
+
+.download-btn{
+display:block;
+width:100%;
+padding:15px;
+background:gold;
+color:black;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+transition:0.3s;
+}
+
+.download-btn:hover{
+opacity:0.85;
+}
+
+.loading{
+display:none;
+margin-top:15px;
+color:gold;
+font-size:14px;
+}
+
+.footer{
+margin-top:20px;
+font-size:12px;
+color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="app-icon">CM</div>
+
+<h1>Cryptomice</h1>
+<div class="version">Version 1.0.0</div>
+
+<div class="card">
+<b>Features:</b>
+<ul>
+<li>Secure login system</li>
+<li>User dashboard</li>
+<li>Referral tracking</li>
+<li>Fast and responsive UI</li>
+</ul>
+</div>
+
+<div class="card">
+<b>File size:</b> ~15MB<br>
+<b>Compatibility:</b> Android 7+
+</div>
+
+<button class="download-btn" onclick="startDownload()">
+⬇️ Download for Android
+</button>
+
+<div class="loading" id="loading">
+Preparing download...
+</div>
+
+<p style="margin-top:10px; color:#aaa; font-size:13px;">
+✔ Verified file<br>
+✔ Secure download<br>
+✔ Latest version (v1.0.0)
+</p>
+
+<div class="footer">
+By downloading, you agree to our Terms & Privacy Policy
+</div>
+
+</div>
+
+<script>
+function startDownload(){
+
+  const btn = document.querySelector(".download-btn");
+  const loading = document.getElementById("loading");
+
+  btn.innerHTML = "Preparing Download...";
+  btn.disabled = true;
+
+  loading.style.display = "block";
+
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 10;
+    loading.innerHTML = "Preparing download... " + progress + "%";
+
+    if(progress >= 100){
+      clearInterval(interval);
+
+      loading.innerHTML = "Starting download...";
+
+      setTimeout(() => {
+        window.location.href = "https://drive.google.com/uc?export=download&id=1zqSIhZr9yfUKuC358_kmRdos3W4bibBk";
+      }, 800);
+    }
+
+  }, 150);
+
+}
+</script>
+
+</body>
+  </html>
