@@ -1,21 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 
+<meta charset="UTF-8">
+
+<!-- 🔍 GOOGLE VERIFICATION -->
 <meta name="google-site-verification" content="Gb0y1wO-vPnZaBSbM0LvemVniT-5jbJA-xfJyXmfZL0" />
 
-<meta name="description" content="Cryptomice is a referral-based crypto rewards platform where users earn digital rewards by inviting others online.">
-<meta name="keywords" content="crypto referral, earn crypto online, bitcoin referral system, crypto rewards, passive crypto income">
-<meta name="robots" content="index, follow">
-
+<!-- SEO CORE -->
 <title>Cryptomice – Earn Crypto Through Referrals</title>
 
+<meta name="description" content="Cryptomice is a referral-based digital rewards platform where users earn crypto rewards through engagement and referrals.">
+<meta name="keywords" content="crypto referrals, earn crypto, bitcoin rewards, LTC referrals, passive crypto income, crypto earning platform">
+<meta name="robots" content="index, follow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffd84d">
 
-<!-- ✅ GOOGLE TRUST STRUCTURED DATA -->
+<!-- 🌐 CANONICAL -->
+<link rel="canonical" href="https://cryptomice.github.io/cryptomice/">
+
+<!-- ================= SCHEMA.ORG (VERY IMPORTANT) ================= -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -23,67 +30,45 @@
   "name": "Cryptomice",
   "url": "https://cryptomice.github.io/cryptomice/",
   "logo": "https://cryptomice.github.io/cryptomice/icon-512.png",
-  "description": "Cryptomice is a referral-based crypto rewards platform where users earn digital rewards by inviting others online.",
+  "description": "Cryptomice is a referral-based digital rewards platform where users earn crypto through referrals and engagement.",
   "sameAs": [
     "https://www.facebook.com/profile.php?id=61551847504420"
-  ],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "email": "support@cryptomice.com",
-    "contactType": "customer support"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Cryptomice",
+  "url": "https://cryptomice.github.io/cryptomice/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://cryptomice.github.io/cryptomice/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
   }
 }
 </script>
 
 <style>
 
-/* ================= LOADING SCREEN ================= */
-#splash{
-position:fixed;
-top:0;left:0;
-width:100%;
-height:100%;
-background:#03060c;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-z-index:99999;
-color:#ffd84d;
-text-align:center;
+/* ================= BASE RESET ================= */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-#bar{
-width:60%;
-height:6px;
-background:#111827;
-border-radius:10px;
-overflow:hidden;
-margin-top:20px;
-}
-
-#fill{
-width:0%;
-height:100%;
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-animation:loadbar 2.5s forwards;
-}
-
-@keyframes loadbar{
-from{width:0%;}
-to{width:100%;}
-}
-
-/* ================= BASE ================= */
 body{
 margin:0;
 font-family:Arial, sans-serif;
 background:#03060c;
 color:white;
 overflow-x:hidden;
-transition: opacity 0.2s ease;
 }
 
+/* BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -101,8 +86,8 @@ z-index:0;
 }
 
 @keyframes moveSparkles{
-0%{transform:scale(1) rotate(0deg);}
-100%{transform:scale(1.2) rotate(3deg);}
+0%{transform:scale(1);}
+100%{transform:scale(1.15);}
 }
 
 *{position:relative;z-index:1;}
@@ -120,7 +105,7 @@ font-size:26px;
 font-weight:bold;
 color:#ffd84d;
 text-align:center;
-text-shadow:0 0 8px #ffd84d,0 0 20px #ffcc00,0 0 40px rgba(255,215,0,0.6);
+text-shadow:0 0 8px #ffd84d;
 }
 
 .hero-img{
@@ -140,8 +125,13 @@ text-align:center;
 
 .highlight{color:#ffd84d;}
 
-.desc{text-align:center;font-size:14px;opacity:0.9;}
+.desc{
+text-align:center;
+font-size:14px;
+opacity:0.9;
+}
 
+/* BUTTONS */
 .buttons button{
 width:100%;
 padding:14px;
@@ -162,7 +152,7 @@ background:#0f172a;
 color:white;
 }
 
-/* INSTALL BUTTON */
+/* INSTALL */
 #installBtn{
 width:100%;
 padding:14px;
@@ -209,7 +199,8 @@ margin-bottom:15px;
 }
 
 .icon{
-width:40px;height:40px;
+width:40px;
+height:40px;
 background:#111827;
 border-radius:10px;
 display:flex;
@@ -218,9 +209,6 @@ justify-content:center;
 margin-right:10px;
 color:#ffd84d;
 }
-
-/* TRUST */
-.trust-img{width:100%;border-radius:15px;}
 
 /* SOCIAL */
 .social{
@@ -243,7 +231,7 @@ font-weight:bold;
 text-decoration:none;
 }
 
-/* FOOTER LINKS */
+/* FOOTER */
 .footer-links{
 margin-top:25px;
 text-align:center;
@@ -257,7 +245,6 @@ text-decoration:none;
 margin:0 5px;
 }
 
-/* FOOTER */
 .footer{
 text-align:center;
 font-size:12px;
@@ -266,39 +253,30 @@ margin:20px;
 }
 
 </style>
+
 </head>
 
 <body>
-
-<!-- SPLASH -->
-<div id="splash">
-<div style="font-size:28px;font-weight:bold;">🐭 CRYPTOMICE</div>
-<div style="margin-top:10px;">Loading your system...</div>
-<div id="bar"><div id="fill"></div></div>
-</div>
 
 <!-- HERO -->
 <div class="hero">
 
 <div class="logo">🐭 CRYPTOMICE</div>
 
-<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img">
+<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img" alt="Cryptomice platform">
 
-<div class="title">
-Turn referrals into real <span class="highlight">crypto wealth</span>
-</div>
+<h1 class="title">
+Turn referrals into real <span class="highlight">crypto rewards</span>
+</h1>
 
-<p class="desc">Earn crypto online through referrals and rewards.</p>
+<p class="desc">
+Cryptomice is a digital referral rewards platform built for online earning and engagement.
+</p>
 
 <div class="buttons">
 <button class="activate" onclick="goPayment()">Activate Account</button>
 <button class="login" onclick="goLogin()">Member Login</button>
 <button class="login" onclick="navigateTo('guide.html')">How it works</button>
-
-<button id="downloadBtn" class="activate" onclick="navigateTo('download.html')">
-⬇️ Download App
-</button>
-
 </div>
 
 <button id="installBtn">Install App</button>
@@ -315,19 +293,16 @@ Turn referrals into real <span class="highlight">crypto wealth</span>
 
 <!-- DASHBOARD -->
 <div class="dashboard">
-<div class="balance">10m+ Members</div>
+<div class="balance">Community Growing</div>
 </div>
 
 <!-- FEATURES -->
 <div class="features">
-<div class="feature"><div class="icon">⚡</div><div>Instant Earnings</div></div>
-<div class="feature"><div class="icon">🔒</div><div>Secure System</div></div>
-<div class="feature"><div class="icon">💸</div><div>Withdraw Anytime</div></div>
-<div class="feature"><div class="icon">👥</div><div>Limited Access</div></div>
+<div class="feature"><div class="icon">⚡</div><div>Instant System</div></div>
+<div class="feature"><div class="icon">🔒</div><div>Secure Access</div></div>
+<div class="feature"><div class="icon">💸</div><div>Reward Tracking</div></div>
+<div class="feature"><div class="icon">👥</div><div>Referral Network</div></div>
 </div>
-
-<!-- TRUST -->
-<img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="trust-img">
 
 <!-- SOCIAL -->
 <div class="social">
@@ -346,61 +321,39 @@ Follow us on Facebook
 <a href="contact.html">Contact</a>
 </div>
 
-<!-- FOOTER -->
-<div class="footer">© 2009 - 2026 Cryptomice</div>
+<div class="footer">© 2026 Cryptomice</div>
 
 <script>
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-},2500);
-
 function navigateTo(url){
-document.body.style.opacity = "0.6";
-setTimeout(()=>{ window.location.href = url; }, 150);
+window.location.href = url;
 }
-
 function goPayment(){
 navigateTo("payment.html");
 }
-
 function goLogin(){
-navigateTo("payment.html");
+navigateTo("login.html");
 }
 
+/* INSTALL */
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById("installBtn").style.display = "block";
+e.preventDefault();
+deferredPrompt = e;
+document.getElementById("installBtn").style.display = "block";
 });
 
 document.getElementById("installBtn").addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-
-  deferredPrompt = null;
-  document.getElementById("installBtn").style.display = "none";
+if (!deferredPrompt) return;
+deferredPrompt.prompt();
+await deferredPrompt.userChoice;
+deferredPrompt = null;
+document.getElementById("installBtn").style.display = "none";
 });
 
-window.addEventListener("load", () => {
-  const isApp =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-
-  if (isApp) {
-    const downloadBtn = document.getElementById("downloadBtn");
-    const installBtn = document.getElementById("installBtn");
-
-    if (downloadBtn) downloadBtn.style.display = "none";
-    if (installBtn) installBtn.style.display = "none";
-  }
-});
-
+/* SW */
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+navigator.serviceWorker.register("sw.js");
 }
 </script>
 
