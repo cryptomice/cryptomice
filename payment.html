@@ -157,29 +157,8 @@ text-decoration:none;
 margin:0 5px;
 }
 
-/* ================= FIXED BUTTON AREA ================= */
-.extra-section{
-margin:30px auto;
-max-width:500px;
-padding:20px;
-text-align:center;
-}
-
-.extra-section h3{
-color:#ffd84d;
-margin-bottom:10px;
-}
-
-.extra-btn{
-width:100%;
-padding:15px;
-border:none;
-border-radius:12px;
-font-weight:bold;
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-color:black;
-box-shadow:0 0 20px rgba(255,215,0,0.5);
-cursor:pointer;
+.footer a:hover{
+text-decoration:underline;
 }
 
 </style>
@@ -205,16 +184,6 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 
 <input id="email" placeholder="Enter email">
 <input id="txid" placeholder="Enter TXID">
-
-<div class="txid-box">
-<p>Need help finding your TXID?</p>
-
-<button class="txid-btn"
-onclick="window.location.href='txid-guide.html'">
-📘 TXID GUIDE
-</button>
-
-</div>
 
 <button id="payBtn" class="primary">Submit Payment</button>
 
@@ -252,16 +221,8 @@ GO TO SIGN UP
 <a href="terms.html">Terms</a> |
 <a href="privacy.html">Privacy</a> |
 <a href="disclaimer.html">Disclaimer</a> |
-<a href="contact.html">Contact</a>
-</div>
-
-<!-- ✅ BUTTON IS NOW HERE (FULLY VISIBLE ALWAYS) -->
-<div class="extra-section">
-<h3>Need Help?</h3>
-<button class="extra-btn"
-onclick="window.location.href='txid-guide.html'">
-📘 OPEN TXID GUIDE
-</button>
+<a href="contact.html">Contact</a> |
+<a href="txid-guide.html">TXID Guide</a>
 </div>
 
 <script type="module">
@@ -320,4 +281,4 @@ alert(e.message);
 </script>
 
 </body>
-</html>
+  </html>
