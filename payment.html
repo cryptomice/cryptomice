@@ -6,7 +6,7 @@
 
 <style>
 
-/* FIX LAYOUT ISSUE */
+/* RESET */
 *{
 margin:0;
 padding:0;
@@ -20,6 +20,7 @@ color:white;
 overflow-x:hidden;
 }
 
+/* BACKGROUND EFFECT */
 body::before{
 content:"";
 position:fixed;
@@ -41,8 +42,13 @@ z-index:0;
 100%{transform:scale(1.15);}
 }
 
-*{position:relative;z-index:1;}
+/* FIX LAYER ORDER (IMPORTANT FIX) */
+body > *{
+position:relative;
+z-index:1;
+}
 
+/* HEADER */
 .header{
 padding:15px;
 text-align:center;
@@ -56,24 +62,24 @@ color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
 }
 
+/* CONTAINER */
 .container{
 max-width:500px;
 margin:20px auto;
 padding:15px;
-padding-bottom:60px;
 }
 
+/* CARD FIX (IMPORTANT) */
 .card{
-background:rgba(11,18,32,0.78);
-border:1px solid rgba(255,215,0,0.10);
+background:rgba(11,18,32,0.90);
+border:1px solid rgba(255,215,0,0.15);
 border-radius:14px;
 padding:15px;
 margin-bottom:20px;
-box-shadow:inset 0 0 25px rgba(0,0,0,0.35);
-backdrop-filter:blur(5px);
+box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-/* INPUTS FIXED */
+/* INPUTS */
 input{
 width:100%;
 padding:13px;
@@ -85,22 +91,16 @@ color:white;
 font-size:14px;
 }
 
-input:focus{
-outline:none;
-border-color:#ffd84d;
-box-shadow:0 0 10px rgba(255,215,0,0.35);
-}
-
 /* BUTTONS */
 button{
 width:100%;
-padding:13px;
+padding:14px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 font-weight:bold;
 cursor:pointer;
-margin-top:10px;
-transition:0.2s;
+margin-top:12px;
+display:block;
 }
 
 .primary{
@@ -113,40 +113,13 @@ background:#1f2937;
 color:white;
 }
 
-button:hover{
-transform:scale(1.03);
-}
-
-/* ADDRESS */
-.address{
-background:#0f172a;
-padding:10px;
-border-radius:8px;
-border:1px solid rgba(255,215,0,0.15);
-font-weight:bold;
-word-break:break-all;
-}
-
-/* MESSAGE */
-.msg{
-font-size:13px;
-margin-top:8px;
-}
-
-/* 🔥 TXID GUIDE BOX (FIXED VISIBILITY) */
+/* TXID BOX FIX */
 .txid-box{
 margin-top:15px;
 padding:12px;
 border:1px solid #ffd84d;
 border-radius:12px;
 background:rgba(255,215,0,0.06);
-box-shadow:0 0 15px rgba(255,215,0,0.25);
-}
-
-.txid-box p{
-font-size:12px;
-opacity:0.8;
-margin-bottom:8px;
 }
 
 .txid-btn{
@@ -158,7 +131,21 @@ font-weight:bold;
 cursor:pointer;
 background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
-box-shadow:0 0 18px rgba(255,215,0,0.6);
+}
+
+/* ADDRESS */
+.address{
+background:#0f172a;
+padding:10px;
+border-radius:8px;
+border:1px solid rgba(255,215,0,0.15);
+word-break:break-all;
+}
+
+/* MESSAGE */
+.msg{
+font-size:13px;
+margin-top:8px;
 }
 
 /* FOOTER */
@@ -174,10 +161,6 @@ font-size:13px;
 color:#ffd84d;
 text-decoration:none;
 margin:0 5px;
-}
-
-.footer a:hover{
-text-decoration:underline;
 }
 
 </style>
@@ -204,12 +187,14 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <input id="email" placeholder="Enter email">
 <input id="txid" placeholder="Enter TXID">
 
-<!-- 🔥 IMPROVED TXID GUIDE -->
 <div class="txid-box">
 <p>Need help finding your TXID?</p>
-<button class="txid-btn" onclick="window.location.href='txid-guide.html'">
-📘 OPEN TXID GUIDE
+
+<button class="txid-btn"
+onclick="window.location.href='txid-guide.html'">
+📘 TXID GUIDE
 </button>
+
 </div>
 
 <button id="payBtn" class="primary">Submit Payment</button>
@@ -259,12 +244,12 @@ import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/fir
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -313,4 +298,4 @@ document.getElementById("loginMsg").innerText=e.message;
 </script>
 
 </body>
-</html>
+  </html>
