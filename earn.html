@@ -134,21 +134,26 @@ cursor:pointer;
 
 <div class="header">
 <div class="logo">🐭 Cryptomice</div>
-<div class="subtitle">Complete tasks and earn free Litecoin</div>
+<div class="subtitle">Complete ads and earn free Litecoin</div>
 </div>
 
 <div class="balance-box">
 <div class="balance-title">Current Balance</div>
 <div class="balance" id="balance">Loading...</div>
-<div class="small-text">🔥 Earn +10 Coins per task</div>
+<div class="small-text">🔥 Click ads, earn 10 Mice Coins per task</div>
 </div>
 
 <div class="guide">
 <h3>How It Works</h3>
-<p>Complete tasks and earn rewards.</p>
+<p>
+1. Click START AD<br><br>
+2. Stay on the page for a few seconds<br><br>
+3. Return automatically<br><br>
+4. Earn Mice Coins instantly
+</p>
 </div>
 
-<div class="section-title">🔥 High Paying Tasks</div>
+<div class="section-title">🔥 High Paying Ads</div>
 
 <div class="task-container">
 
@@ -159,13 +164,13 @@ cursor:pointer;
 <div class="reward">+10 Coins</div>
 </div>
 
-<div class="task-title">Play Mini Game</div>
+<div class="task-title">Play Mini Game Ad</div>
 <div class="task-desc">Stay active for 30 seconds.</div>
 
-<button class="task-btn" onclick="completeTask()">START TASK</button>
+<button class="task-btn" onclick="completeTask()">START AD</button>
 </div>
 
-<!-- SMART LINK TASK -->
+<!-- SMART AD TASK -->
 <div class="task-card">
 
 <div class="task-top">
@@ -173,16 +178,16 @@ cursor:pointer;
 <div class="reward">+10 Coins</div>
 </div>
 
-<div class="task-title">Smart Link Visit</div>
-<div class="task-desc">Visit partner site and return after 25 seconds.</div>
+<div class="task-title">Click Ads Offer</div>
+<div class="task-desc">Open partner ad and return after a short delay.</div>
 
 <div class="task-meta">
-<div class="meta-box">⏱ 25s</div>
-<div class="meta-box">Smart Task</div>
+<div class="meta-box">⏱ 10s–20s</div>
+<div class="meta-box">Ad Reward</div>
 </div>
 
 <button class="task-btn" onclick="startSmartLink()">
-START SMART LINK
+START AD
 </button>
 
 </div>
@@ -215,7 +220,7 @@ await setPersistence(auth, browserLocalPersistence);
 
 let currentUser = null;
 
-// 🔐 AUTH
+// AUTH
 onAuthStateChanged(auth, async (user) => {
 if(!user){
 window.location.href = "auth.html";
@@ -226,7 +231,7 @@ await ensureUser();
 loadBalance();
 });
 
-// 👤 CREATE USER
+// CREATE USER
 async function ensureUser(){
 const ref = doc(db,"users",currentUser.uid);
 const snap = await getDoc(ref);
@@ -239,7 +244,7 @@ coins:0
 }
 }
 
-// 💰 LOAD BALANCE
+// LOAD BALANCE
 async function loadBalance(){
 const ref = doc(db,"users",currentUser.uid);
 const snap = await getDoc(ref);
@@ -248,7 +253,7 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-// 🎮 NORMAL TASK
+// NORMAL TASK
 window.completeTask = async function(){
 
 const ref = doc(db,"users",currentUser.uid);
@@ -263,38 +268,48 @@ loadBalance();
 alert("+10 Coins Added!");
 };
 
-// 🔗 SMART LINK SYSTEM (FIXED)
+// SMART ADS SYSTEM (SAFE VERSION)
 let smartActive = false;
 let smartStart = 0;
-let lastSmart = 0;
+let lastClick = 0;
+
+// YOUR LINKS
+const smartLinks = [
+"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
+"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
+];
 
 window.startSmartLink = function(){
 
 let now = Date.now();
 
-// ⛔ cooldown 60 seconds
-if(now - lastSmart < 60000){
-alert("Wait before doing this again.");
+// cooldown 45 seconds
+if(now - lastClick < 45000){
+alert("Wait before clicking another ad.");
 return;
 }
 
-window.open("https://example.com","_blank");
+// rotate links
+let link = smartLinks[Math.floor(Math.random() * smartLinks.length)];
+
+window.open(link,"_blank");
 
 smartActive = true;
 smartStart = now;
-lastSmart = now;
+lastClick = now;
 
-alert("Stay 25 seconds then return.");
+alert("Stay 10–15 seconds then return.");
 };
 
-// 🔁 RETURN DETECTION
+// RETURN CHECK
 document.addEventListener("visibilitychange", async ()=>{
 
 if(document.visibilityState === "visible" && smartActive){
 
 let time = (Date.now() - smartStart)/1000;
 
-if(time < 20){
+if(time < 8){
 smartActive = false;
 alert("Too fast. No reward.");
 return;
@@ -312,7 +327,7 @@ loadBalance();
 
 smartActive = false;
 
-alert("+10 Smart Link Coins!");
+alert("+10 Ad Coins Earned!");
 
 }
 
@@ -321,4 +336,4 @@ alert("+10 Smart Link Coins!");
 </script>
 
 </body>
-  </html>
+</html>
