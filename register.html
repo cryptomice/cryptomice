@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sign Up - Cryptomice</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#050812;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+width:90%;
+max-width:420px;
+background:linear-gradient(145deg,#111827,#0f172a);
+padding:30px;
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.05);
+box-shadow:0 0 25px rgba(255,215,0,0.08);
+}
+
+.logo{
+text-align:center;
+font-size:28px;
+font-weight:bold;
+color:#facc15;
+margin-bottom:10px;
+}
+
+.subtitle{
+text-align:center;
+font-size:14px;
+color:#9ca3af;
+margin-bottom:25px;
+}
+
+input{
+width:100%;
+padding:14px;
+margin-bottom:15px;
+border-radius:12px;
+border:none;
+outline:none;
+background:#0b1220;
+color:white;
+font-size:14px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#facc15,#fde047);
+color:#050812;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.9;
+transform:scale(1.02);
+}
+
+.footer{
+text-align:center;
+margin-top:15px;
+font-size:13px;
+color:#9ca3af;
+}
+
+.footer a{
+color:#facc15;
+text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">🐭 Cryptomice</div>
+<div class="subtitle">Create your free account</div>
+
+<input type="email" id="email" placeholder="Email Address">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="signUp()">Create Account</button>
+
+<div class="footer">
+Already have an account?
+<a href="login.html">Login</a>
+</div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+
+<script>
+// 🔥 YOUR FIREBASE CONFIG (replace this)
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "XXXX",
+appId: "XXXX"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// SIGN UP FUNCTION
+function signUp(){
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
+
+if(!email || !password){
+alert("Please fill all fields");
+return;
+}
+
+auth.createUserWithEmailAndPassword(email, password)
+.then((userCredential) => {
+
+// Redirect after signup
+alert("Account created successfully!");
+window.location.href = "earn.html";
+
+})
+.catch((error) => {
+alert(error.message);
+});
+}
+</script>
+
+</body>
+</html>
