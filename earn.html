@@ -7,11 +7,7 @@
 <title>Earn Free Litecoin - Cryptomice</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
 background:#050812;
@@ -49,11 +45,7 @@ font-weight:bold;
 color:#facc15;
 }
 
-.subtitle{
-margin-top:8px;
-font-size:14px;
-color:#9ca3af;
-}
+.subtitle{margin-top:8px;font-size:14px;color:#9ca3af;}
 
 .balance-box{
 margin:20px;
@@ -64,11 +56,7 @@ box-shadow:0 0 25px rgba(255,215,0,0.08);
 border:1px solid rgba(255,255,255,0.05);
 }
 
-.balance-title{
-font-size:14px;
-color:#9ca3af;
-margin-bottom:10px;
-}
+.balance-title{font-size:14px;color:#9ca3af;margin-bottom:10px;}
 
 .balance{
 font-size:36px;
@@ -76,11 +64,7 @@ font-weight:bold;
 color:#facc15;
 }
 
-.small-text{
-margin-top:10px;
-font-size:13px;
-color:#9ca3af;
-}
+.small-text{margin-top:10px;font-size:13px;color:#9ca3af;}
 
 .guide{
 margin:20px;
@@ -90,26 +74,13 @@ border-radius:18px;
 border:1px solid rgba(255,255,255,0.05);
 }
 
-.guide h3{
-margin-bottom:15px;
-color:#facc15;
-}
-
-.guide p{
-font-size:14px;
-line-height:1.7;
-color:#d1d5db;
-}
-
 .section-title{
 margin:25px 20px 15px;
 font-size:20px;
 font-weight:bold;
 }
 
-.task-container{
-padding:0 20px 100px;
-}
+.task-container{padding:0 20px 100px;}
 
 .task-card{
 background:linear-gradient(145deg,#111827,#0f172a);
@@ -126,40 +97,19 @@ margin-bottom:18px;
 }
 
 .task-icon{
-width:55px;
-height:55px;
-border-radius:15px;
+width:55px;height:55px;border-radius:15px;
 background:rgba(250,204,21,0.1);
-display:flex;
-align-items:center;
-justify-content:center;
+display:flex;align-items:center;justify-content:center;
 font-size:26px;
 }
 
-.reward{
-font-size:20px;
-font-weight:bold;
-color:#facc15;
-}
+.reward{font-size:20px;font-weight:bold;color:#facc15;}
 
-.task-title{
-font-size:18px;
-font-weight:bold;
-margin-bottom:8px;
-}
+.task-title{font-size:18px;font-weight:bold;margin-bottom:8px;}
 
-.task-desc{
-font-size:14px;
-color:#9ca3af;
-line-height:1.6;
-}
+.task-desc{font-size:14px;color:#9ca3af;}
 
-.task-meta{
-display:flex;
-gap:12px;
-margin-bottom:20px;
-flex-wrap:wrap;
-}
+.task-meta{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 
 .meta-box{
 background:#0b1220;
@@ -181,27 +131,6 @@ color:#050812;
 cursor:pointer;
 }
 
-.bottom-nav{
-position:fixed;
-bottom:0;
-left:0;
-width:100%;
-background:#0b1220;
-display:flex;
-justify-content:space-around;
-padding:14px 0;
-border-top:1px solid rgba(255,255,255,0.08);
-}
-
-.nav-item{
-text-align:center;
-font-size:12px;
-color:#9ca3af;
-}
-
-.nav-item.active{
-color:#facc15;
-}
 </style>
 </head>
 
@@ -209,62 +138,55 @@ color:#facc15;
 
 <div class="header">
 <div class="logo">🐭 Cryptomice</div>
-<div class="subtitle">
-Complete tasks and earn free Litecoin
-</div>
+<div class="subtitle">Complete tasks and earn free Litecoin</div>
 </div>
 
 <div class="balance-box">
 <div class="balance-title">Current Balance</div>
-
-<div class="balance" id="balance">
-Loading...
-</div>
-
-<div class="small-text">
-🔥 Earn +10 Coins per task
-</div>
+<div class="balance" id="balance">Loading...</div>
+<div class="small-text">🔥 Earn +10 Coins per task</div>
 </div>
 
 <div class="guide">
 <h3>How It Works</h3>
-
-<p>
-1. Click START TASK<br><br>
-2. Stay active for 20–40 seconds<br><br>
-3. Complete interaction<br><br>
-4. Return and get rewards
-</p>
+<p>Complete tasks and earn rewards.</p>
 </div>
 
-<div class="section-title">
-🔥 High Paying Tasks
-</div>
+<div class="section-title">🔥 High Paying Tasks</div>
 
 <div class="task-container">
 
+<!-- NORMAL TASK -->
 <div class="task-card">
-
 <div class="task-top">
 <div class="task-icon">🎮</div>
 <div class="reward">+10 Coins</div>
 </div>
 
-<div class="task-title">
-Play Mini Game
+<div class="task-title">Play Mini Game</div>
+<div class="task-desc">Stay active for 30 seconds.</div>
+
+<button class="task-btn" onclick="completeTask()">START TASK</button>
 </div>
 
-<div class="task-desc">
-Stay active for 30 seconds.
+<!-- SMART LINK TASK -->
+<div class="task-card">
+
+<div class="task-top">
+<div class="task-icon">🔗</div>
+<div class="reward">+10 Coins</div>
 </div>
+
+<div class="task-title">Smart Link Visit</div>
+<div class="task-desc">Visit partner site and return after 25 seconds.</div>
 
 <div class="task-meta">
-<div class="meta-box">⏱ 30s</div>
-<div class="meta-box">Easy</div>
+<div class="meta-box">⏱ 25s</div>
+<div class="meta-box">Smart Task</div>
 </div>
 
-<button class="task-btn" onclick="completeTask()">
-START TASK
+<button class="task-btn" onclick="startSmartLink()">
+START SMART LINK
 </button>
 
 </div>
@@ -303,90 +225,108 @@ appId: "1:185364902129:web:51953cbb27278fb05ef950"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// KEEP USER LOGGED IN
 await setPersistence(auth, browserLocalPersistence);
 
 let currentUser = null;
 
-// AUTH CHECK
+// AUTH
 onAuthStateChanged(auth, async (user) => {
-
 if(!user){
 window.location.href = "auth.html";
 return;
 }
 
 currentUser = user;
-
-await ensureUserDocument();
-
+await ensureUser();
 loadBalance();
-
 });
 
-// CREATE USER DOCUMENT IF MISSING
-async function ensureUserDocument(){
-
-const ref = doc(db, "users", currentUser.uid);
-
+// CREATE USER IF NOT EXISTS
+async function ensureUser(){
+const ref = doc(db,"users",currentUser.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-
-await setDoc(ref, {
-email: currentUser.email,
-coins: 0,
-tasksCompleted: 0,
-referrals: 0,
-createdAt: Date.now()
+await setDoc(ref,{
+email:currentUser.email,
+coins:0
 });
-
 }
-
 }
 
 // LOAD BALANCE
 async function loadBalance(){
-
-const ref = doc(db, "users", currentUser.uid);
-
+const ref = doc(db,"users",currentUser.uid);
 const snap = await getDoc(ref);
 
-if(snap.exists()){
-
 document.getElementById("balance").innerText =
-snap.data().coins + " Mice Coins";
-
+(snap.data()?.coins || 0) + " Mice Coins";
 }
 
-}
-
-// COMPLETE TASK
+// NORMAL TASK
 window.completeTask = async function(){
 
-if(!currentUser) return;
-
-const ref = doc(db, "users", currentUser.uid);
-
+const ref = doc(db,"users",currentUser.uid);
 const snap = await getDoc(ref);
 
 let coins = snap.data().coins || 0;
-
 coins += 10;
 
-await updateDoc(ref, {
-coins: coins
-});
+await updateDoc(ref,{coins});
+
+loadBalance();
+alert("+10 Coins Added!");
+};
+
+// SMART LINK SYSTEM
+let smartActive = false;
+let smartStart = 0;
+
+window.startSmartLink = function(){
+
+if(smartActive) return;
+
+window.open("https://example.com","_blank");
+
+smartActive = true;
+smartStart = Date.now();
+
+alert("Stay 25 seconds then return.");
+};
+
+// RETURN DETECTION
+document.addEventListener("visibilitychange", async ()=>{
+
+if(document.visibilityState === "visible" && smartActive){
+
+let time = (Date.now() - smartStart)/1000;
+
+if(time < 20){
+smartActive = false;
+alert("Too fast. No reward.");
+return;
+}
+
+const ref = doc(db,"users",currentUser.uid);
+const snap = await getDoc(ref);
+
+let coins = snap.data().coins || 0;
+coins += 10;
+
+await updateDoc(ref,{coins});
 
 loadBalance();
 
-alert("+10 Coins Added!");
+smartActive = false;
 
-};
+alert("+10 Smart Link Coins!");
+
+}
+
+});
 
 </script>
 
