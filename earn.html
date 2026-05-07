@@ -110,7 +110,7 @@ background:linear-gradient(90deg,#facc15,#fde047);
 border-radius:50px;
 }
 
-/* Guide Box */
+/* Guide */
 .guide{
 margin:20px;
 background:#111827;
@@ -130,14 +130,13 @@ line-height:1.7;
 color:#d1d5db;
 }
 
-/* Section Title */
+/* Tasks */
 .section-title{
 margin:25px 20px 15px;
 font-size:20px;
 font-weight:bold;
 }
 
-/* Task Cards */
 .task-container{
 padding:0 20px 100px;
 }
@@ -148,17 +147,10 @@ border-radius:22px;
 padding:20px;
 margin-bottom:18px;
 border:1px solid rgba(255,255,255,0.05);
-box-shadow:0 0 20px rgba(0,0,0,0.3);
-transition:0.3s;
-}
-
-.task-card:hover{
-transform:translateY(-3px);
 }
 
 .task-top{
 display:flex;
-align-items:center;
 justify-content:space-between;
 margin-bottom:18px;
 }
@@ -178,10 +170,6 @@ font-size:26px;
 font-size:20px;
 font-weight:bold;
 color:#facc15;
-}
-
-.task-info{
-margin-bottom:18px;
 }
 
 .task-title{
@@ -221,21 +209,14 @@ font-weight:bold;
 background:linear-gradient(90deg,#facc15,#fde047);
 color:#050812;
 cursor:pointer;
-transition:0.3s;
 }
 
-.task-btn:hover{
-opacity:0.9;
-transform:scale(1.01);
-}
-
-/* Bonus Ad Box */
+/* Bonus */
 .bonus-box{
 margin:20px;
 padding:22px;
 background:linear-gradient(145deg,#1e293b,#0f172a);
 border-radius:20px;
-border:1px solid rgba(255,255,255,0.05);
 text-align:center;
 }
 
@@ -249,7 +230,6 @@ margin-bottom:10px;
 .bonus-text{
 font-size:14px;
 color:#d1d5db;
-line-height:1.6;
 margin-bottom:18px;
 }
 
@@ -264,7 +244,7 @@ color:#050812;
 cursor:pointer;
 }
 
-/* Bottom Nav */
+/* Bottom nav */
 .bottom-nav{
 position:fixed;
 bottom:0;
@@ -285,207 +265,130 @@ color:#9ca3af;
 
 .nav-item.active{
 color:#facc15;
-font-weight:bold;
 }
 </style>
 </head>
+
 <body>
 
-<!-- Header -->
 <div class="header">
 <div class="logo">🐭 Cryptomice</div>
-<div class="subtitle">
-Complete tasks and earn free Litecoin
-</div>
+<div class="subtitle">Complete tasks and earn free Litecoin</div>
 </div>
 
-<!-- Balance -->
+<!-- USER BALANCE -->
 <div class="balance-box">
 <div class="balance-title">Current Balance</div>
-<div class="balance">245 Mice Coins</div>
+<div class="balance" id="balance">Loading...</div>
 
 <div class="small-text">
-🔥 Complete smart links and earn +10 Coins per task
+🔥 Earn +10 Coins per task
 </div>
 </div>
 
-<!-- Progress -->
-<div class="progress-section">
-<div class="progress-title">
-Daily Goal Progress
-</div>
-
-<div class="progress-bar">
-<div class="progress-fill"></div>
-</div>
-
-<div class="small-text" style="margin-top:10px;">
-6/10 tasks completed today
-</div>
-</div>
-
-<!-- Guide -->
+<!-- GUIDE -->
 <div class="guide">
 <h3>How It Works</h3>
-
 <p>
 1. Click START TASK<br><br>
 2. Stay active for 20–40 seconds<br><br>
-3. Complete simple interaction<br><br>
-4. Return automatically<br><br>
-5. Receive 10 Mice Coins instantly
+3. Complete interaction<br><br>
+4. Return and get rewards
 </p>
 </div>
 
-<!-- Tasks -->
-<div class="section-title">
-🔥 High Paying Tasks
-</div>
+<!-- TASKS -->
+<div class="section-title">🔥 High Paying Tasks</div>
 
 <div class="task-container">
 
-<!-- Task 1 -->
 <div class="task-card">
-
 <div class="task-top">
 <div class="task-icon">🎮</div>
-
-<div class="reward">
-+10 Coins
-</div>
+<div class="reward">+10 Coins</div>
 </div>
 
-<div class="task-info">
-<div class="task-title">
-Play Mini Game
-</div>
-
-<div class="task-desc">
-Open the game and stay active for 30 seconds to earn free coins.
-</div>
-</div>
+<div class="task-title">Play Mini Game</div>
+<div class="task-desc">Stay active for 30 seconds.</div>
 
 <div class="task-meta">
-<div class="meta-box">⏱ 30 Seconds</div>
-<div class="meta-box">✅ Easy</div>
-<div class="meta-box">🔥 Popular</div>
+<div class="meta-box">⏱ 30s</div>
+<div class="meta-box">Easy</div>
 </div>
 
-<button class="task-btn">
-START TASK
-</button>
-
-</div>
-
-<!-- Task 2 -->
-<div class="task-card">
-
-<div class="task-top">
-<div class="task-icon">📲</div>
-
-<div class="reward">
-+10 Coins
-</div>
-</div>
-
-<div class="task-info">
-<div class="task-title">
-Install App
-</div>
-
-<div class="task-desc">
-Visit the app page and remain active to unlock your reward.
-</div>
-</div>
-
-<div class="task-meta">
-<div class="meta-box">⏱ 40 Seconds</div>
-<div class="meta-box">✅ Easy</div>
-<div class="meta-box">⭐ Trusted</div>
-</div>
-
-<button class="task-btn">
-START TASK
-</button>
-
-</div>
-
-<!-- Task 3 -->
-<div class="task-card">
-
-<div class="task-top">
-<div class="task-icon">🌐</div>
-
-<div class="reward">
-+10 Coins
-</div>
-</div>
-
-<div class="task-info">
-<div class="task-title">
-Visit Website
-</div>
-
-<div class="task-desc">
-Explore the website for a few seconds and claim your free reward.
-</div>
-</div>
-
-<div class="task-meta">
-<div class="meta-box">⏱ 25 Seconds</div>
-<div class="meta-box">💰 Fast Reward</div>
-<div class="meta-box">🔥 Trending</div>
-</div>
-
-<button class="task-btn">
-START TASK
-</button>
-
+<button class="task-btn" onclick="completeTask()">START TASK</button>
 </div>
 
 </div>
 
-<!-- Bonus Ad -->
-<div class="bonus-box">
+<!-- FIREBASE -->
+<script type="module">
 
-<div class="bonus-title">
-🎁 Bonus Unlock
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-<div class="bonus-text">
-Watch one short rewarded ad after every 15 completed tasks and earn bonus Mice Coins.
-</div>
+import { getFirestore, doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<button class="bonus-btn">
-WATCH & EARN BONUS
-</button>
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "XXXX",
+appId: "XXXX"
+};
 
-</div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
+let currentUser = null;
 
-<div class="nav-item active">
-🏠<br>Home
-</div>
+// AUTH CHECK
+onAuthStateChanged(auth, async (user) => {
+if(!user){
+window.location.href = "auth.html";
+return;
+}
 
-<div class="nav-item">
-💰<br>Earn
-</div>
+currentUser = user;
+loadBalance();
+});
 
-<div class="nav-item">
-🎡<br>Spin
-</div>
+// LOAD BALANCE
+async function loadBalance(){
+const ref = doc(db, "users", currentUser.uid);
+const snap = await getDoc(ref);
 
-<div class="nav-item">
-👥<br>Referral
-</div>
+if(snap.exists()){
+document.getElementById("balance").innerText =
+snap.data().coins + " Mice Coins";
+}
+}
 
-<div class="nav-item">
-🏦<br>Withdraw
-</div>
+// COMPLETE TASK (TEMP LOGIC)
+window.completeTask = async function(){
 
-</div>
+if(!currentUser) return;
+
+const ref = doc(db, "users", currentUser.uid);
+const snap = await getDoc(ref);
+
+let coins = snap.data().coins || 0;
+coins += 10;
+
+// UPDATE COINS
+await updateDoc(ref, {
+coins: coins
+});
+
+loadBalance();
+alert("+10 Coins Added!");
+};
+
+</script>
 
 </body>
   </html>
