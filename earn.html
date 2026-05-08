@@ -27,6 +27,7 @@ cursor:pointer;
 margin-top:10px;
 color:#050812;
 }
+
 input{
 width:100%;
 padding:12px;
@@ -58,12 +59,13 @@ color:white;
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
-<!-- OFFER WALL (BITLABS READY) -->
+<!-- OFFER WALL -->
 <div class="task">
 <h3>🎮 Offer Wall</h3>
 <div class="small">
-Complete surveys, app installs & games to earn coins
+Complete surveys, installs & games to earn coins
 </div>
+
 <button class="btn" onclick="openOfferWall()">
 OPEN OFFER WALL
 </button>
@@ -83,9 +85,7 @@ OPEN OFFER WALL
 
 <input id="wallet" placeholder="Enter Litecoin Wallet Address">
 
-<button class="btn" onclick="withdraw()">
-WITHDRAW
-</button>
+<button class="btn" onclick="withdraw()">WITHDRAW</button>
 </div>
 
 <script type="module">
@@ -104,7 +104,7 @@ addDoc,
 collection
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE CONFIG */
+/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -122,7 +122,7 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user=null;
 
-/* ---------------- AUTH ---------------- */
+/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
 if(!u){
 location.href="auth.html";
@@ -134,16 +134,13 @@ const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
 
 if(!snap.exists()){
-await setDoc(ref,{
-coins:0,
-createdAt:Date.now()
-});
+await setDoc(ref,{coins:0});
 }
 
 load();
 });
 
-/* ---------------- LOAD ---------------- */
+/* LOAD */
 async function load(){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
@@ -152,7 +149,7 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins||0);
 }
 
-/* ---------------- REWARD ---------------- */
+/* REWARD */
 async function reward(amount){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
@@ -164,7 +161,7 @@ await updateDoc(ref,{coins:c});
 load();
 }
 
-/* ---------------- ADS ---------------- */
+/* ADS */
 const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
@@ -178,7 +175,6 @@ let active=false;
 let start=0;
 let lastAd=0;
 
-/* START AD */
 window.startAd=function(){
 
 if(Date.now()-lastAd<30000){
@@ -215,13 +211,12 @@ alert("+10 Coins Earned");
 }
 });
 
-/* ---------------- OFFER WALL (BITLABS READY) ---------------- */
+/* OFFER WALL LINK FIXED */
 window.openOfferWall = function () {
-  // replace later with Bitlabs URL
-  window.open("https://YOUR_BITLABS_OFFERWALL_URL", "_blank");
+  window.location.href = "rewards.html";
 };
 
-/* ---------------- FAUCET ---------------- */
+/* FAUCET */
 window.claimFaucet=async function(){
 
 const ref=doc(db,"users",user.uid);
@@ -244,7 +239,7 @@ load();
 alert("+20 Faucet");
 };
 
-/* ---------------- WITHDRAW ---------------- */
+/* WITHDRAW */
 window.withdraw=async function(){
 
 let wallet=document.getElementById("wallet").value;
