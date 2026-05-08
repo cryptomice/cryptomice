@@ -7,10 +7,16 @@
 <title>Cryptomice Rewards Hub</title>
 
 <style>
-body{
+
+*{
 margin:0;
-font-family:Arial,sans-serif;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
 background:#050812;
+font-family:Arial,sans-serif;
 color:white;
 }
 
@@ -22,9 +28,19 @@ border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
-font-size:26px;
+font-size:28px;
 font-weight:bold;
 color:#facc15;
+}
+
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
+}
+
+#app{
+display:none;
 }
 
 .container{
@@ -35,30 +51,32 @@ margin:auto;
 
 .card{
 background:#111827;
-padding:18px;
+padding:20px;
 border-radius:18px;
-margin-bottom:15px;
+margin-bottom:18px;
 border:1px solid rgba(255,255,255,0.05);
 }
 
 .balance{
-font-size:32px;
-color:#facc15;
+font-size:34px;
 font-weight:bold;
+color:#facc15;
+margin-top:8px;
 }
 
 .title{
 font-size:18px;
-margin-bottom:10px;
 font-weight:bold;
+margin-bottom:10px;
 }
 
 .small{
 font-size:13px;
 color:#9ca3af;
+line-height:1.6;
 }
 
-button{
+.btn{
 width:100%;
 padding:14px;
 border:none;
@@ -66,26 +84,40 @@ border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
-margin-top:10px;
+margin-top:12px;
+color:#050812;
+font-size:15px;
+}
+
+.btn-dark{
+background:#1f2937;
+color:white;
 }
 
 .section{
-margin-top:20px;
+margin-top:15px;
 }
 
 .badge{
 display:inline-block;
-padding:5px 10px;
+padding:6px 12px;
 background:#0b1220;
 border-radius:50px;
 font-size:12px;
-margin-right:5px;
+margin:4px;
 color:#d1d5db;
 }
+
 </style>
 </head>
 
 <body>
+
+<div id="loading">
+Loading Rewards Hub...
+</div>
+
+<div id="app">
 
 <div class="header">
 <div class="logo">🐭 Cryptomice Rewards Hub</div>
@@ -93,22 +125,30 @@ color:#d1d5db;
 
 <div class="container">
 
+<!-- BALANCE -->
 <div class="card">
+
 <div class="small">Your Balance</div>
-<div class="balance" id="balance">Loading...</div>
+
+<div class="balance" id="balance">
+0 Mice Coins
 </div>
 
-<!-- BITLABS MAIN SECTION -->
+</div>
+
+<!-- BITLABS -->
 <div class="card">
 
-<div class="title">🔥 Earn with Bitlabs Offer Wall</div>
+<div class="title">
+🔥 Earn with BitLabs Offer Wall
+</div>
 
 <div class="small">
-Complete real offers and earn Mice Coins instantly.
+Complete surveys, gaming offers, installs and high paying tasks to earn Mice Coins instantly.
 </div>
 
-<button onclick="openBitlabs()">
-Open Offer Wall
+<button class="btn" onclick="openBitlabs()">
+OPEN OFFER WALL
 </button>
 
 <div class="section">
@@ -116,23 +156,62 @@ Open Offer Wall
 <span class="badge">📊 Surveys</span>
 <span class="badge">🎮 Gaming Offers</span>
 <span class="badge">📱 App Installs</span>
+<span class="badge">💰 High Rewards</span>
 
 </div>
 
 </div>
 
-<!-- OPTIONAL INTERNAL TASK -->
+<!-- BONUS TASK -->
 <div class="card">
 
-<div class="title">🎁 Bonus Tasks (Optional)</div>
-
-<div class="small">
-Extra rewards while waiting for offers.
+<div class="title">
+🎁 Bonus Tasks
 </div>
 
-<button onclick="bonusTask()">
-Complete Bonus Task (+10 Coins)
+<div class="small">
+Complete bonus tasks while waiting for new offers.
+</div>
+
+<button class="btn" onclick="bonusTask()">
+COMPLETE BONUS TASK (+10)
 </button>
+
+</div>
+
+<!-- DAILY STREAK -->
+<div class="card">
+
+<div class="title">
+📅 Daily Streak
+</div>
+
+<div class="small">
+Claim streak rewards every day and increase your earnings.
+</div>
+
+<button class="btn" onclick="openStreak()">
+OPEN DAILY STREAK
+</button>
+
+</div>
+
+<!-- BACK -->
+<div class="card">
+
+<div class="title">
+⬅ Return
+</div>
+
+<div class="small">
+Go back to the main earn page.
+</div>
+
+<button class="btn btn-dark" onclick="goEarn()">
+BACK TO EARN
+</button>
+
+</div>
 
 </div>
 
@@ -140,84 +219,149 @@ Complete Bonus Task (+10 Coins)
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } 
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+getAuth,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+}
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { getFirestore, doc, getDoc, setDoc, updateDoc }
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+updateDoc
+}
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* FIREBASE */
 const firebaseConfig = {
-apiKey: "YOUR_API_KEY",
+apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
 projectId: "cryptomice-free-section",
 storageBucket: "cryptomice-free-section.firebasestorage.app",
 messagingSenderId: "185364902129",
-appId: "YOUR_APP_ID"
+appId: "1:185364902129:web:51953cbb27278fb05ef950"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* KEEP LOGIN */
+setPersistence(auth, browserLocalPersistence)
+.catch(()=>{});
+
 let user = null;
+let ready = false;
+
+/* FAIL SAFE */
+setTimeout(()=>{
+if(!ready){
+document.getElementById("loading").innerText =
+"Loading failed. Refresh page.";
+}
+},4000);
 
 /* AUTH */
 onAuthStateChanged(auth, async (u)=>{
+
+ready = true;
+
 if(!u){
-window.location.href="auth.html";
+location.replace("auth.html");
 return;
 }
-user = u;
-await ensureUser();
-loadBalance();
-});
 
-/* USER CREATE */
-async function ensureUser(){
+user = u;
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
+
 await setDoc(ref,{
 email:user.email,
-coins:0
+coins:0,
+lastFaucet:0,
+streak:0,
+lastClaim:0
 });
-}
+
 }
 
-/* BALANCE */
+/* SHOW APP */
+document.getElementById("loading").style.display = "none";
+document.getElementById("app").style.display = "block";
+
+loadBalance();
+
+});
+
+/* LOAD BALANCE */
 async function loadBalance(){
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
+
 }
 
-/* BITLABS */
+/* OPEN BITLABS */
 window.openBitlabs = function(){
 
-let bitlabsOfferwallURL = "YOUR_BITLABS_OFFERWALL_LINK";
+/* REPLACE WITH YOUR REAL BITLABS LINK */
+const bitlabsOfferwallURL =
+"https://YOUR-BITLABS-OFFERWALL-LINK";
 
 window.open(bitlabsOfferwallURL,"_blank");
 
 };
 
 /* BONUS TASK */
+let lastBonus = 0;
+
 window.bonusTask = async function(){
+
+if(Date.now() - lastBonus < 30000){
+alert("Wait before doing another bonus task");
+return;
+}
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 let coins = snap.data()?.coins || 0;
+
 coins += 10;
 
-await updateDoc(ref,{coins});
+await updateDoc(ref,{
+coins:coins
+});
+
+lastBonus = Date.now();
 
 loadBalance();
 
 alert("+10 Coins Added");
+
+};
+
+/* DAILY STREAK */
+window.openStreak = function(){
+location.href = "daily-streak.html";
+};
+
+/* BACK */
+window.goEarn = function(){
+location.href = "earn.html";
 };
 
 </script>
