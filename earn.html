@@ -15,6 +15,7 @@ body{margin:0;background:#050812;color:white;font-family:Arial;}
 .balance{font-size:34px;color:#facc15;}
 
 .task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+
 .small{font-size:13px;color:#9ca3af;}
 
 .btn{
@@ -29,8 +30,13 @@ margin-top:10px;
 color:#050812;
 }
 
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
+}
+
 #app{display:none;}
-#loading{text-align:center;padding:40px;color:#9ca3af;}
 </style>
 </head>
 
@@ -51,22 +57,26 @@ color:#050812;
 
 <div class="task">
 <h3>🎯 Earn Ads</h3>
+<div class="small">Click ads and earn Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
 <div class="task">
 <h3>🎮 Offer Wall</h3>
-<button class="btn" onclick="goRewards()">OPEN OFFER WALL</button>
+<div class="small">Surveys, installs & games</div>
+<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
 </div>
 
 <div class="task">
 <h3>🚰 Faucet</h3>
+<div class="small">Claim once every 24h</div>
 <button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
 </div>
 
 <div class="task">
-<h3>🔥 Daily Streak</h3>
-<button class="btn" onclick="goStreak()">DAILY STREAK</button>
+<h3>📅 Daily Streak</h3>
+<div class="small">Build streak rewards</div>
+<button class="btn" onclick="openStreak()">OPEN STREAK</button>
 </div>
 
 </div>
@@ -102,24 +112,27 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-await setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
+/* SAFE STATE */
 let user = null;
-let authReady = false;
-let redirected = false;
+let ready = false;
 
-/* =========================
-   SAFE AUTH GATE (NO BLINK)
-========================= */
+/* 🔥 TIMEOUT FIX (prevents infinite loading) */
+setTimeout(() => {
+if(!ready){
+document.getElementById("loading").innerText =
+"Loading failed. Please refresh.";
+}
+}, 3000);
+
+/* AUTH */
 onAuthStateChanged(auth, async (u) => {
 
-if (redirected) return;
+ready = true;
 
-authReady = true;
-
-if (!u) {
-redirected = true;
-window.location.replace("auth.html");
+if(!u){
+location.replace("auth.html");
 return;
 }
 
@@ -128,12 +141,17 @@ user = u;
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-if (!snap.exists()) {
-await setDoc(ref,{coins:0,lastFaucet:0});
+if(!snap.exists()){
+await setDoc(ref,{
+coins:0,
+lastFaucet:0,
+streak:0,
+lastStreak:0
+});
 }
 
-document.getElementById("loading").style.display="none";
-document.getElementById("app").style.display="block";
+document.getElementById("loading").style.display = "none";
+document.getElementById("app").style.display = "block";
 
 loadBalance();
 
@@ -148,21 +166,26 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-/* NAVIGATION (SAFE) */
-window.goRewards = function(){
-window.location.replace("rewards.html");
-};
+/* REWARD */
+async function reward(amount){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-window.goStreak = function(){
-window.location.replace("daily-streak.html");
-};
+let c = snap.data().coins || 0;
+c += amount;
+
+await updateDoc(ref,{coins:c});
+loadBalance();
+}
 
 /* ADS */
 const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka"
+"https://thoroughgear.com/TpOLka",
+"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
 ];
 
 let active=false;
@@ -171,8 +194,10 @@ let lastAd=0;
 
 window.startAd=function(){
 
+if(!user) return;
+
 if(Date.now()-lastAd<30000){
-alert("Cooldown");
+alert("Cooldown active");
 return;
 }
 
@@ -182,33 +207,37 @@ active=true;
 start=Date.now();
 lastAd=Date.now();
 
-alert("Stay few seconds");
 };
 
-/* REWARD CHECK */
-document.addEventListener("visibilitychange",async()=>{
+/* FIXED CHEAT SYSTEM */
+document.addEventListener("visibilitychange", async ()=>{
 
-if(document.visibilityState==="visible"&&active){
-
-let t=(Date.now()-start)/1000;
+if(document.visibilityState==="visible" && active){
 
 active=false;
 
+let t=(Date.now()-start)/1000;
+
 if(t<8){
-alert("Invalid");
+alert("Invalid session");
 return;
 }
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let c=snap.data().coins||0;
-await updateDoc(ref,{coins:c+10});
-
-loadBalance();
-alert("+10");
+await reward(10);
+alert("+10 Coins Earned");
 }
+
 });
+
+/* OFFER WALL (FIXED LINK) */
+window.openOfferWall=function(){
+location.href="rewards.html";
+};
+
+/* DAILY STREAK LINK */
+window.openStreak=function(){
+location.href="daily-streak.html";
+};
 
 /* FAUCET */
 window.claimFaucet=async function(){
@@ -216,20 +245,21 @@ window.claimFaucet=async function(){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
 
-let d=snap.data();
+let data=snap.data();
 let now=Date.now();
 
-if(now-(d.lastFaucet||0)<86400000){
+if(now-(data.lastFaucet||0)<86400000){
 alert("Come back later");
 return;
 }
 
 await updateDoc(ref,{
-coins:(d.coins||0)+20,
+coins:(data.coins||0)+20,
 lastFaucet:now
 });
 
 loadBalance();
+alert("+20 Faucet");
 };
 
 </script>
