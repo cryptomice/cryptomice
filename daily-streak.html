@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cryptomice Rewards Hub</title><style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cryptomice Daily Streak</title><style>
 body{
 margin:0;
 font-family:Arial,sans-serif;
@@ -10,16 +10,34 @@ color:white;
 }
 
 .header{
-padding:20px;
+padding:15px 20px;
 text-align:center;
 background:#0b1220;
 border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
-font-size:26px;
+font-size:24px;
 font-weight:bold;
 color:#facc15;
+}
+
+.nav{
+margin-top:10px;
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.nav a{
+text-decoration:none;
+color:#d1d5db;
+background:#111827;
+padding:8px 12px;
+border-radius:10px;
+font-size:13px;
+border:1px solid rgba(255,255,255,0.05);
 }
 
 .container{
@@ -64,8 +82,9 @@ cursor:pointer;
 margin-top:10px;
 }
 
-.section{
-margin-top:20px;
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
 }
 
 .badge{
@@ -78,28 +97,26 @@ margin-right:5px;
 color:#d1d5db;
 }
 </style></head><body><div class="header">
-<div class="logo">🐭 Cryptomice Rewards Hub</div>
-</div><div class="container"><div class="card">
+<div class="logo">🐭 Cryptomice Daily Streak</div><div class="nav">
+<a href="https://cryptomice.github.io/cryptomice/earn.html">Earn Page</a>
+<a href="https://cryptomice.github.io/cryptomice/rewards.html">Rewards</a>
+</div></div><div class="container"><div class="card">
 <div class="small">Your Balance</div>
 <div class="balance" id="balance">Loading...</div>
-</div><!-- BITLABS MAIN SECTION --><div class="card"><div class="title">🔥 Earn with Bitlabs Offer Wall</div><div class="small">
-Complete real offers and earn Mice Coins instantly.
-</div><!-- CHANGED ONLY THIS --><button onclick="openOfferWall()">
-Open Offer Wall
-</button><div class="section"><span class="badge">📊 Surveys</span> <span class="badge">🎮 Gaming Offers</span> <span class="badge">📱 App Installs</span>
-
-</div></div><!-- BONUS TASK --><div class="card"><div class="title">🎁 Bonus Tasks (Optional)</div><div class="small">
-Extra rewards while waiting for offers.
-</div><!-- CHANGED ONLY THIS --><button onclick="bonusTask()">
-Complete Bonus Task (+10 Coins)
-</button></div></div><script type="module">
+</div><!-- DAILY STREAK --><div class="card">
+<div class="title">🔥 Daily Streak Reward</div>
+<div class="small">Claim your fixed daily reward of 16 Mice Coins every 24 hours.</div>
+<button id="claimBtn" onclick="claimDaily()">Claim 16 Coins</button>
+<div class="small" id="timer" style="margin-top:10px;"></div>
+</div><!-- NAV BUTTON --><div class="card">
+<div class="title">🚀 Go to Earn Page</div>
+<div class="small">Continue earning more Mice Coins through offers and tasks.</div>
+<button onclick="goEarn()">Open Earn Page</button>
+</div></div><script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import { getFirestore, doc, getDoc, setDoc, updateDoc }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "YOUR_API_KEY",
@@ -115,51 +132,87 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let user = null;
+const REWARD = 16;
+const COOLDOWN = 24 * 60 * 60 * 1000;
 
-/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
-if(!u){
-window.location.href="auth.html";
-return;
-}
+if(!u){ window.location.href="auth.html"; return; }
 user = u;
 await ensureUser();
-loadBalance();
+loadData();
 });
 
-/* USER CREATE */
 async function ensureUser(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
-
 if(!snap.exists()){
-await setDoc(ref,{
-email:user.email,
-coins:0
-});
+await setDoc(ref,{ email:user.email, coins:0, lastClaim:0 });
 }
 }
 
-/* BALANCE */
+async function loadData(){
+await loadBalance();
+await updateTimer();
+}
+
 async function loadBalance(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
-
-document.getElementById("balance").innerText =
-(snap.data()?.coins || 0) + " Mice Coins";
+document.getElementById("balance").innerText = (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-/* 🔁 CHANGED ROUTE ONLY */
-window.openOfferWall = function(){
-window.location.href =
-"https://cryptomice.github.io/cryptomice/coming-soon.html";
+window.claimDaily = async function(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+const data = snap.data();
+
+const now = Date.now();
+const last = data.lastClaim || 0;
+
+if(now - last < COOLDOWN){
+alert("You already claimed today. Come back later.");
+return;
+}
+
+const newCoins = (data.coins || 0) + REWARD;
+
+await updateDoc(ref,{ coins:newCoins, lastClaim:now });
+
+loadBalance();
+updateTimer();
+
+alert("You received 16 Mice Coins!");
 };
 
-/* 🔁 CHANGED ROUTE ONLY */
-window.bonusTask = function(){
-window.location.href =
-"https://cryptomice.github.io/cryptomice/coming-soon.html";
+window.goEarn = function(){
+window.location.href = "https://cryptomice.github.io/cryptomice/earn.html";
 };
+
+async function updateTimer(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+const last = snap.data()?.lastClaim || 0;
+const now = Date.now();
+
+const btn = document.getElementById("claimBtn");
+const timer = document.getElementById("timer");
+
+if(now - last >= COOLDOWN){
+btn.disabled = false;
+timer.innerText = "You can claim now.";
+return;
+}
+
+btn.disabled = true;
+const remaining = COOLDOWN - (now - last);
+
+const hrs = Math.floor(remaining / 3600000);
+const mins = Math.floor((remaining % 3600000) / 60000);
+
+timer.innerText = `Next claim in ${hrs}h ${mins}m`;
+}
+
+setInterval(updateTimer, 60000);
 
 </script></body>
-</html>
+  </html>
