@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- 🔍 GOOGLE VERIFICATION -->
 <meta name="google-site-verification" content="Gb0y1wO-vPnZaBSbM0LvemVniT-5jbJA-xfJyXmfZL0" />
 
 <title>Cryptomice – Earn Crypto Through Referrals</title>
@@ -33,6 +32,8 @@
 </script>
 
 <style>
+
+/* BASE */
 *{
 margin:0;
 padding:0;
@@ -140,7 +141,7 @@ color:black;
 display:none;
 }
 
-/* ⭐ NEW DOWNLOAD BUTTON */
+/* ✅ DOWNLOAD BUTTON (NEW) */
 #downloadBtn{
 width:100%;
 padding:14px;
@@ -154,7 +155,7 @@ color:black;
 display:block;
 }
 
-/* HIDE DOWNLOAD BUTTON INSIDE INSTALLED APP (PWA MODE) */
+/* Hide download button inside installed app */
 @media all and (display-mode: standalone){
 #downloadBtn{
 display:none;
@@ -245,11 +246,13 @@ font-size:12px;
 opacity:0.5;
 margin:20px;
 }
+
 </style>
 </head>
 
 <body>
 
+<!-- HERO -->
 <div class="hero">
 
 <div class="logo">🐭 CRYPTOMICE</div>
@@ -270,13 +273,14 @@ Cryptomice is a digital referral rewards platform built for online earning and e
 <button class="login" onclick="navigateTo('guide.html')">How it works</button>
 </div>
 
-<!-- ⭐ DOWNLOAD BUTTON (VISIBLE ONLY ON WEBSITE) -->
+<!-- DOWNLOAD BUTTON (VISIBLE ONLY WEBSITE) -->
 <button id="downloadBtn" onclick="downloadApp()">Download App</button>
 
 <button id="installBtn">Install App</button>
 
 </div>
 
+<!-- STATS -->
 <div class="stats">
 <div class="stat"><h3>10m+</h3><p>Members</p></div>
 <div class="stat"><h3>50k+ LTC</h3><p>Earned</p></div>
@@ -310,6 +314,7 @@ Cryptomice is a digital referral rewards platform built for online earning and e
 <div class="footer">© 2026 Cryptomice</div>
 
 <script>
+
 function navigateTo(url){
 window.location.href = url;
 }
@@ -322,7 +327,7 @@ function goLogin(){
 navigateTo("login.html");
 }
 
-/* DOWNLOAD BUTTON ACTION */
+/* DOWNLOAD */
 function downloadApp(){
 window.location.href = "cryptomice.apk";
 }
@@ -330,14 +335,14 @@ window.location.href = "cryptomice.apk";
 /* INSTALL PWA */
 let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", (e) => {
+window.addEventListener("beforeinstallprompt", (e)=>{
 e.preventDefault();
 deferredPrompt = e;
 document.getElementById("installBtn").style.display = "block";
 });
 
-document.getElementById("installBtn").addEventListener("click", async () => {
-if (!deferredPrompt) return;
+document.getElementById("installBtn").addEventListener("click", async ()=>{
+if(!deferredPrompt) return;
 deferredPrompt.prompt();
 await deferredPrompt.userChoice;
 deferredPrompt = null;
@@ -345,9 +350,10 @@ document.getElementById("installBtn").style.display = "none";
 });
 
 /* SERVICE WORKER */
-if ("serviceWorker" in navigator) {
+if("serviceWorker" in navigator){
 navigator.serviceWorker.register("sw.js");
 }
+
 </script>
 
 </body>
