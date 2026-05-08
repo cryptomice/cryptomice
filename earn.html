@@ -3,120 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Earn Free Litecoin - Cryptomice</title>
+<title>Cryptomice Earn System</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+body{margin:0;background:#050812;color:white;font-family:Arial;}
+.header{text-align:center;padding:20px;background:#0b1220;}
+.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-body{
-background:#050812;
-font-family:Arial,sans-serif;
-color:white;
-overflow-x:hidden;
-}
+.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
+.balance{font-size:34px;color:#facc15;}
 
-body::before{
-content:"";
-position:fixed;
-top:-200px;
-left:-200px;
-width:500px;
-height:500px;
-background:rgba(255,215,0,0.08);
-border-radius:50%;
-filter:blur(120px);
-z-index:-1;
-}
-
-.header{
-padding:20px;
-text-align:center;
-border-bottom:1px solid rgba(255,255,255,0.08);
-background:#0b1220;
-position:sticky;
-top:0;
-z-index:100;
-}
-
-.logo{font-size:28px;font-weight:bold;color:#facc15;}
-.subtitle{margin-top:8px;font-size:14px;color:#9ca3af;}
-
-.balance-box{
-margin:20px;
-background:linear-gradient(145deg,#111827,#0f172a);
-border-radius:20px;
-padding:25px;
-box-shadow:0 0 25px rgba(255,215,0,0.08);
-border:1px solid rgba(255,255,255,0.05);
-}
-
-.balance-title{font-size:14px;color:#9ca3af;margin-bottom:10px;}
-.balance{font-size:36px;font-weight:bold;color:#facc15;}
-.small-text{margin-top:10px;font-size:13px;color:#9ca3af;}
-
-.guide{
-margin:20px;
-background:#111827;
-padding:20px;
-border-radius:18px;
-border:1px solid rgba(255,255,255,0.05);
-}
-
-.section-title{
-margin:25px 20px 15px;
-font-size:20px;
-font-weight:bold;
-}
-
-.task-container{padding:0 20px 100px;}
-
-.task-card{
-background:linear-gradient(145deg,#111827,#0f172a);
-border-radius:22px;
-padding:20px;
-margin-bottom:18px;
-border:1px solid rgba(255,255,255,0.05);
-}
-
-.task-top{
-display:flex;
-justify-content:space-between;
-margin-bottom:18px;
-}
-
-.task-icon{
-width:55px;height:55px;border-radius:15px;
-background:rgba(250,204,21,0.1);
-display:flex;align-items:center;justify-content:center;
-font-size:26px;
-}
-
-.reward{font-size:20px;font-weight:bold;color:#facc15;}
-.task-title{font-size:18px;font-weight:bold;margin-bottom:8px;}
-.task-desc{font-size:14px;color:#9ca3af;}
-
-.task-meta{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-
-.meta-box{
-background:#0b1220;
-padding:8px 14px;
-border-radius:50px;
-font-size:13px;
-color:#d1d5db;
-}
-
-.task-btn{
+.btn{
 width:100%;
-padding:15px;
+padding:14px;
 border:none;
-border-radius:14px;
-font-size:16px;
-font-weight:bold;
+border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
-color:#050812;
+font-weight:bold;
 cursor:pointer;
+margin-top:10px;
 }
+
+.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.small{font-size:13px;color:#9ca3af;}
 </style>
 </head>
 
@@ -124,46 +33,23 @@ cursor:pointer;
 
 <div class="header">
 <div class="logo">🐭 Cryptomice</div>
-<div class="subtitle">Click ads & earn 10 Mice Coins</div>
 </div>
 
-<div class="balance-box">
-<div class="balance-title">Current Balance</div>
-<div class="balance" id="balance">Loading...</div>
-<div class="small-text">🔥 Earn 10 Coins per verified ad engagement</div>
+<div class="box">
+<div>Balance</div>
+<div class="balance" id="balance">0</div>
 </div>
 
-<div class="guide">
-<h3>How It Works</h3>
-<p>
-1. Click START AD<br><br>
-2. Stay on the page (no switching tabs)<br><br>
-3. Return after timer completes<br><br>
-4. Earn rewards automatically
-</p>
+<div class="task">
+<h3>🎯 Watch Ads</h3>
+<div class="small">Stay focused for reward</div>
+<button class="btn" onclick="startAd()">START AD</button>
 </div>
 
-<div class="section-title">🔥 Ads Tasks</div>
-
-<div class="task-container">
-
-<div class="task-card">
-<div class="task-top">
-<div class="task-icon">🔗</div>
-<div class="reward">+10 Coins</div>
-</div>
-
-<div class="task-title">Watch Partner Ad</div>
-<div class="task-desc">Stay active while ad loads in new tab.</div>
-
-<div class="task-meta">
-<div class="meta-box">⏱ 12s+</div>
-<div class="meta-box">Anti-cheat</div>
-</div>
-
-<button class="task-btn" onclick="startAd()">START AD</button>
-</div>
-
+<div class="task">
+<h3>🚰 Faucet</h3>
+<div class="small">Claim once every 24h</div>
+<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
 </div>
 
 <script type="module">
@@ -171,7 +57,6 @@ cursor:pointer;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import { getFirestore, doc, getDoc, setDoc, updateDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -190,129 +75,134 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-let user = null;
+let user=null;
 
-/* ---------------- AD POOL (MERGED) ---------------- */
-const adLinks = [
+/* ---------------- AD POOLS ---------------- */
+const adsA = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka",
-"https://wrathful-piano.com/398aSn",
-"https://wrathful-piano.com/ibU5KJ",
-"https://thoroughgear.com/40mbTS",
-"https://thoroughgear.com/FSas0E",
-"https://wrathful-piano.com/fJDG7O",
-"https://wrathful-piano.com/i1Tn5O",
+"https://thoroughgear.com/TpOLka"
+];
 
+const adsB = [
 "https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
 "https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
 "https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
 ];
 
-let active = false;
-let startTime = 0;
-let lastClaim = 0;
-let lastLink = null;
-let focusTime = 0;
-let interval = null;
+let active=false;
+let start=0;
+let focus=0;
+let lastAd=0;
 
 /* ---------------- AUTH ---------------- */
 onAuthStateChanged(auth, async (u)=>{
-if(!u){ window.location.href="auth.html"; return; }
-user = u;
+if(!u){location.href="auth.html";return;}
+user=u;
 
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
 if(!snap.exists()){
-await setDoc(ref,{email:user.email,coins:0});
+await setDoc(ref,{coins:0});
 }
 
-loadBalance();
+load();
 });
 
-/* ---------------- BALANCE ---------------- */
-async function loadBalance(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
-document.getElementById("balance").innerText =
-(snap.data()?.coins || 0) + " Mice Coins";
+/* ---------------- LOAD ---------------- */
+async function load(){
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
+document.getElementById("balance").innerText=snap.data().coins||0;
 }
 
-/* ---------------- AD START ---------------- */
-window.startAd = function(){
+/* ---------------- REWARD ---------------- */
+async function reward(amount){
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
-let now = Date.now();
+let c=snap.data().coins||0;
+c+=amount;
 
-/* cooldown */
-if(now - lastClaim < 30000){
-alert("Wait before next ad.");
+await updateDoc(ref,{coins:c});
+load();
+}
+
+/* ---------------- AD SYSTEM ---------------- */
+window.startAd=function(){
+
+let now=Date.now();
+
+if(now-lastAd<30000){
+alert("Wait cooldown");
 return;
 }
 
-/* rotate link */
-let link;
-do{
-link = adLinks[Math.floor(Math.random()*adLinks.length)];
-}while(link === lastLink);
-
-lastLink = link;
+/* pool mix */
+let pool=Math.random()>0.5?adsA:adsB;
+let link=pool[Math.floor(Math.random()*pool.length)];
 
 window.open(link,"_blank");
 
-active = true;
-startTime = now;
-focusTime = 0;
-lastClaim = now;
+active=true;
+start=now;
+focus=0;
+lastAd=now;
 
-/* track active focus */
-if(interval) clearInterval(interval);
-
-interval = setInterval(()=>{
-if(document.visibilityState === "visible"){
-focusTime += 1;
-}
+/* track focus */
+setInterval(()=>{
+if(document.visibilityState==="visible") focus++;
 },1000);
 
-alert("Stay on the tab for a few seconds to earn reward.");
+alert("Stay on page to earn reward");
 };
 
-/* ---------------- ANTI CHEAT CHECK ---------------- */
-document.addEventListener("visibilitychange", async ()=>{
+/* ---------------- ANTI CHEAT ---------------- */
+document.addEventListener("visibilitychange",async()=>{
 
-if(document.visibilityState === "visible" && active){
+if(document.visibilityState==="visible"&&active){
 
-let duration = (Date.now() - startTime)/1000;
+let t=(Date.now()-start)/1000;
 
-/* must have real engagement */
-if(duration < 8 || focusTime < 6){
-active = false;
-clearInterval(interval);
-alert("No reward (invalid activity).");
+if(t<8||focus<5){
+active=false;
+alert("Invalid session");
 return;
 }
 
-/* reward */
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
-let coins = snap.data()?.coins || 0;
-coins += 10;
-
-await updateDoc(ref,{coins});
-
-loadBalance();
-
-active = false;
-clearInterval(interval);
-
-alert("+10 Mice Coins Earned!");
+active=false;
+await reward(10);
+alert("+10 Coins Earned");
 }
 });
+
+/* ---------------- FAUCET ---------------- */
+window.claimFaucet=async function(){
+
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
+
+let data=snap.data();
+let now=Date.now();
+let day=86400000;
+
+if(data.lastFaucet && now-data.lastFaucet<day){
+alert("Come back later");
+return;
+}
+
+await updateDoc(ref,{
+coins:(data.coins||0)+20,
+lastFaucet:now
+});
+
+load();
+alert("+20 Faucet Claimed");
+};
 
 </script>
 
 </body>
-</html>
+  </html>
