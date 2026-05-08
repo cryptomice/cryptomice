@@ -46,10 +46,9 @@ color:white;
 <div class="logo">🐭 Cryptomice Earn</div>
 </div>
 
-<!-- BALANCE -->
 <div class="box">
 <div>Balance</div>
-<div class="balance" id="balance">0</div>
+<div class="balance" id="balance">Loading...</div>
 </div>
 
 <!-- ADS -->
@@ -62,13 +61,8 @@ color:white;
 <!-- OFFER WALL -->
 <div class="task">
 <h3>🎮 Offer Wall</h3>
-<div class="small">
-Complete surveys, installs & games to earn coins
-</div>
-
-<button class="btn" onclick="openOfferWall()">
-OPEN OFFER WALL
-</button>
+<div class="small">Surveys, installs & games</div>
+<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
 </div>
 
 <!-- FAUCET -->
@@ -120,44 +114,52 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-let user=null;
+let user = null;
+let authReady = false;
 
-/* AUTH */
-onAuthStateChanged(auth, async (u)=>{
-if(!u){
-location.href="auth.html";
+/* 🔥 FIX: prevent redirect flicker */
+onAuthStateChanged(auth, async (u) => {
+
+authReady = true;
+
+if (!u) {
+if (authReady) {
+window.location.href = "auth.html";
+}
 return;
 }
-user=u;
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+user = u;
 
-if(!snap.exists()){
-await setDoc(ref,{coins:0});
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
+
+if (!snap.exists()) {
+await setDoc(ref, { coins: 0 });
 }
 
 load();
+
 });
 
 /* LOAD */
-async function load(){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+async function load() {
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(snap.data()?.coins||0);
+(snap.data()?.coins || 0);
 }
 
 /* REWARD */
-async function reward(amount){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+async function reward(amount) {
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
 
-let c=snap.data().coins||0;
-c+=amount;
+let c = snap.data().coins || 0;
+c += amount;
 
-await updateDoc(ref,{coins:c});
+await updateDoc(ref, { coins: c });
 load();
 }
 
@@ -166,73 +168,71 @@ const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka",
-"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
+"https://thoroughgear.com/TpOLka"
 ];
 
-let active=false;
-let start=0;
-let lastAd=0;
+let active = false;
+let start = 0;
+let lastAd = 0;
 
-window.startAd=function(){
+window.startAd = function () {
 
-if(Date.now()-lastAd<30000){
+if (Date.now() - lastAd < 30000) {
 alert("Cooldown active");
 return;
 }
 
-let link=ads[Math.floor(Math.random()*ads.length)];
-window.open(link,"_blank");
+let link = ads[Math.floor(Math.random() * ads.length)];
+window.open(link, "_blank");
 
-active=true;
-start=Date.now();
-lastAd=Date.now();
+active = true;
+start = Date.now();
+lastAd = Date.now();
 
 alert("Stay a few seconds then return");
 };
 
 /* CHEAT PROTECTION */
-document.addEventListener("visibilitychange",async()=>{
+document.addEventListener("visibilitychange", async () => {
 
-if(document.visibilityState==="visible"&&active){
+if (document.visibilityState === "visible" && active) {
 
-let time=(Date.now()-start)/1000;
+let time = (Date.now() - start) / 1000;
 
-if(time<8){
-active=false;
+if (time < 8) {
+active = false;
 alert("Invalid session");
 return;
 }
 
-active=false;
+active = false;
 await reward(10);
 alert("+10 Coins Earned");
 }
 });
 
-/* OFFER WALL LINK FIXED */
+/* OFFER WALL */
 window.openOfferWall = function () {
-  window.location.href = "rewards.html";
+window.location.href = "rewards.html";
 };
 
 /* FAUCET */
-window.claimFaucet=async function(){
+window.claimFaucet = async function () {
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
 
-let data=snap.data();
-let now=Date.now();
+let data = snap.data();
+let now = Date.now();
 
-if(data.lastFaucet && now-data.lastFaucet<86400000){
+if (data.lastFaucet && now - data.lastFaucet < 86400000) {
 alert("Come back later");
 return;
 }
 
-await updateDoc(ref,{
-coins:(data.coins||0)+20,
-lastFaucet:now
+await updateDoc(ref, {
+coins: (data.coins || 0) + 20,
+lastFaucet: now
 });
 
 load();
@@ -240,34 +240,34 @@ alert("+20 Faucet");
 };
 
 /* WITHDRAW */
-window.withdraw=async function(){
+window.withdraw = async function () {
 
-let wallet=document.getElementById("wallet").value;
+let wallet = document.getElementById("wallet").value;
 
-if(!wallet){
+if (!wallet) {
 alert("Enter wallet");
 return;
 }
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+const ref = doc(db, "users", user.uid);
+const snap = await getDoc(ref);
 
-let coins=snap.data().coins||0;
+let coins = snap.data().coins || 0;
 
-if(coins<1000){
+if (coins < 1000) {
 alert("Minimum 1000 coins required");
 return;
 }
 
-await addDoc(collection(db,"withdrawals"),{
-uid:user.uid,
-wallet:wallet,
-amount:coins,
-status:"pending",
-time:Date.now()
+await addDoc(collection(db, "withdrawals"), {
+uid: user.uid,
+wallet: wallet,
+amount: coins,
+status: "pending",
+time: Date.now()
 });
 
-await updateDoc(ref,{coins:0});
+await updateDoc(ref, { coins: 0 });
 
 load();
 alert("Withdrawal submitted!");
