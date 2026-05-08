@@ -1,62 +1,251 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Cryptomice Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#03060c;
+color:white;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+position:relative;
+}
+
+/* GOLD BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+background:
+radial-gradient(circle at 20% 30%, rgba(255,215,0,0.15), transparent 40%),
+radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent 45%),
+radial-gradient(circle at 40% 80%, rgba(255,215,0,0.08), transparent 50%);
+animation:glow 8s infinite alternate ease-in-out;
+z-index:0;
+}
+
+@keyframes glow{
+0%{transform:scale(1);}
+100%{transform:scale(1.1);}
+}
+
+.card{
+position:relative;
+z-index:1;
+width:90%;
+max-width:420px;
+background:#0b1220;
+padding:30px 22px;
+border-radius:20px;
+border:1px solid rgba(255,215,0,0.15);
+box-shadow:0 0 30px rgba(255,215,0,0.08);
+}
+
+.logo{
+text-align:center;
+font-size:30px;
+font-weight:bold;
+color:#ffd84d;
+margin-bottom:10px;
+text-shadow:0 0 10px #ffd84d;
+}
+
+.subtitle{
+text-align:center;
+font-size:14px;
+color:#9ca3af;
+margin-bottom:25px;
+}
+
+input{
+width:100%;
+padding:14px;
+margin-bottom:14px;
+border:none;
+border-radius:12px;
+background:#111827;
+color:white;
+font-size:15px;
+outline:none;
+}
+
+input::placeholder{
+color:#9ca3af;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+font-weight:bold;
+font-size:15px;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(1.01);
+}
+
+#msg{
+margin-top:15px;
+text-align:center;
+font-size:13px;
+color:#ffd84d;
+word-break:break-word;
+}
+
+.footer{
+margin-top:20px;
+text-align:center;
+font-size:13px;
+color:#9ca3af;
+}
+
+.footer a{
+color:#ffd84d;
+text-decoration:none;
+font-weight:bold;
+}
+
+.loading{
+opacity:0.7;
+pointer-events:none;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;background:#f5f5f5;padding:20px;">
+<body>
 
-<h2>Login</h2>
+<div class="card">
 
-<input id="email" type="email" placeholder="Email" style="display:block;width:100%;padding:10px;margin:10px 0;">
-<input id="password" type="password" placeholder="Password" style="display:block;width:100%;padding:10px;margin:10px 0;">
+<div class="logo">🐭 CRYPTOMICE</div>
 
-<button id="loginBtn" style="padding:10px;width:100%;">
-Login
+<div class="subtitle">
+Login to access your dashboard and rewards
+</div>
+
+<input id="email" type="email" placeholder="Enter Email">
+
+<input id="password" type="password" placeholder="Enter Password">
+
+<button id="loginBtn">
+LOGIN
 </button>
 
 <p id="msg"></p>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+<div class="footer">
+Don't have an account?
+<a href="signup.html">Create Account</a>
+</div>
 
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+}
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+/* FIREBASE */
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* 🔐 AUTO REDIRECT IF ALREADY LOGGED IN */
+/* KEEP LOGIN */
+await setPersistence(auth, browserLocalPersistence);
+
+/* AUTO REDIRECT */
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
-  }
+
+if(user){
+window.location.replace("dashboard.html");
+}
+
 });
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+/* LOGIN */
+document.getElementById("loginBtn")
+.addEventListener("click", async ()=>{
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById("msg").innerText = "Login successful!";
+const btn = document.getElementById("loginBtn");
 
-    setTimeout(() => {
-      window.location.href = "https://cryptomice.github.io/cryptomice/dashboard.html";
-    }, 800);
+const email =
+document.getElementById("email").value.trim();
 
-  } catch (error) {
-    document.getElementById("msg").innerText = error.message;
-  }
+const password =
+document.getElementById("password").value;
+
+const msg = document.getElementById("msg");
+
+if(!email || !password){
+msg.innerText = "Enter email and password";
+return;
+}
+
+try{
+
+btn.innerText = "Logging in...";
+btn.classList.add("loading");
+
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+msg.innerText = "Login successful";
+
+setTimeout(()=>{
+window.location.replace("dashboard.html");
+},700);
+
+}catch(error){
+
+msg.innerText = error.message;
+
+btn.innerText = "LOGIN";
+btn.classList.remove("loading");
+
+}
+
 });
+
 </script>
 
 </body>
