@@ -6,17 +6,48 @@
 <title>Cryptomice Earn System</title>
 
 <style>
-body{margin:0;background:#050812;color:white;font-family:Arial;}
+body{
+margin:0;
+background:#050812;
+color:white;
+font-family:Arial;
+}
 
-.header{text-align:center;padding:20px;background:#0b1220;}
-.logo{color:#facc15;font-size:28px;font-weight:bold;}
+.header{
+text-align:center;
+padding:20px;
+background:#0b1220;
+}
 
-.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
-.balance{font-size:34px;color:#facc15;}
+.logo{
+color:#facc15;
+font-size:28px;
+font-weight:bold;
+}
 
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.box{
+margin:20px;
+padding:20px;
+background:#111827;
+border-radius:16px;
+}
 
-.small{font-size:13px;color:#9ca3af;}
+.balance{
+font-size:34px;
+color:#facc15;
+}
+
+.task{
+margin:20px;
+padding:20px;
+background:#0f172a;
+border-radius:16px;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+}
 
 .btn{
 width:100%;
@@ -30,13 +61,26 @@ margin-top:10px;
 color:#050812;
 }
 
+input{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:none;
+border-radius:12px;
+background:#111827;
+color:white;
+box-sizing:border-box;
+}
+
 #loading{
 text-align:center;
 padding:40px;
 color:#9ca3af;
 }
 
-#app{display:none;}
+#app{
+display:none;
+}
 </style>
 </head>
 
@@ -55,50 +99,84 @@ color:#9ca3af;
 <div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
+<!-- ADS -->
 <div class="task">
 <h3>🎯 Earn Ads</h3>
 <div class="small">Click ads and earn Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
+<!-- OFFER WALL -->
 <div class="task">
 <h3>🎮 Offer Wall</h3>
 <div class="small">Surveys, installs & games</div>
-<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
+<button class="btn" onclick="openOfferWall()">
+OPEN OFFER WALL
+</button>
 </div>
 
-<div class="task">
-<h3>🚰 Faucet</h3>
-<div class="small">Claim once every 24h</div>
-<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
-</div>
-
+<!-- DAILY STREAK -->
 <div class="task">
 <h3>📅 Daily Streak</h3>
-<div class="small">Build streak rewards</div>
-<button class="btn" onclick="openStreak()">OPEN STREAK</button>
+<div class="small">Build your daily streak rewards</div>
+<button class="btn" onclick="openStreak()">
+OPEN STREAK
+</button>
+</div>
+
+<!-- FAUCET -->
+<div class="task">
+<h3>🚰 Faucet</h3>
+<div class="small">Claim once every 24 hours</div>
+<button class="btn" onclick="claimFaucet()">
+CLAIM FAUCET
+</button>
+</div>
+
+<!-- WITHDRAW -->
+<div class="task">
+<h3>💸 Withdraw</h3>
+<div class="small">
+Minimum withdrawal: 1000 Mice Coins
+</div>
+
+<input
+id="wallet"
+placeholder="Enter Litecoin Wallet Address"
+>
+
+<button class="btn" onclick="withdrawCoins()">
+WITHDRAW
+</button>
 </div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
 getAuth,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
 getFirestore,
 doc,
 getDoc,
 setDoc,
-updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+updateDoc,
+collection,
+addDoc
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -112,27 +190,35 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-setPersistence(auth, browserLocalPersistence).catch(()=>{});
+/* KEEP LOGIN */
+setPersistence(auth, browserLocalPersistence)
+.catch(()=>{});
 
-/* SAFE STATE */
+/* SAFE AUTH */
 let user = null;
-let ready = false;
+let authChecked = false;
 
-/* 🔥 TIMEOUT FIX (prevents infinite loading) */
-setTimeout(() => {
-if(!ready){
+/* LOADING FAILSAFE */
+setTimeout(()=>{
+
+if(!authChecked){
 document.getElementById("loading").innerText =
-"Loading failed. Please refresh.";
+"Connection taking longer than expected...";
 }
-}, 3000);
 
-/* AUTH */
-onAuthStateChanged(auth, async (u) => {
+},3000);
 
-ready = true;
+/* AUTH CHECK */
+onAuthStateChanged(auth, async(u)=>{
+
+authChecked = true;
 
 if(!u){
+
+setTimeout(()=>{
 location.replace("auth.html");
+},800);
+
 return;
 }
 
@@ -141,128 +227,210 @@ user = u;
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
+/* CREATE USER */
 if(!snap.exists()){
+
 await setDoc(ref,{
 coins:0,
 lastFaucet:0,
 streak:0,
-lastStreak:0
+lastStreak:0,
+createdAt:Date.now()
 });
+
 }
 
-document.getElementById("loading").style.display = "none";
-document.getElementById("app").style.display = "block";
+/* SHOW APP */
+document.getElementById("loading").style.display="none";
+document.getElementById("app").style.display="block";
 
 loadBalance();
 
 });
 
-/* LOAD */
+/* LOAD BALANCE */
 async function loadBalance(){
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
+
 }
 
-/* REWARD */
+/* REWARD SYSTEM */
 async function reward(amount){
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-let c = snap.data().coins || 0;
-c += amount;
+let coins = snap.data()?.coins || 0;
 
-await updateDoc(ref,{coins:c});
+coins += amount;
+
+await updateDoc(ref,{
+coins:coins
+});
+
 loadBalance();
+
 }
 
 /* ADS */
 const ads = [
+
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
 "https://thoroughgear.com/TpOLka",
+"https://wrathful-piano.com/398aSn",
+"https://wrathful-piano.com/ibU5KJ",
+"https://thoroughgear.com/40mbTS",
+"https://thoroughgear.com/FSas0E",
+"https://wrathful-piano.com/fJDG7O",
+"https://wrathful-piano.com/i1Tn5O",
+
 "https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
+"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
+
 ];
 
-let active=false;
-let start=0;
-let lastAd=0;
+let adActive = false;
+let adStart = 0;
+let lastAd = 0;
 
-window.startAd=function(){
+/* START AD */
+window.startAd = function(){
 
 if(!user) return;
 
-if(Date.now()-lastAd<30000){
-alert("Cooldown active");
+let now = Date.now();
+
+/* COOLDOWN */
+if(now - lastAd < 30000){
+alert("Please wait before opening another ad.");
 return;
 }
 
-window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");
+/* RANDOM LINK */
+let link = ads[Math.floor(Math.random()*ads.length)];
 
-active=true;
-start=Date.now();
-lastAd=Date.now();
+window.open(link,"_blank");
+
+adActive = true;
+adStart = now;
+lastAd = now;
+
+alert("Stay on the ad for a few seconds then return.");
 
 };
 
-/* FIXED CHEAT SYSTEM */
-document.addEventListener("visibilitychange", async ()=>{
+/* ANTI CHEAT */
+document.addEventListener("visibilitychange", async()=>{
 
-if(document.visibilityState==="visible" && active){
+if(document.visibilityState==="visible" && adActive){
 
-active=false;
+adActive = false;
 
-let t=(Date.now()-start)/1000;
+let seconds = (Date.now()-adStart)/1000;
 
-if(t<8){
-alert("Invalid session");
+if(seconds < 8){
+alert("Invalid session.");
 return;
 }
 
 await reward(10);
-alert("+10 Coins Earned");
+
+alert("+10 Mice Coins Earned!");
+
 }
 
 });
 
-/* OFFER WALL (FIXED LINK) */
-window.openOfferWall=function(){
-location.href="rewards.html";
+/* OFFER WALL */
+window.openOfferWall = function(){
+location.href = "rewards.html";
 };
 
-/* DAILY STREAK LINK */
-window.openStreak=function(){
-location.href="daily-streak.html";
+/* DAILY STREAK */
+window.openStreak = function(){
+location.href = "daily-streak.html";
 };
 
 /* FAUCET */
-window.claimFaucet=async function(){
+window.claimFaucet = async function(){
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-let data=snap.data();
-let now=Date.now();
+let data = snap.data();
+let now = Date.now();
 
-if(now-(data.lastFaucet||0)<86400000){
-alert("Come back later");
+if(now - (data.lastFaucet || 0) < 86400000){
+alert("Faucet already claimed.");
 return;
 }
 
 await updateDoc(ref,{
-coins:(data.coins||0)+20,
+coins:(data.coins || 0) + 20,
 lastFaucet:now
 });
 
 loadBalance();
-alert("+20 Faucet");
+
+alert("+20 Faucet Coins Claimed!");
+
+};
+
+/* WITHDRAW */
+window.withdrawCoins = async function(){
+
+const wallet =
+document.getElementById("wallet").value.trim();
+
+if(!wallet){
+alert("Enter Litecoin wallet address.");
+return;
+}
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+let coins = snap.data()?.coins || 0;
+
+/* MINIMUM */
+if(coins < 1000){
+alert("Minimum withdrawal is 1000 Coins.");
+return;
+}
+
+/* SAVE REQUEST */
+await addDoc(collection(db,"withdrawals"),{
+
+uid:user.uid,
+wallet:wallet,
+coins:coins,
+status:"pending",
+createdAt:Date.now()
+
+});
+
+/* RESET BALANCE */
+await updateDoc(ref,{
+coins:0
+});
+
+loadBalance();
+
+document.getElementById("wallet").value="";
+
+alert("Withdrawal request submitted!");
+
 };
 
 </script>
 
 </body>
-</html>
+  </html>
