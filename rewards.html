@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cryptomice Rewards</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#050812;
+color:white;
+}
+
+.header{
+padding:20px;
+text-align:center;
+background:#0b1220;
+border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{font-size:26px;color:#facc15;font-weight:bold;}
+
+.container{padding:20px;}
+
+.card{
+background:#111827;
+padding:20px;
+border-radius:18px;
+margin-bottom:15px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.balance{
+font-size:32px;
+color:#facc15;
+font-weight:bold;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#facc15,#fde047);
+color:#000;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+margin-top:8px;
+}
+
+.offerwall{
+background:#0f172a;
+padding:15px;
+border-radius:15px;
+border:1px solid rgba(255,255,255,0.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div class="logo">🐭 Cryptomice Rewards</div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<div class="small">Current Balance</div>
+<div class="balance" id="balance">Loading...</div>
+</div>
+
+<div class="card">
+<h3>Earn Coins</h3>
+
+<button onclick="completeTask()" id="taskBtn">
+Watch / Complete Task (+10 Coins)
+</button>
+
+<div class="small">Cooldown: 20 seconds per task</div>
+</div>
+
+<div class="card offerwall">
+<h3>Bitlabs Offer Wall</h3>
+<p class="small">
+Complete surveys & offers to earn more Coins.
+</p>
+
+<button onclick="openOfferWall()">
+Open Offer Wall
+</button>
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { getFirestore, doc, getDoc, setDoc, updateDoc }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "cryptomice-free-section.firebaseapp.com",
+projectId: "cryptomice-free-section",
+storageBucket: "cryptomice-free-section.firebasestorage.app",
+messagingSenderId: "185364902129",
+appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let user = null;
+let lastClick = 0;
+
+/* AUTH */
+onAuthStateChanged(auth, async (u)=>{
+if(!u){
+window.location.href="auth.html";
+return;
+}
+user = u;
+await ensureUser();
+loadBalance();
+});
+
+/* CREATE USER */
+async function ensureUser(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if(!snap.exists()){
+await setDoc(ref,{
+email:user.email,
+coins:0
+});
+}
+}
+
+/* BALANCE */
+async function loadBalance(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+document.getElementById("balance").innerText =
+(snap.data()?.coins || 0) + " Mice Coins";
+}
+
+/* TASK SYSTEM (ANTI-SPAM BASIC) */
+window.completeTask = async function(){
+
+let now = Date.now();
+if(now - lastClick < 20000){
+alert("Wait 20 seconds before next task");
+return;
+}
+
+lastClick = now;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+let coins = snap.data()?.coins || 0;
+coins += 10;
+
+await updateDoc(ref,{coins});
+
+loadBalance();
+alert("+10 Coins Added");
+};
+
+/* BITLABS OFFER WALL */
+window.openOfferWall = function(){
+
+// Replace later with your real Bitlabs URL
+let bitlabsURL = "https://YOUR_BITLABS_OFFERWALL_LINK_HERE";
+
+window.open(bitlabsURL,"_blank");
+
+};
+
+</script>
+
+</body>
+  </html>
