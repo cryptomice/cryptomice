@@ -7,14 +7,42 @@
 
 <style>
 body{margin:0;background:#050812;color:white;font-family:Arial;}
-.header{text-align:center;padding:20px;background:#0b1220;}
-.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
-.balance{font-size:34px;color:#facc15;}
+.header{
+text-align:center;
+padding:20px;
+background:#0b1220;
+}
 
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
-.small{font-size:13px;color:#9ca3af;}
+.logo{
+color:#facc15;
+font-size:28px;
+font-weight:bold;
+}
+
+.box{
+margin:20px;
+padding:20px;
+background:#111827;
+border-radius:16px;
+}
+
+.balance{
+font-size:34px;
+color:#facc15;
+}
+
+.task{
+margin:20px;
+padding:20px;
+background:#0f172a;
+border-radius:16px;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+}
 
 .btn{
 width:100%;
@@ -54,15 +82,22 @@ color:white;
 <!-- ADS -->
 <div class="task">
 <h3>🎯 Earn Ads</h3>
-<div class="small">Watch ads and earn Mice Coins</div>
+<div class="small">Click ads and earn 10 Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
 <!-- OFFER WALL -->
 <div class="task">
 <h3>🎮 Offer Wall</h3>
-<div class="small">Surveys, installs & games</div>
+<div class="small">Surveys, installs & gaming offers (Bitlabs)</div>
 <button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
+</div>
+
+<!-- DAILY STREAK -->
+<div class="task">
+<h3>🔥 Daily Streak</h3>
+<div class="small">Claim daily rewards & increase earnings</div>
+<button class="btn" onclick="openStreak()">OPEN DAILY STREAK</button>
 </div>
 
 <!-- FAUCET -->
@@ -116,16 +151,15 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
 let authReady = false;
+let loaded = false;
 
-/* 🔥 FIX: prevent redirect flicker */
+/* AUTH (FIXED NO BLINK LOOP) */
 onAuthStateChanged(auth, async (u) => {
 
 authReady = true;
 
 if (!u) {
-if (authReady) {
-window.location.href = "auth.html";
-}
+if (authReady) window.location.href = "auth.html";
 return;
 }
 
@@ -138,7 +172,10 @@ if (!snap.exists()) {
 await setDoc(ref, { coins: 0 });
 }
 
+if (!loaded) {
+loaded = true;
 load();
+}
 
 });
 
@@ -168,7 +205,9 @@ const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka"
+"https://thoroughgear.com/TpOLka",
+"https://wrathful-piano.com/398aSn",
+"https://wrathful-piano.com/ibU5KJ"
 ];
 
 let active = false;
@@ -214,6 +253,11 @@ alert("+10 Coins Earned");
 /* OFFER WALL */
 window.openOfferWall = function () {
 window.location.href = "rewards.html";
+};
+
+/* DAILY STREAK */
+window.openStreak = function () {
+window.location.href = "daily-streak.html";
 };
 
 /* FAUCET */
