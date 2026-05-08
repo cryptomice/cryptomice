@@ -9,28 +9,18 @@
 <title>Cryptomice – Earn Crypto Through Referrals</title>
 
 <meta name="description" content="Cryptomice is a referral-based digital rewards platform where users earn crypto rewards through engagement and referrals.">
-<meta name="keywords" content="crypto referrals, earn crypto, bitcoin rewards, LTC referrals, passive crypto income, crypto earning platform">
-<meta name="robots" content="index, follow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffd84d">
 
-<link rel="canonical" href="https://cryptomice.github.io/cryptomice/">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Cryptomice",
-  "url": "https://cryptomice.github.io/cryptomice/",
-  "logo": "https://cryptomice.github.io/cryptomice/icon-512.png",
-  "description": "Cryptomice is a referral-based digital rewards platform where users earn crypto through referrals and engagement."
-}
-</script>
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 body{
 font-family:Arial;
@@ -39,6 +29,7 @@ color:white;
 overflow-x:hidden;
 }
 
+/* BACKGROUND EFFECT */
 body::before{
 content:"";
 position:fixed;
@@ -58,27 +49,42 @@ to{transform:scale(1.15);}
 
 *{position:relative;z-index:1;}
 
-.hero{padding:20px;text-align:center;}
+/* HERO */
+.hero{
+padding:20px;
+text-align:center;
+background:radial-gradient(circle at top,#0b1f3a,#03060c);
+}
 
 .logo{
 font-size:26px;
-color:#ffd84d;
 font-weight:bold;
+color:#ffd84d;
 }
 
 .hero-img{
 width:100%;
 max-width:400px;
 margin:20px auto;
+display:block;
 border-radius:15px;
+box-shadow:0 0 25px rgba(255,215,0,0.25);
 }
 
-.title{font-size:28px;text-align:center;}
+.title{
+font-size:30px;
+font-weight:bold;
+}
 
 .highlight{color:#ffd84d;}
 
-.desc{text-align:center;font-size:14px;}
+.desc{
+font-size:14px;
+opacity:0.9;
+margin-top:10px;
+}
 
+/* BUTTONS */
 .buttons button{
 width:100%;
 padding:14px;
@@ -90,7 +96,7 @@ cursor:pointer;
 }
 
 .activate{
-background:#ffd84d;
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
 }
 
@@ -99,14 +105,14 @@ background:#0f172a;
 color:white;
 }
 
-/* INSTALL BUTTON (ALWAYS VISIBLE ON WEBSITE) */
+/* DOWNLOAD BUTTON */
 #installBtn{
 width:100%;
 padding:14px;
+margin-top:10px;
 border:none;
 border-radius:12px;
 font-weight:bold;
-margin-top:10px;
 cursor:pointer;
 background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
@@ -119,6 +125,7 @@ display:flex;
 justify-content:space-around;
 padding:15px;
 background:#0b1220;
+text-align:center;
 }
 
 /* FOOTER */
@@ -140,24 +147,27 @@ font-size:12px;
 opacity:0.5;
 margin:20px;
 }
+
 </style>
 
 </head>
 
 <body>
 
+<!-- HERO -->
 <div class="hero">
 
 <div class="logo">🐭 CRYPTOMICE</div>
 
-<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img">
+<!-- 🔥 YOUR ORIGINAL IMAGE RESTORED -->
+<img src="file_00000000957871f5933ba799b9ea7eb1.jpg" class="hero-img" alt="Cryptomice">
 
 <h1 class="title">
 Turn referrals into <span class="highlight">crypto rewards</span>
 </h1>
 
 <p class="desc">
-Earn crypto through engagement and referrals.
+Cryptomice is a digital referral rewards platform built for earning crypto.
 </p>
 
 <div class="buttons">
@@ -166,18 +176,20 @@ Earn crypto through engagement and referrals.
 <button class="login" onclick="navigateTo('guide.html')">How it works</button>
 </div>
 
-<!-- INSTALL BUTTON -->
+<!-- DOWNLOAD BUTTON (ADDED, SAFE) -->
 <button id="installBtn">Download App</button>
 
 </div>
 
+<!-- STATS -->
 <div class="stats">
 <div><b>10M+</b><br>Users</div>
 <div><b>50K+</b><br>Earned</div>
 <div><b>0.01 LTC</b><br>Signup</div>
-<div><b>Referral</b><br>Rewards</div>
+<div><b>Referral</b><br>System</div>
 </div>
 
+<!-- FOOTER -->
 <div class="footer-links">
 <a href="about.html">About</a> |
 <a href="terms.html">Terms</a> |
@@ -188,12 +200,15 @@ Earn crypto through engagement and referrals.
 <div class="footer">© 2026 Cryptomice</div>
 
 <script>
+
 function navigateTo(url){
 window.location.href = url;
 }
+
 function goPayment(){
 navigateTo("payment.html");
 }
+
 function goLogin(){
 navigateTo("login.html");
 }
@@ -217,7 +232,7 @@ await deferredPrompt.userChoice;
 deferredPrompt = null;
 });
 
-/* HIDE IN APP MODE */
+/* HIDE IN INSTALLED MODE */
 function hideInstallInApp(){
 if(window.matchMedia("(display-mode: standalone)").matches){
 document.getElementById("installBtn").style.display = "none";
