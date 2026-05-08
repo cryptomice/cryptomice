@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Streak - Cryptomice</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#050812;
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+min-height:100vh;
+}
+
+.header{
+width:100%;
+text-align:center;
+padding:20px;
+background:#0b1220;
+border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+color:#facc15;
+}
+
+.container{
+width:90%;
+max-width:420px;
+margin-top:30px;
+background:#111827;
+padding:20px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,0.05);
+text-align:center;
+}
+
+.streak{
+font-size:42px;
+color:#facc15;
+margin:10px 0;
+font-weight:bold;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+margin-bottom:20px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#facc15,#fde047);
+font-weight:bold;
+cursor:pointer;
+font-size:15px;
+color:#050812;
+}
+
+.lock{
+margin-top:15px;
+font-size:13px;
+color:#9ca3af;
+}
+
+.reward{
+margin-top:15px;
+font-size:14px;
+color:#d1d5db;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div class="logo">🐭 Cryptomice Daily Streak</div>
+</div>
+
+<div class="container">
+
+<div class="small">Your current streak</div>
+<div class="streak" id="streak">0</div>
+
+<div class="reward" id="rewardText">Daily reward: +10 Coins</div>
+
+<button class="btn" onclick="claimStreak()">CLAIM DAILY REWARD</button>
+
+<div class="lock" id="status">Loading...</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { getFirestore, doc, getDoc, setDoc, updateDoc }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "XXXX",
+appId: "XXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+await setPersistence(auth, browserLocalPersistence);
+
+let user = null;
+let userRef = null;
+
+onAuthStateChanged(auth, async (u) => {
+
+if(!u){
+window.location.href = "auth.html";
+return;
+}
+
+user = u;
+userRef = doc(db,"users",user.uid);
+
+await ensureUser();
+loadData();
+
+});
+
+async function ensureUser(){
+
+const snap = await getDoc(userRef);
+
+if(!snap.exists()){
+await setDoc(userRef,{
+coins:0,
+streak:0,
+lastClaim:0
+});
+}
+
+}
+
+async function loadData(){
+
+const snap = await getDoc(userRef);
+const data = snap.data();
+
+document.getElementById("streak").innerText = data.streak || 0;
+
+updateReward(data.streak || 0);
+
+checkCooldown(data.lastClaim || 0);
+
+}
+
+function updateReward(streak){
+
+let reward = 10 + (streak * 2);
+
+document.getElementById("rewardText").innerText =
+"Daily reward: +" + reward + " Coins";
+
+}
+
+function checkCooldown(lastClaim){
+
+let now = Date.now();
+let diff = now - lastClaim;
+
+if(diff < 86400000){
+document.getElementById("status").innerText =
+"Come back in " + Math.ceil((86400000 - diff)/3600000) + " hours";
+}else{
+document.getElementById("status").innerText =
+"You can claim now!";
+}
+
+}
+
+window.claimStreak = async function(){
+
+const snap = await getDoc(userRef);
+const data = snap.data();
+
+let now = Date.now();
+let last = data.lastClaim || 0;
+
+if(now - last < 86400000){
+alert("Already claimed today");
+return;
+}
+
+let streak = data.streak || 0;
+let coins = data.coins || 0;
+
+streak += 1;
+let reward = 10 + (streak * 2);
+
+coins += reward;
+
+await updateDoc(userRef,{
+streak: streak,
+coins: coins,
+lastClaim: now
+});
+
+loadData();
+
+alert("+" + reward + " Coins claimed!");
+
+};
+
+</script>
+
+</body>
+</html>
