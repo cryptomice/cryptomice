@@ -7,14 +7,42 @@
 
 <style>
 body{margin:0;background:#050812;color:white;font-family:Arial;}
-.header{text-align:center;padding:20px;background:#0b1220;}
-.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
-.balance{font-size:34px;color:#facc15;}
+.header{
+text-align:center;
+padding:20px;
+background:#0b1220;
+}
 
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
-.small{font-size:13px;color:#9ca3af;}
+.logo{
+color:#facc15;
+font-size:28px;
+font-weight:bold;
+}
+
+.box{
+margin:20px;
+padding:20px;
+background:#111827;
+border-radius:16px;
+}
+
+.balance{
+font-size:34px;
+color:#facc15;
+}
+
+.task{
+margin:20px;
+padding:20px;
+background:#0f172a;
+border-radius:16px;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+}
 
 .btn{
 width:100%;
@@ -27,10 +55,23 @@ cursor:pointer;
 margin-top:10px;
 color:#050812;
 }
+
+/* hidden app until auth resolves */
+#app{display:none;}
+
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
+}
 </style>
 </head>
 
 <body>
+
+<div id="loading">Loading Cryptomice...</div>
+
+<div id="app">
 
 <div class="header">
 <div class="logo">🐭 Cryptomice Earn</div>
@@ -38,7 +79,7 @@ color:#050812;
 
 <div class="box">
 <div>Balance</div>
-<div class="balance" id="balance">Loading...</div>
+<div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
 <div class="task">
@@ -57,6 +98,8 @@ color:#050812;
 <h3>🚰 Faucet</h3>
 <div class="small">Claim once every 24h</div>
 <button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
+</div>
+
 </div>
 
 <script type="module">
@@ -97,7 +140,7 @@ let user = null;
 let authReady = false;
 
 /* =========================
-   FIXED AUTH FLOW (NO BLINK)
+   FIXED AUTH (NO BLINK)
 ========================= */
 onAuthStateChanged(auth, async (u) => {
 
@@ -114,16 +157,23 @@ const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 if (!snap.exists()) {
-await setDoc(ref, { coins: 0, lastFaucet: 0 });
+await setDoc(ref, {
+coins: 0,
+lastFaucet: 0
+});
 }
+
+/* SHOW APP ONLY AFTER AUTH IS READY */
+document.getElementById("loading").style.display = "none";
+document.getElementById("app").style.display = "block";
 
 loadBalance();
 
 });
 
-/* LOAD */
-async function loadBalance() {
-const ref = doc(db, "users", user.uid);
+/* LOAD BALANCE */
+async function loadBalance(){
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
@@ -131,14 +181,14 @@ document.getElementById("balance").innerText =
 }
 
 /* REWARD */
-async function reward(amount) {
-const ref = doc(db, "users", user.uid);
+async function reward(amount){
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 let c = snap.data().coins || 0;
 c += amount;
 
-await updateDoc(ref, { coins: c });
+await updateDoc(ref,{coins:c});
 loadBalance();
 }
 
@@ -161,17 +211,17 @@ let start = 0;
 let lastAd = 0;
 
 /* START AD */
-window.startAd = function () {
+window.startAd = function(){
 
-if (!user) return;
+if(!user) return;
 
-if (Date.now() - lastAd < 30000) {
+if(Date.now() - lastAd < 30000){
 alert("Cooldown active");
 return;
 }
 
-let link = ads[Math.floor(Math.random() * ads.length)];
-window.open(link, "_blank");
+let link = ads[Math.floor(Math.random()*ads.length)];
+window.open(link,"_blank");
 
 active = true;
 start = Date.now();
@@ -180,16 +230,16 @@ lastAd = Date.now();
 alert("Stay a few seconds then return");
 };
 
-/* CHEAT PROTECTION */
-document.addEventListener("visibilitychange", async () => {
+/* ANTI CHEAT */
+document.addEventListener("visibilitychange", async ()=>{
 
-if (document.visibilityState === "visible" && active) {
+if(document.visibilityState === "visible" && active){
 
-let time = (Date.now() - start) / 1000;
+let time = (Date.now() - start)/1000;
 
 active = false;
 
-if (time < 8) {
+if(time < 8){
 alert("Invalid session");
 return;
 }
@@ -201,27 +251,27 @@ alert("+10 Coins Earned");
 });
 
 /* OFFER WALL */
-window.openOfferWall = function () {
+window.openOfferWall = function(){
 window.location.href = "rewards.html";
 };
 
 /* FAUCET */
-window.claimFaucet = async function () {
+window.claimFaucet = async function(){
 
-const ref = doc(db, "users", user.uid);
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 let data = snap.data();
 let now = Date.now();
 
-if (now - (data.lastFaucet || 0) < 86400000) {
+if(now - (data.lastFaucet||0) < 86400000){
 alert("Come back later");
 return;
 }
 
-await updateDoc(ref, {
-coins: (data.coins || 0) + 20,
-lastFaucet: now
+await updateDoc(ref,{
+coins:(data.coins||0)+20,
+lastFaucet:now
 });
 
 loadBalance();
@@ -231,4 +281,4 @@ alert("+20 Faucet Claimed");
 </script>
 
 </body>
-  </html>
+   </html>
