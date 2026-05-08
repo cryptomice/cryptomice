@@ -7,7 +7,6 @@
 
 <style>
 body{margin:0;background:#050812;color:white;font-family:Arial;}
-
 .header{text-align:center;padding:20px;background:#0b1220;}
 .logo{color:#facc15;font-size:28px;font-weight:bold;}
 
@@ -67,7 +66,7 @@ color:white;
 
 <div class="task">
 <h3>🎯 Earn Ads</h3>
-<div class="small">Click ads and earn Mice Coins</div>
+<div class="small">Watch 8–15 seconds to earn reward</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
@@ -79,7 +78,7 @@ color:white;
 
 <div class="task">
 <h3>🚰 Faucet</h3>
-<div class="small">Claim once every 2 hours</div>
+<div class="small">Claim every 2 hours</div>
 <button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
 </div>
 
@@ -114,7 +113,6 @@ addDoc,
 collection
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -130,23 +128,24 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-let user = null;
-let active = false;
-let start = 0;
-let lastAd = 0;
+let user=null;
+let active=false;
+let start=0;
+let lastAd=0;
+let withdrawLock=false;
 
-/* AUTH (NO BLINK FIX) */
-onAuthStateChanged(auth, async (u) => {
+/* AUTH */
+onAuthStateChanged(auth, async (u)=>{
 
 if(!u){
 location.replace("auth.html");
 return;
 }
 
-user = u;
+user=u;
 
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
 if(!snap.exists()){
 await setDoc(ref,{
@@ -162,94 +161,92 @@ loadBalance();
 
 });
 
-/* LOAD */
+/* BALANCE */
 async function loadBalance(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(snap.data()?.coins || 0) + " Mice Coins";
+(snap.data()?.coins||0)+" Mice Coins";
 }
 
 /* REWARD */
 async function reward(amount){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
-let c = snap.data().coins || 0;
-c += amount;
+let c=snap.data().coins||0;
+c+=amount;
 
 await updateDoc(ref,{coins:c});
 loadBalance();
 }
 
-/* ADS SYSTEM */
-const ads = [
+/* ADS */
+const ads=[
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka",
-"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
+"https://thoroughgear.com/TpOLka"
 ];
 
-window.startAd = function(){
+window.startAd=function(){
 
-if(Date.now() - lastAd < 30000){
+if(Date.now()-lastAd<30000){
 alert("Cooldown active");
 return;
 }
 
 window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");
 
-active = true;
-start = Date.now();
-lastAd = Date.now();
+active=true;
+start=Date.now();
+lastAd=Date.now();
 
-alert("Stay 8–15 seconds then return");
+alert("Watch 8–15 seconds");
 };
 
-/* ANTI CHEAT */
-document.addEventListener("visibilitychange", async ()=>{
+/* CHEAT CHECK */
+document.addEventListener("visibilitychange",async()=>{
 
-if(document.visibilityState === "visible" && active){
+if(document.visibilityState==="visible"&&active){
 
-active = false;
+active=false;
 
-let t = (Date.now() - start)/1000;
+let t=(Date.now()-start)/1000;
 
-if(t < 8){
+if(t<8){
 alert("Invalid session");
 return;
 }
 
 await reward(10);
-alert("+10 Coins Earned");
+alert("+10 Coins");
 }
 
 });
 
 /* OFFER WALL */
-window.openOfferWall = function(){
+window.openOfferWall=function(){
 location.href="rewards.html";
 };
 
-/* FAUCET (2 HOURS) */
-window.claimFaucet = async function(){
+/* FAUCET */
+window.claimFaucet=async function(){
 
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
-let data = snap.data();
-let now = Date.now();
+let d=snap.data();
+let now=Date.now();
 
-if(now - (data.lastFaucet||0) < 7200000){
+if(now-(d.lastFaucet||0)<7200000){
 alert("Wait 2 hours");
 return;
 }
 
 await updateDoc(ref,{
-coins:(data.coins||0)+0.09,
+coins:(d.coins||0)+5,
 lastFaucet:now
 });
 
@@ -257,32 +254,33 @@ loadBalance();
 alert("+Faucet Reward");
 };
 
-/* WITHDRAW (LEDGER SYSTEM FIX) */
-window.withdraw = async function(){
+/* WITHDRAW FIXED (ANTI DOUBLE + ADMIN READY) */
+window.withdraw=async function(){
 
-let wallet = document.getElementById("wallet").value;
+if(withdrawLock) return;
 
+let wallet=document.getElementById("wallet").value;
 if(!wallet){
 alert("Enter wallet");
 return;
 }
 
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
-let coins = snap.data().coins || 0;
+let coins=snap.data().coins||0;
 
-if(coins < 500){
-alert("Minimum 500 Mice Coins required");
+if(coins<500){
+alert("Minimum 500 required");
 return;
 }
 
-/* 🔥 DEDUCT IMMEDIATELY (ledger lock system) */
-coins -= 500;
+withdrawLock=true;
 
-await updateDoc(ref,{coins:coins});
+/* deduct first */
+await updateDoc(ref,{coins:coins-500});
 
-/* send request to admin */
+/* send to admin */
 await addDoc(collection(db,"withdrawals"),{
 uid:user.uid,
 email:user.email,
@@ -292,12 +290,23 @@ status:"pending",
 time:Date.now()
 });
 
-loadBalance();
+/* ALSO send free section copy (admin requirement) */
+await addDoc(collection(db,"cryptomice_free_withdrawals"),{
+uid:user.uid,
+email:user.email,
+wallet:wallet,
+amount:500,
+status:"pending",
+time:Date.now()
+});
 
-alert("Withdrawal request sent (500 coins deducted)");
+withdrawLock=false;
+
+loadBalance();
+alert("Withdrawal sent (500 deducted)");
 };
 
 </script>
 
 </body>
-</html>
+  </html>
