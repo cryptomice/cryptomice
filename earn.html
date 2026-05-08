@@ -8,41 +8,14 @@
 <style>
 body{margin:0;background:#050812;color:white;font-family:Arial;}
 
-.header{
-text-align:center;
-padding:20px;
-background:#0b1220;
-}
+.header{text-align:center;padding:20px;background:#0b1220;}
+.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-.logo{
-color:#facc15;
-font-size:28px;
-font-weight:bold;
-}
+.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
+.balance{font-size:34px;color:#facc15;}
 
-.box{
-margin:20px;
-padding:20px;
-background:#111827;
-border-radius:16px;
-}
-
-.balance{
-font-size:34px;
-color:#facc15;
-}
-
-.task{
-margin:20px;
-padding:20px;
-background:#0f172a;
-border-radius:16px;
-}
-
-.small{
-font-size:13px;
-color:#9ca3af;
-}
+.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.small{font-size:13px;color:#9ca3af;}
 
 .btn{
 width:100%;
@@ -56,14 +29,8 @@ margin-top:10px;
 color:#050812;
 }
 
-/* hidden app until auth resolves */
 #app{display:none;}
-
-#loading{
-text-align:center;
-padding:40px;
-color:#9ca3af;
-}
+#loading{text-align:center;padding:40px;color:#9ca3af;}
 </style>
 </head>
 
@@ -84,20 +51,22 @@ color:#9ca3af;
 
 <div class="task">
 <h3>🎯 Earn Ads</h3>
-<div class="small">Click ads and earn Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
 <div class="task">
 <h3>🎮 Offer Wall</h3>
-<div class="small">Surveys, installs & games</div>
-<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
+<button class="btn" onclick="goRewards()">OPEN OFFER WALL</button>
 </div>
 
 <div class="task">
 <h3>🚰 Faucet</h3>
-<div class="small">Claim once every 24h</div>
 <button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
+</div>
+
+<div class="task">
+<h3>🔥 Daily Streak</h3>
+<button class="btn" onclick="goStreak()">DAILY STREAK</button>
 </div>
 
 </div>
@@ -120,7 +89,6 @@ setDoc,
 updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* Firebase */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -138,40 +106,40 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
 let authReady = false;
+let redirected = false;
 
 /* =========================
-   FIXED AUTH (NO BLINK)
+   SAFE AUTH GATE (NO BLINK)
 ========================= */
 onAuthStateChanged(auth, async (u) => {
+
+if (redirected) return;
 
 authReady = true;
 
 if (!u) {
+redirected = true;
 window.location.replace("auth.html");
 return;
 }
 
 user = u;
 
-const ref = doc(db, "users", user.uid);
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if (!snap.exists()) {
-await setDoc(ref, {
-coins: 0,
-lastFaucet: 0
-});
+await setDoc(ref,{coins:0,lastFaucet:0});
 }
 
-/* SHOW APP ONLY AFTER AUTH IS READY */
-document.getElementById("loading").style.display = "none";
-document.getElementById("app").style.display = "block";
+document.getElementById("loading").style.display="none";
+document.getElementById("app").style.display="block";
 
 loadBalance();
 
 });
 
-/* LOAD BALANCE */
+/* LOAD */
 async function loadBalance(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
@@ -180,105 +148,91 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-/* REWARD */
-async function reward(amount){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+/* NAVIGATION (SAFE) */
+window.goRewards = function(){
+window.location.replace("rewards.html");
+};
 
-let c = snap.data().coins || 0;
-c += amount;
-
-await updateDoc(ref,{coins:c});
-loadBalance();
-}
+window.goStreak = function(){
+window.location.replace("daily-streak.html");
+};
 
 /* ADS */
 const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka",
-"https://wrathful-piano.com/398aSn",
-"https://wrathful-piano.com/ibU5KJ",
-"https://thoroughgear.com/40mbTS",
-"https://thoroughgear.com/FSas0E",
-"https://wrathful-piano.com/fJDG7O",
-"https://wrathful-piano.com/i1Tn5O"
+"https://thoroughgear.com/TpOLka"
 ];
 
-let active = false;
-let start = 0;
-let lastAd = 0;
+let active=false;
+let start=0;
+let lastAd=0;
 
-/* START AD */
-window.startAd = function(){
+window.startAd=function(){
 
-if(!user) return;
-
-if(Date.now() - lastAd < 30000){
-alert("Cooldown active");
+if(Date.now()-lastAd<30000){
+alert("Cooldown");
 return;
 }
 
-let link = ads[Math.floor(Math.random()*ads.length)];
-window.open(link,"_blank");
+window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");
 
-active = true;
-start = Date.now();
-lastAd = Date.now();
+active=true;
+start=Date.now();
+lastAd=Date.now();
 
-alert("Stay a few seconds then return");
+alert("Stay few seconds");
 };
 
-/* ANTI CHEAT */
-document.addEventListener("visibilitychange", async ()=>{
+/* REWARD CHECK */
+document.addEventListener("visibilitychange",async()=>{
 
-if(document.visibilityState === "visible" && active){
+if(document.visibilityState==="visible"&&active){
 
-let time = (Date.now() - start)/1000;
+let t=(Date.now()-start)/1000;
 
-active = false;
+active=false;
 
-if(time < 8){
-alert("Invalid session");
+if(t<8){
+alert("Invalid");
 return;
 }
 
-await reward(10);
-alert("+10 Coins Earned");
-}
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
+let c=snap.data().coins||0;
+await updateDoc(ref,{coins:c+10});
+
+loadBalance();
+alert("+10");
+}
 });
 
-/* OFFER WALL */
-window.openOfferWall = function(){
-window.location.href = "rewards.html";
-};
-
 /* FAUCET */
-window.claimFaucet = async function(){
+window.claimFaucet=async function(){
 
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
 
-let data = snap.data();
-let now = Date.now();
+let d=snap.data();
+let now=Date.now();
 
-if(now - (data.lastFaucet||0) < 86400000){
+if(now-(d.lastFaucet||0)<86400000){
 alert("Come back later");
 return;
 }
 
 await updateDoc(ref,{
-coins:(data.coins||0)+20,
+coins:(d.coins||0)+20,
 lastFaucet:now
 });
 
 loadBalance();
-alert("+20 Faucet Claimed");
 };
 
 </script>
 
 </body>
-   </html>
+</html>
