@@ -10,8 +10,10 @@ margin:0;
 font-family:Arial, sans-serif;
 background:#03060c;
 color:white;
+overflow-x:hidden;
 }
 
+/* GOLD BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -20,7 +22,13 @@ height:100%;
 background:
 radial-gradient(circle at 20% 20%, rgba(255,215,0,0.15), transparent 40%),
 radial-gradient(circle at 80% 60%, rgba(255,215,0,0.08), transparent 50%);
+animation:move 8s infinite alternate;
 z-index:0;
+}
+
+@keyframes move{
+from{transform:scale(1);}
+to{transform:scale(1.2);}
 }
 
 *{position:relative;z-index:1;}
@@ -39,6 +47,7 @@ text-shadow:0 0 15px #ffd84d;
 .section-title{
 margin:20px 15px 10px;
 color:#ffd84d;
+text-shadow:0 0 10px #ffd84d;
 }
 
 .card{
@@ -47,6 +56,7 @@ padding:15px;
 border-radius:12px;
 background:#0b1220;
 border:1px solid rgba(255,215,0,0.2);
+box-shadow:0 0 20px rgba(255,215,0,0.08);
 }
 
 .item{
@@ -57,34 +67,50 @@ margin-bottom:10px;
 border:1px solid rgba(255,215,0,0.15);
 }
 
+.item p{
+margin:4px 0;
+font-size:13px;
+}
+
 button{
 padding:8px 12px;
 border:none;
 border-radius:6px;
 cursor:pointer;
+margin-right:5px;
 margin-top:5px;
 font-weight:bold;
 }
 
-.approve{background:#00ff88;color:black;}
-.delete{background:#ff4d4d;color:white;}
-.paid{background:#ffd84d;color:black;}
-
-.badge{
-padding:3px 8px;
-border-radius:20px;
-font-size:11px;
-display:inline-block;
-margin-top:5px;
+.approve{
+background:linear-gradient(90deg,#00ff88,#00cc66);
+color:black;
 }
 
-.pending{background:#ffcc00;color:black;}
-.done{background:#00cc66;color:black;}
+.delete{
+background:linear-gradient(90deg,#ff4d4d,#cc0000);
+color:white;
+}
+
+.paid{
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+}
 
 .empty{
 opacity:0.6;
 font-size:13px;
 padding:10px;
+}
+
+.refresh-btn{
+margin:10px 15px;
+padding:10px;
+background:#111827;
+border:1px solid #ffd84d;
+color:#ffd84d;
+border-radius:8px;
+cursor:pointer;
 }
 </style>
 </head>
@@ -95,22 +121,25 @@ padding:10px;
 <h2>🐭 CRYPTOMICE ADMIN</h2>
 </div>
 
+<button class="refresh-btn" onclick="manualRefresh()">
+🔄 Refresh Data
+</button>
+
 <!-- ORIGINAL PAYMENTS -->
 <h3 class="section-title">💰 Payment Requests</h3>
 <div id="payments" class="card"></div>
 
-<!-- ORIGINAL WITHDRAWALS (UNCHANGED SYSTEM) -->
-<h3 class="section-title">💸 Withdrawals (Legacy System)</h3>
-<div id="withdrawals_old" class="card"></div>
+<!-- ORIGINAL WITHDRAWALS -->
+<h3 class="section-title">💸 Withdrawals (Main System)</h3>
+<div id="withdrawals" class="card"></div>
 
-<!-- NEW CRYPTOMICE FREE SECTION -->
+<!-- NEW FREE SECTION -->
 <h3 class="section-title">🐭 Cryptomice Free Section Withdrawals</h3>
-<div id="withdrawals_free" class="card"></div>
+<div id="freeWithdrawals" class="card"></div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import {
 getFirestore,
 collection,
@@ -118,7 +147,7 @@ getDocs,
 updateDoc,
 deleteDoc,
 doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -132,119 +161,133 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ===================== PAYMENTS ===================== */
+/* ---------------- PAYMENTS ---------------- */
 async function loadPayments(){
-const c=document.getElementById("payments");
-c.innerHTML="";
+const container = document.getElementById("payments");
+container.innerHTML = "";
 
-const snap=await getDocs(collection(db,"payments"));
+const snap = await getDocs(collection(db,"payments"));
 
 if(snap.empty){
-c.innerHTML="<div class='empty'>No payments</div>";
+container.innerHTML = "<div class='empty'>No payment requests</div>";
 return;
 }
 
 snap.forEach(d=>{
-const x=d.data();
+const data = d.data();
 
-c.innerHTML+=`
+container.innerHTML += `
 <div class="item">
-<p><b>Email:</b> ${x.email||"N/A"}</p>
-<p><b>TXID:</b> ${x.txid||"N/A"}</p>
-<p>Status: ${x.status||"pending"}</p>
+<p><b>Email:</b> ${data.email}</p>
+<p><b>TXID:</b> ${data.txid}</p>
+<p>Status: ${data.status}</p>
 
-<button class="approve" onclick="approve('${d.id}')">Approve</button>
-<button class="delete" onclick="delPay('${d.id}')">Delete</button>
+<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
+<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
 </div>
 `;
 });
 }
 
-/* ===================== OLD WITHDRAWALS ===================== */
-async function loadOldWithdrawals(){
-const c=document.getElementById("withdrawals_old");
-c.innerHTML="";
+/* ---------------- MAIN WITHDRAWALS ---------------- */
+async function loadWithdrawals(){
+const container = document.getElementById("withdrawals");
+container.innerHTML = "";
 
-const snap=await getDocs(collection(db,"withdrawals"));
+const snap = await getDocs(collection(db,"withdrawals"));
 
 if(snap.empty){
-c.innerHTML="<div class='empty'>No legacy withdrawals</div>";
+container.innerHTML = "<div class='empty'>No withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
-const x=d.data();
+const data = d.data();
 
-c.innerHTML+=`
+container.innerHTML += `
 <div class="item">
-<p><b>Email:</b> ${x.email||"N/A"}</p>
-<p><b>Amount:</b> ${x.amount||0}</p>
-<p><b>Wallet:</b> ${x.wallet||"N/A"}</p>
+<p><b>Email:</b> ${data.email || "N/A"}</p>
+<p><b>Amount:</b> ${data.amount}</p>
+<p><b>Wallet:</b> ${data.wallet || "No wallet"}</p>
 
-<span class="badge ${x.status==='paid'?'done':'pending'}">
-${x.status||"pending"}
-</span>
-
-<button class="paid" onclick="markOldPaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="delOld('${d.id}')">Delete</button>
+<button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
+<button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
 </div>
 `;
 });
 }
 
-/* ===================== CRYPTOMICE FREE SECTION ===================== */
+/* ---------------- FREE SECTION WITHDRAWALS ---------------- */
 async function loadFreeWithdrawals(){
-const c=document.getElementById("withdrawals_free");
-c.innerHTML="";
+const container = document.getElementById("freeWithdrawals");
+container.innerHTML = "";
 
-const snap=await getDocs(collection(db,"free_withdrawals"));
+const snap = await getDocs(collection(db,"cryptomice_free_withdrawals"));
 
 if(snap.empty){
-c.innerHTML="<div class='empty'>No Cryptomice Free withdrawals</div>";
+container.innerHTML = "<div class='empty'>No free section withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
-const x=d.data();
+const data = d.data();
 
-c.innerHTML+=`
+container.innerHTML += `
 <div class="item">
-<p><b>User:</b> ${x.email||"N/A"}</p>
-<p><b>UID:</b> ${x.uid||"N/A"}</p>
-<p><b>Amount:</b> ${x.amount} Mice Coins</p>
-<p><b>Wallet:</b> ${x.wallet||"N/A"}</p>
-
-<span class="badge ${x.status==='paid'?'done':'pending'}">
-${x.status||"pending"}
-</span>
+<p><b>User:</b> ${data.uid}</p>
+<p><b>Coins:</b> ${data.amount} Mice Coins</p>
+<p><b>Wallet:</b> ${data.wallet}</p>
+<p>Status: ${data.status}</p>
 
 <button class="paid" onclick="markFreePaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="delFree('${d.id}')">Delete</button>
+<button class="delete" onclick="deleteFree('${d.id}')">Delete</button>
 </div>
 `;
 });
 }
 
-/* ACTIONS */
-window.approve=async(id)=>{await updateDoc(doc(db,"payments",id),{status:"approved"});loadPayments();};
-window.delPay=async(id)=>{await deleteDoc(doc(db,"payments",id));loadPayments();};
-
-window.markOldPaid=async(id)=>{await updateDoc(doc(db,"withdrawals",id),{status:"paid"});loadOldWithdrawals();};
-window.delOld=async(id)=>{await deleteDoc(doc(db,"withdrawals",id));loadOldWithdrawals();};
-
-window.markFreePaid=async(id)=>{await updateDoc(doc(db,"free_withdrawals",id),{status:"paid"});loadFreeWithdrawals();};
-window.delFree=async(id)=>{await deleteDoc(doc(db,"free_withdrawals",id));loadFreeWithdrawals();};
-
-/* AUTO REFRESH */
-setInterval(()=>{
+/* ---------------- ACTIONS ---------------- */
+window.approvePayment = async (id)=>{
+await updateDoc(doc(db,"payments",id),{status:"approved"});
 loadPayments();
-loadOldWithdrawals();
+};
+
+window.deletePayment = async (id)=>{
+await deleteDoc(doc(db,"payments",id));
+loadPayments();
+};
+
+window.markPaid = async (id)=>{
+await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
+loadWithdrawals();
+};
+
+window.deleteWithdraw = async (id)=>{
+await deleteDoc(doc(db,"withdrawals",id));
+loadWithdrawals();
+};
+
+/* FREE SECTION ACTIONS */
+window.markFreePaid = async (id)=>{
+await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
 loadFreeWithdrawals();
-},10000);
+};
+
+window.deleteFree = async (id)=>{
+await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
+loadFreeWithdrawals();
+};
+
+/* MANUAL REFRESH ONLY */
+window.manualRefresh = function(){
+loadPayments();
+loadWithdrawals();
+loadFreeWithdrawals();
+};
 
 /* INIT */
 loadPayments();
-loadOldWithdrawals();
+loadWithdrawals();
 loadFreeWithdrawals();
 
 </script>
