@@ -26,6 +26,15 @@ margin-top:10px;
 
 .task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
 .small{font-size:13px;color:#9ca3af;}
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:none;
+background:#111827;
+color:white;
+}
 </style>
 </head>
 
@@ -40,16 +49,28 @@ margin-top:10px;
 <div class="balance" id="balance">0</div>
 </div>
 
+<!-- ADS -->
 <div class="task">
-<h3>🎯 Watch Ads</h3>
-<div class="small">Stay focused for reward</div>
+<h3>🎯 Earn Ads</h3>
+<div class="small">Stay active to earn rewards</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
+<!-- FAUCET -->
 <div class="task">
 <h3>🚰 Faucet</h3>
 <div class="small">Claim once every 24h</div>
-<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
+<button class="btn" onclick="claimFaucet()">CLAIM</button>
+</div>
+
+<!-- WITHDRAW -->
+<div class="task">
+<h3>💸 Withdraw</h3>
+<div class="small">Minimum: 1000 Coins</div>
+
+<input id="wallet" placeholder="Enter Litecoin Wallet Address">
+
+<button class="btn" onclick="withdraw()">WITHDRAW</button>
 </div>
 
 <script type="module">
@@ -57,9 +78,18 @@ margin-top:10px;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+updateDoc,
+addDoc,
+collection
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -77,18 +107,14 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user=null;
 
-/* ---------------- AD POOLS ---------------- */
-const adsA = [
+/* ADS */
+const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka"
-];
-
-const adsB = [
+"https://thoroughgear.com/TpOLka",
 "https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
-"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
 ];
 
 let active=false;
@@ -96,7 +122,7 @@ let start=0;
 let focus=0;
 let lastAd=0;
 
-/* ---------------- AUTH ---------------- */
+/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
 if(!u){location.href="auth.html";return;}
 user=u;
@@ -111,14 +137,15 @@ await setDoc(ref,{coins:0});
 load();
 });
 
-/* ---------------- LOAD ---------------- */
+/* LOAD */
 async function load(){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
-document.getElementById("balance").innerText=snap.data().coins||0;
+document.getElementById("balance").innerText =
+(snap.data()?.coins||0);
 }
 
-/* ---------------- REWARD ---------------- */
+/* REWARD */
 async function reward(amount){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
@@ -130,43 +157,39 @@ await updateDoc(ref,{coins:c});
 load();
 }
 
-/* ---------------- AD SYSTEM ---------------- */
+/* ADS */
 window.startAd=function(){
 
-let now=Date.now();
-
-if(now-lastAd<30000){
-alert("Wait cooldown");
+if(Date.now()-lastAd<30000){
+alert("Cooldown active");
 return;
 }
 
-/* pool mix */
-let pool=Math.random()>0.5?adsA:adsB;
-let link=pool[Math.floor(Math.random()*pool.length)];
-
+let link=ads[Math.floor(Math.random()*ads.length)];
 window.open(link,"_blank");
 
 active=true;
-start=now;
+start=Date.now();
 focus=0;
-lastAd=now;
+lastAd=Date.now();
 
-/* track focus */
-setInterval(()=>{
+/* focus tracker */
+let t=setInterval(()=>{
+if(!active) clearInterval(t);
 if(document.visibilityState==="visible") focus++;
 },1000);
 
-alert("Stay on page to earn reward");
+alert("Stay a few seconds...");
 };
 
-/* ---------------- ANTI CHEAT ---------------- */
+/* CHEAT PROTECTION */
 document.addEventListener("visibilitychange",async()=>{
 
 if(document.visibilityState==="visible"&&active){
 
-let t=(Date.now()-start)/1000;
+let time=(Date.now()-start)/1000;
 
-if(t<8||focus<5){
+if(time<8||focus<5){
 active=false;
 alert("Invalid session");
 return;
@@ -178,7 +201,7 @@ alert("+10 Coins Earned");
 }
 });
 
-/* ---------------- FAUCET ---------------- */
+/* FAUCET */
 window.claimFaucet=async function(){
 
 const ref=doc(db,"users",user.uid);
@@ -186,10 +209,9 @@ const snap=await getDoc(ref);
 
 let data=snap.data();
 let now=Date.now();
-let day=86400000;
 
-if(data.lastFaucet && now-data.lastFaucet<day){
-alert("Come back later");
+if(data.lastFaucet && now-data.lastFaucet<86400000){
+alert("Try tomorrow");
 return;
 }
 
@@ -199,10 +221,46 @@ lastFaucet:now
 });
 
 load();
-alert("+20 Faucet Claimed");
+alert("+20 Faucet");
+};
+
+/* WITHDRAW */
+window.withdraw=async function(){
+
+let wallet=document.getElementById("wallet").value;
+
+if(!wallet){
+alert("Enter wallet");
+return;
+}
+
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
+
+let coins=snap.data().coins||0;
+
+if(coins<1000){
+alert("Minimum 1000 coins required");
+return;
+}
+
+/* log request */
+await addDoc(collection(db,"withdrawals"),{
+uid:user.uid,
+wallet:wallet,
+amount:coins,
+status:"pending",
+time:Date.now()
+});
+
+/* reset balance */
+await updateDoc(ref,{coins:0});
+
+load();
+alert("Withdrawal submitted!");
 };
 
 </script>
 
 </body>
-  </html>
+</html>
