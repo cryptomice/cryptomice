@@ -13,7 +13,7 @@ color:white;
 overflow-x:hidden;
 }
 
-/* ✨ GOLD BACKGROUND */
+/* GOLD BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -33,7 +33,6 @@ to{transform:scale(1.2);}
 
 *{position:relative;z-index:1;}
 
-/* HEADER */
 .header{
 text-align:center;
 padding:15px;
@@ -45,14 +44,12 @@ color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
 }
 
-/* SECTION TITLE */
 .section-title{
 margin:20px 15px 10px;
 color:#ffd84d;
 text-shadow:0 0 10px #ffd84d;
 }
 
-/* CARD */
 .card{
 margin:15px;
 padding:15px;
@@ -62,7 +59,6 @@ border:1px solid rgba(255,215,0,0.2);
 box-shadow:0 0 20px rgba(255,215,0,0.08);
 }
 
-/* ITEM BOX */
 .item{
 background:#0f172a;
 padding:12px;
@@ -71,13 +67,11 @@ margin-bottom:10px;
 border:1px solid rgba(255,215,0,0.15);
 }
 
-/* TEXT */
 .item p{
 margin:4px 0;
 font-size:13px;
 }
 
-/* BUTTONS */
 button{
 padding:8px 12px;
 border:none;
@@ -88,32 +82,38 @@ margin-top:5px;
 font-weight:bold;
 }
 
-/* ACTION BUTTONS */
 .approve{
 background:linear-gradient(90deg,#00ff88,#00cc66);
 color:black;
-box-shadow:0 0 10px rgba(0,255,120,0.5);
 }
 
 .delete{
 background:linear-gradient(90deg,#ff4d4d,#cc0000);
 color:white;
-box-shadow:0 0 10px rgba(255,0,0,0.5);
 }
 
 .paid{
 background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
-box-shadow:0 0 10px rgba(255,215,0,0.5);
 }
 
-/* STATUS */
 .status{
 font-size:12px;
-opacity:0.7;
+opacity:0.8;
+margin-top:5px;
 }
 
-/* EMPTY */
+.badge{
+display:inline-block;
+padding:3px 8px;
+border-radius:20px;
+font-size:11px;
+margin-top:5px;
+}
+
+.pending{background:#ffcc00;color:black;}
+.done{background:#00cc66;color:black;}
+
 .empty{
 opacity:0.6;
 font-size:13px;
@@ -131,12 +131,12 @@ padding:10px;
 <h3 class="section-title">💰 Payment Requests</h3>
 <div id="payments" class="card"></div>
 
-<h3 class="section-title">💸 Withdrawal Requests</h3>
+<h3 class="section-title">💸 Withdrawal Requests - Cryptomice Free Section</h3>
 <div id="withdrawals" class="card"></div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 getFirestore,
@@ -145,7 +145,7 @@ getDocs,
 updateDoc,
 deleteDoc,
 doc
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -159,8 +159,7 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
-/* ---------------- PAYMENTS ---------------- */
+/* LOAD PAYMENTS */
 async function loadPayments(){
 
 const container = document.getElementById("payments");
@@ -173,30 +172,25 @@ container.innerHTML = "<div class='empty'>No payment requests</div>";
 return;
 }
 
-snap.forEach(docSnap=>{
+snap.forEach(d=>{
 
-const data = docSnap.data();
-const id = docSnap.id;
+const data = d.data();
 
-const div = document.createElement("div");
-div.className="item";
+container.innerHTML += `
+<div class="item">
+<p><b>Email:</b> ${data.email || "N/A"}</p>
+<p><b>TXID:</b> ${data.txid || "N/A"}</p>
+<p class="status">Status: ${data.status || "pending"}</p>
 
-div.innerHTML = `
-<p><b>Email:</b> ${data.email}</p>
-<p><b>TXID:</b> ${data.txid}</p>
-<p class="status">Status: ${data.status}</p>
-
-<button class="approve" onclick="approvePayment('${id}')">Approve</button>
-<button class="delete" onclick="deletePayment('${id}')">Delete</button>
+<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
+<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
+</div>
 `;
-
-container.appendChild(div);
 
 });
 }
 
-
-/* ---------------- WITHDRAWALS ---------------- */
+/* LOAD WITHDRAWALS */
 async function loadWithdrawals(){
 
 const container = document.getElementById("withdrawals");
@@ -209,35 +203,32 @@ container.innerHTML = "<div class='empty'>No withdrawals</div>";
 return;
 }
 
-snap.forEach(docSnap=>{
+snap.forEach(d=>{
 
-const data = docSnap.data();
-const id = docSnap.id;
+const data = d.data();
 
-const wallet =
-data.wallet ||
-data.walletAddress ||
-"No wallet provided";
+container.innerHTML += `
+<div class="item">
+<p><b>User:</b> ${data.email || "N/A"}</p>
+<p><b>UID:</b> ${data.uid || "N/A"}</p>
+<p><b>Amount:</b> ${data.amount} Mice Coins</p>
+<p><b>Wallet:</b> ${data.wallet || "N/A"}</p>
 
-const div = document.createElement("div");
-div.className="item";
+<span class="badge ${data.status==='paid'?'done':'pending'}">
+${data.status || "pending"}
+</span>
 
-div.innerHTML = `
-<p><b>Email:</b> ${data.email || "N/A"}</p>
-<p><b>Amount:</b> $${data.amount}</p>
-<p><b>Wallet:</b> ${wallet}</p>
+<br>
 
-<button class="paid" onclick="markPaid('${id}')">Mark Paid</button>
-<button class="delete" onclick="deleteWithdraw('${id}')">Delete</button>
+<button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
+<button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
+</div>
 `;
-
-container.appendChild(div);
 
 });
 }
 
-
-/* ---------------- ACTIONS ---------------- */
+/* ACTIONS */
 window.approvePayment = async (id)=>{
 await updateDoc(doc(db,"payments",id),{status:"approved"});
 loadPayments();
@@ -258,6 +249,11 @@ await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
+/* LIVE REFRESH (IMPORTANT FOR REAL ADMIN USE) */
+setInterval(()=>{
+loadPayments();
+loadWithdrawals();
+},10000);
 
 /* INIT */
 loadPayments();
