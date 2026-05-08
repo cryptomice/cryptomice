@@ -149,17 +149,16 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
+/* 🔥 STABLE AUTH STATE (NO BLINK LOOP) */
 let user = null;
-let authReady = false;
-let loaded = false;
+let ready = false;
 
-/* AUTH (FIXED NO BLINK LOOP) */
+setTimeout(() => ready = true, 300);
+
 onAuthStateChanged(auth, async (u) => {
 
-authReady = true;
-
 if (!u) {
-if (authReady) window.location.href = "auth.html";
+if (ready) window.location.replace("auth.html");
 return;
 }
 
@@ -172,14 +171,11 @@ if (!snap.exists()) {
 await setDoc(ref, { coins: 0 });
 }
 
-if (!loaded) {
-loaded = true;
 load();
-}
 
 });
 
-/* LOAD */
+/* LOAD BALANCE */
 async function load() {
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
@@ -200,14 +196,16 @@ await updateDoc(ref, { coins: c });
 load();
 }
 
-/* ADS */
+/* ADS SYSTEM */
 const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
 "https://thoroughgear.com/jVLBPd",
 "https://thoroughgear.com/TpOLka",
 "https://wrathful-piano.com/398aSn",
-"https://wrathful-piano.com/ibU5KJ"
+"https://wrathful-piano.com/ibU5KJ",
+"https://wrathful-piano.com/fJDG7O",
+"https://wrathful-piano.com/i1Tn5O"
 ];
 
 let active = false;
@@ -231,7 +229,7 @@ lastAd = Date.now();
 alert("Stay a few seconds then return");
 };
 
-/* CHEAT PROTECTION */
+/* ANTI-CHEAT */
 document.addEventListener("visibilitychange", async () => {
 
 if (document.visibilityState === "visible" && active) {
