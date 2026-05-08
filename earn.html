@@ -40,7 +40,6 @@ z-index:100;
 }
 
 .logo{font-size:28px;font-weight:bold;color:#facc15;}
-
 .subtitle{margin-top:8px;font-size:14px;color:#9ca3af;}
 
 .balance-box{
@@ -53,13 +52,7 @@ border:1px solid rgba(255,255,255,0.05);
 }
 
 .balance-title{font-size:14px;color:#9ca3af;margin-bottom:10px;}
-
-.balance{
-font-size:36px;
-font-weight:bold;
-color:#facc15;
-}
-
+.balance{font-size:36px;font-weight:bold;color:#facc15;}
 .small-text{margin-top:10px;font-size:13px;color:#9ca3af;}
 
 .guide{
@@ -100,9 +93,7 @@ font-size:26px;
 }
 
 .reward{font-size:20px;font-weight:bold;color:#facc15;}
-
 .task-title{font-size:18px;font-weight:bold;margin-bottom:8px;}
-
 .task-desc{font-size:14px;color:#9ca3af;}
 
 .task-meta{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
@@ -126,7 +117,6 @@ background:linear-gradient(90deg,#facc15,#fde047);
 color:#050812;
 cursor:pointer;
 }
-
 </style>
 </head>
 
@@ -134,62 +124,44 @@ cursor:pointer;
 
 <div class="header">
 <div class="logo">🐭 Cryptomice</div>
-<div class="subtitle">Complete ads and earn free Litecoin</div>
+<div class="subtitle">Click ads & earn 10 Mice Coins</div>
 </div>
 
 <div class="balance-box">
 <div class="balance-title">Current Balance</div>
 <div class="balance" id="balance">Loading...</div>
-<div class="small-text">🔥 Click ads, earn 10 Mice Coins per task</div>
+<div class="small-text">🔥 Earn 10 Coins per verified ad engagement</div>
 </div>
 
 <div class="guide">
 <h3>How It Works</h3>
 <p>
 1. Click START AD<br><br>
-2. Stay on the page for a few seconds<br><br>
-3. Return automatically<br><br>
-4. Earn Mice Coins instantly
+2. Stay on the page (no switching tabs)<br><br>
+3. Return after timer completes<br><br>
+4. Earn rewards automatically
 </p>
 </div>
 
-<div class="section-title">🔥 High Paying Ads</div>
+<div class="section-title">🔥 Ads Tasks</div>
 
 <div class="task-container">
 
-<!-- NORMAL TASK -->
 <div class="task-card">
-<div class="task-top">
-<div class="task-icon">🎮</div>
-<div class="reward">+10 Coins</div>
-</div>
-
-<div class="task-title">Play Mini Game Ad</div>
-<div class="task-desc">Stay active for 30 seconds.</div>
-
-<button class="task-btn" onclick="completeTask()">START AD</button>
-</div>
-
-<!-- SMART AD TASK -->
-<div class="task-card">
-
 <div class="task-top">
 <div class="task-icon">🔗</div>
 <div class="reward">+10 Coins</div>
 </div>
 
-<div class="task-title">Click Ads Offer</div>
-<div class="task-desc">Open partner ad and return after a short delay.</div>
+<div class="task-title">Watch Partner Ad</div>
+<div class="task-desc">Stay active while ad loads in new tab.</div>
 
 <div class="task-meta">
-<div class="meta-box">⏱ 10s–20s</div>
-<div class="meta-box">Ad Reward</div>
+<div class="meta-box">⏱ 12s+</div>
+<div class="meta-box">Anti-cheat</div>
 </div>
 
-<button class="task-btn" onclick="startSmartLink()">
-START AD
-</button>
-
+<button class="task-btn" onclick="startAd()">START AD</button>
 </div>
 
 </div>
@@ -218,104 +190,112 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-let currentUser = null;
+let user = null;
 
-// AUTH
-onAuthStateChanged(auth, async (user) => {
-if(!user){
-window.location.href = "auth.html";
-return;
-}
-currentUser = user;
-await ensureUser();
-loadBalance();
-});
+/* ---------------- AD POOL (MERGED) ---------------- */
+const adLinks = [
+"https://wrathful-piano.com/VFOZNk",
+"https://wrathful-piano.com/rIiayv",
+"https://thoroughgear.com/jVLBPd",
+"https://thoroughgear.com/TpOLka",
+"https://wrathful-piano.com/398aSn",
+"https://wrathful-piano.com/ibU5KJ",
+"https://thoroughgear.com/40mbTS",
+"https://thoroughgear.com/FSas0E",
+"https://wrathful-piano.com/fJDG7O",
+"https://wrathful-piano.com/i1Tn5O",
 
-// CREATE USER
-async function ensureUser(){
-const ref = doc(db,"users",currentUser.uid);
+"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
+"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
+];
+
+let active = false;
+let startTime = 0;
+let lastClaim = 0;
+let lastLink = null;
+let focusTime = 0;
+let interval = null;
+
+/* ---------------- AUTH ---------------- */
+onAuthStateChanged(auth, async (u)=>{
+if(!u){ window.location.href="auth.html"; return; }
+user = u;
+
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-await setDoc(ref,{
-email:currentUser.email,
-coins:0
-});
-}
+await setDoc(ref,{email:user.email,coins:0});
 }
 
-// LOAD BALANCE
+loadBalance();
+});
+
+/* ---------------- BALANCE ---------------- */
 async function loadBalance(){
-const ref = doc(db,"users",currentUser.uid);
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-// NORMAL TASK
-window.completeTask = async function(){
-
-const ref = doc(db,"users",currentUser.uid);
-const snap = await getDoc(ref);
-
-let coins = snap.data()?.coins || 0;
-coins += 10;
-
-await updateDoc(ref,{coins});
-
-loadBalance();
-alert("+10 Coins Added!");
-};
-
-// SMART ADS SYSTEM (SAFE VERSION)
-let smartActive = false;
-let smartStart = 0;
-let lastClick = 0;
-
-// YOUR LINKS
-const smartLinks = [
-"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
-"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb"
-];
-
-window.startSmartLink = function(){
+/* ---------------- AD START ---------------- */
+window.startAd = function(){
 
 let now = Date.now();
 
-// cooldown 45 seconds
-if(now - lastClick < 45000){
-alert("Wait before clicking another ad.");
+/* cooldown */
+if(now - lastClaim < 30000){
+alert("Wait before next ad.");
 return;
 }
 
-// rotate links
-let link = smartLinks[Math.floor(Math.random() * smartLinks.length)];
+/* rotate link */
+let link;
+do{
+link = adLinks[Math.floor(Math.random()*adLinks.length)];
+}while(link === lastLink);
+
+lastLink = link;
 
 window.open(link,"_blank");
 
-smartActive = true;
-smartStart = now;
-lastClick = now;
+active = true;
+startTime = now;
+focusTime = 0;
+lastClaim = now;
 
-alert("Stay 10–15 seconds then return.");
+/* track active focus */
+if(interval) clearInterval(interval);
+
+interval = setInterval(()=>{
+if(document.visibilityState === "visible"){
+focusTime += 1;
+}
+},1000);
+
+alert("Stay on the tab for a few seconds to earn reward.");
 };
 
-// RETURN CHECK
+/* ---------------- ANTI CHEAT CHECK ---------------- */
 document.addEventListener("visibilitychange", async ()=>{
 
-if(document.visibilityState === "visible" && smartActive){
+if(document.visibilityState === "visible" && active){
 
-let time = (Date.now() - smartStart)/1000;
+let duration = (Date.now() - startTime)/1000;
 
-if(time < 8){
-smartActive = false;
-alert("Too fast. No reward.");
+/* must have real engagement */
+if(duration < 8 || focusTime < 6){
+active = false;
+clearInterval(interval);
+alert("No reward (invalid activity).");
 return;
 }
 
-const ref = doc(db,"users",currentUser.uid);
+/* reward */
+const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 let coins = snap.data()?.coins || 0;
@@ -325,12 +305,11 @@ await updateDoc(ref,{coins});
 
 loadBalance();
 
-smartActive = false;
+active = false;
+clearInterval(interval);
 
-alert("+10 Ad Coins Earned!");
-
+alert("+10 Mice Coins Earned!");
 }
-
 });
 
 </script>
