@@ -13,6 +13,9 @@ body{margin:0;background:#050812;color:white;font-family:Arial;}
 .box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
 .balance{font-size:34px;color:#facc15;}
 
+.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.small{font-size:13px;color:#9ca3af;}
+
 .btn{
 width:100%;
 padding:14px;
@@ -22,10 +25,8 @@ background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
 margin-top:10px;
+color:#050812;
 }
-
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
-.small{font-size:13px;color:#9ca3af;}
 input{
 width:100%;
 padding:12px;
@@ -41,9 +42,10 @@ color:white;
 <body>
 
 <div class="header">
-<div class="logo">🐭 Cryptomice</div>
+<div class="logo">🐭 Cryptomice Earn</div>
 </div>
 
+<!-- BALANCE -->
 <div class="box">
 <div>Balance</div>
 <div class="balance" id="balance">0</div>
@@ -52,25 +54,38 @@ color:white;
 <!-- ADS -->
 <div class="task">
 <h3>🎯 Earn Ads</h3>
-<div class="small">Stay active to earn rewards</div>
+<div class="small">Watch ads and earn Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
+</div>
+
+<!-- OFFER WALL (BITLABS READY) -->
+<div class="task">
+<h3>🎮 Offer Wall</h3>
+<div class="small">
+Complete surveys, app installs & games to earn coins
+</div>
+<button class="btn" onclick="openOfferWall()">
+OPEN OFFER WALL
+</button>
 </div>
 
 <!-- FAUCET -->
 <div class="task">
 <h3>🚰 Faucet</h3>
-<div class="small">Claim once every 24h</div>
-<button class="btn" onclick="claimFaucet()">CLAIM</button>
+<div class="small">Claim free coins every 24 hours</div>
+<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
 </div>
 
 <!-- WITHDRAW -->
 <div class="task">
 <h3>💸 Withdraw</h3>
-<div class="small">Minimum: 1000 Coins</div>
+<div class="small">Minimum withdrawal: 1000 Coins</div>
 
 <input id="wallet" placeholder="Enter Litecoin Wallet Address">
 
-<button class="btn" onclick="withdraw()">WITHDRAW</button>
+<button class="btn" onclick="withdraw()">
+WITHDRAW
+</button>
 </div>
 
 <script type="module">
@@ -89,7 +104,7 @@ addDoc,
 collection
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
+/* FIREBASE CONFIG */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -107,45 +122,37 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user=null;
 
-/* ADS */
-const ads = [
-"https://wrathful-piano.com/VFOZNk",
-"https://wrathful-piano.com/rIiayv",
-"https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka",
-"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
-"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
-];
-
-let active=false;
-let start=0;
-let focus=0;
-let lastAd=0;
-
-/* AUTH */
+/* ---------------- AUTH ---------------- */
 onAuthStateChanged(auth, async (u)=>{
-if(!u){location.href="auth.html";return;}
+if(!u){
+location.href="auth.html";
+return;
+}
 user=u;
 
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
 
 if(!snap.exists()){
-await setDoc(ref,{coins:0});
+await setDoc(ref,{
+coins:0,
+createdAt:Date.now()
+});
 }
 
 load();
 });
 
-/* LOAD */
+/* ---------------- LOAD ---------------- */
 async function load(){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
+
 document.getElementById("balance").innerText =
 (snap.data()?.coins||0);
 }
 
-/* REWARD */
+/* ---------------- REWARD ---------------- */
 async function reward(amount){
 const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
@@ -157,7 +164,21 @@ await updateDoc(ref,{coins:c});
 load();
 }
 
-/* ADS */
+/* ---------------- ADS ---------------- */
+const ads = [
+"https://wrathful-piano.com/VFOZNk",
+"https://wrathful-piano.com/rIiayv",
+"https://thoroughgear.com/jVLBPd",
+"https://thoroughgear.com/TpOLka",
+"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f"
+];
+
+let active=false;
+let start=0;
+let lastAd=0;
+
+/* START AD */
 window.startAd=function(){
 
 if(Date.now()-lastAd<30000){
@@ -170,16 +191,9 @@ window.open(link,"_blank");
 
 active=true;
 start=Date.now();
-focus=0;
 lastAd=Date.now();
 
-/* focus tracker */
-let t=setInterval(()=>{
-if(!active) clearInterval(t);
-if(document.visibilityState==="visible") focus++;
-},1000);
-
-alert("Stay a few seconds...");
+alert("Stay a few seconds then return");
 };
 
 /* CHEAT PROTECTION */
@@ -189,7 +203,7 @@ if(document.visibilityState==="visible"&&active){
 
 let time=(Date.now()-start)/1000;
 
-if(time<8||focus<5){
+if(time<8){
 active=false;
 alert("Invalid session");
 return;
@@ -201,7 +215,13 @@ alert("+10 Coins Earned");
 }
 });
 
-/* FAUCET */
+/* ---------------- OFFER WALL (BITLABS READY) ---------------- */
+window.openOfferWall = function () {
+  // replace later with Bitlabs URL
+  window.open("https://YOUR_BITLABS_OFFERWALL_URL", "_blank");
+};
+
+/* ---------------- FAUCET ---------------- */
 window.claimFaucet=async function(){
 
 const ref=doc(db,"users",user.uid);
@@ -211,7 +231,7 @@ let data=snap.data();
 let now=Date.now();
 
 if(data.lastFaucet && now-data.lastFaucet<86400000){
-alert("Try tomorrow");
+alert("Come back later");
 return;
 }
 
@@ -224,7 +244,7 @@ load();
 alert("+20 Faucet");
 };
 
-/* WITHDRAW */
+/* ---------------- WITHDRAW ---------------- */
 window.withdraw=async function(){
 
 let wallet=document.getElementById("wallet").value;
@@ -244,7 +264,6 @@ alert("Minimum 1000 coins required");
 return;
 }
 
-/* log request */
 await addDoc(collection(db,"withdrawals"),{
 uid:user.uid,
 wallet:wallet,
@@ -253,7 +272,6 @@ status:"pending",
 time:Date.now()
 });
 
-/* reset balance */
 await updateDoc(ref,{coins:0});
 
 load();
