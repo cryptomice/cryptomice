@@ -1,66 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Streak - Cryptomice</title>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cryptomice Rewards Hub</title><style>
 body{
+margin:0;
+font-family:Arial,sans-serif;
 background:#050812;
 color:white;
-display:flex;
-flex-direction:column;
-align-items:center;
-min-height:100vh;
 }
 
 .header{
-width:100%;
-text-align:center;
 padding:20px;
+text-align:center;
 background:#0b1220;
 border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
-font-size:28px;
+font-size:26px;
 font-weight:bold;
 color:#facc15;
 }
 
 .container{
-width:90%;
-max-width:420px;
-margin-top:30px;
-background:#111827;
 padding:20px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,0.05);
-text-align:center;
+max-width:600px;
+margin:auto;
 }
 
-.streak{
-font-size:42px;
+.card{
+background:#111827;
+padding:18px;
+border-radius:18px;
+margin-bottom:15px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.balance{
+font-size:32px;
 color:#facc15;
-margin:10px 0;
+font-weight:bold;
+}
+
+.title{
+font-size:18px;
+margin-bottom:10px;
 font-weight:bold;
 }
 
 .small{
 font-size:13px;
 color:#9ca3af;
-margin-bottom:20px;
 }
 
-.btn{
+button{
 width:100%;
 padding:14px;
 border:none;
@@ -68,253 +61,105 @@ border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
-font-size:15px;
-color:#050812;
 margin-top:10px;
 }
 
-.lock{
-margin-top:15px;
-font-size:13px;
-color:#9ca3af;
+.section{
+margin-top:20px;
 }
 
-.reward{
-margin-top:15px;
-font-size:14px;
+.badge{
+display:inline-block;
+padding:5px 10px;
+background:#0b1220;
+border-radius:50px;
+font-size:12px;
+margin-right:5px;
 color:#d1d5db;
 }
+</style></head><body><div class="header">
+<div class="logo">🐭 Cryptomice Rewards Hub</div>
+</div><div class="container"><div class="card">
+<div class="small">Your Balance</div>
+<div class="balance" id="balance">Loading...</div>
+</div><!-- BITLABS MAIN SECTION --><div class="card"><div class="title">🔥 Earn with Bitlabs Offer Wall</div><div class="small">
+Complete real offers and earn Mice Coins instantly.
+</div><!-- CHANGED ONLY THIS --><button onclick="openOfferWall()">
+Open Offer Wall
+</button><div class="section"><span class="badge">📊 Surveys</span> <span class="badge">🎮 Gaming Offers</span> <span class="badge">📱 App Installs</span>
 
-.back{
-margin-top:15px;
-background:#1f2937;
-color:white;
-}
-</style>
-</head>
+</div></div><!-- BONUS TASK --><div class="card"><div class="title">🎁 Bonus Tasks (Optional)</div><div class="small">
+Extra rewards while waiting for offers.
+</div><!-- CHANGED ONLY THIS --><button onclick="bonusTask()">
+Complete Bonus Task (+10 Coins)
+</button></div></div><script type="module">
 
-<body>
-
-<div class="header">
-<div class="logo">🐭 Cryptomice Daily Streak</div>
-</div>
-
-<div class="container">
-
-<div class="small">Your current streak</div>
-
-<div class="streak" id="streak">0</div>
-
-<div class="reward" id="rewardText">
-Daily reward: +10 Coins
-</div>
-
-<button class="btn" onclick="claimStreak()">
-CLAIM DAILY REWARD
-</button>
-
-<button class="btn back" onclick="goEarn()">
-⬅ BACK TO EARN
-</button>
-
-<div class="lock" id="status">
-Loading...
-</div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-getAuth,
-onAuthStateChanged,
-setPersistence,
-browserLocalPersistence
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-updateDoc
-}
+import { getFirestore, doc, getDoc, setDoc, updateDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
 const firebaseConfig = {
-apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
+apiKey: "YOUR_API_KEY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
 projectId: "cryptomice-free-section",
 storageBucket: "cryptomice-free-section.firebasestorage.app",
 messagingSenderId: "185364902129",
-appId: "1:185364902129:web:51953cbb27278fb05ef950"
+appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* IMPORTANT */
-setPersistence(auth, browserLocalPersistence)
-.catch(()=>{});
-
 let user = null;
-let userRef = null;
-let ready = false;
-
-/* FAIL SAFE */
-setTimeout(()=>{
-if(!ready){
-document.getElementById("status").innerText =
-"Loading failed. Refresh page.";
-}
-},4000);
 
 /* AUTH */
 onAuthStateChanged(auth, async (u)=>{
-
-ready = true;
-
 if(!u){
-location.replace("auth.html");
+window.location.href="auth.html";
 return;
 }
-
 user = u;
-userRef = doc(db,"users",user.uid);
-
 await ensureUser();
-await loadData();
-
+loadBalance();
 });
 
-/* CREATE USER */
+/* USER CREATE */
 async function ensureUser(){
-
-const snap = await getDoc(userRef);
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
 if(!snap.exists()){
-
-await setDoc(userRef,{
-coins:0,
-streak:0,
-lastClaim:0,
-lastFaucet:0
+await setDoc(ref,{
+email:user.email,
+coins:0
 });
-
+}
 }
 
+/* BALANCE */
+async function loadBalance(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+document.getElementById("balance").innerText =
+(snap.data()?.coins || 0) + " Mice Coins";
 }
 
-/* LOAD DATA */
-async function loadData(){
-
-const snap = await getDoc(userRef);
-const data = snap.data();
-
-let streak = data.streak || 0;
-
-document.getElementById("streak").innerText = streak;
-
-updateReward(streak);
-
-checkCooldown(data.lastClaim || 0);
-
-}
-
-/* UPDATE REWARD */
-function updateReward(streak){
-
-let reward = 10 + (streak * 2);
-
-if(reward > 100){
-reward = 100;
-}
-
-document.getElementById("rewardText").innerText =
-"Daily reward: +" + reward + " Coins";
-
-}
-
-/* COOLDOWN */
-function checkCooldown(lastClaim){
-
-let now = Date.now();
-let diff = now - lastClaim;
-
-if(diff < 86400000){
-
-let hours = Math.ceil((86400000 - diff)/3600000);
-
-document.getElementById("status").innerText =
-"Come back in " + hours + " hours";
-
-}else{
-
-document.getElementById("status").innerText =
-"You can claim now!";
-
-}
-
-}
-
-/* CLAIM */
-window.claimStreak = async function(){
-
-if(!user) return;
-
-const snap = await getDoc(userRef);
-const data = snap.data();
-
-let now = Date.now();
-let last = data.lastClaim || 0;
-
-if(now - last < 86400000){
-alert("Already claimed today");
-return;
-}
-
-let streak = data.streak || 0;
-
-/* RESET STREAK IF MISSED 48 HOURS */
-if(last !== 0 && now - last > 172800000){
-streak = 0;
-}
-
-streak += 1;
-
-let reward = 10 + (streak * 2);
-
-if(reward > 100){
-reward = 100;
-}
-
-let coins = data.coins || 0;
-coins += reward;
-
-await updateDoc(userRef,{
-streak: streak,
-coins: coins,
-lastClaim: now
-});
-
-await loadData();
-
-alert("+" + reward + " Coins claimed!");
-
+/* 🔁 CHANGED ROUTE ONLY */
+window.openOfferWall = function(){
+window.location.href =
+"https://cryptomice.github.io/cryptomice/coming-soon.html";
 };
 
-/* BACK */
-window.goEarn = function(){
-location.href = "earn.html";
+/* 🔁 CHANGED ROUTE ONLY */
+window.bonusTask = function(){
+window.location.href =
+"https://cryptomice.github.io/cryptomice/coming-soon.html";
 };
 
-</script>
-
-</body>
+</script></body>
 </html>
