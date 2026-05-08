@@ -7,42 +7,14 @@
 
 <style>
 body{margin:0;background:#050812;color:white;font-family:Arial;}
+.header{text-align:center;padding:20px;background:#0b1220;}
+.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-.header{
-text-align:center;
-padding:20px;
-background:#0b1220;
-}
+.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
+.balance{font-size:34px;color:#facc15;}
 
-.logo{
-color:#facc15;
-font-size:28px;
-font-weight:bold;
-}
-
-.box{
-margin:20px;
-padding:20px;
-background:#111827;
-border-radius:16px;
-}
-
-.balance{
-font-size:34px;
-color:#facc15;
-}
-
-.task{
-margin:20px;
-padding:20px;
-background:#0f172a;
-border-radius:16px;
-}
-
-.small{
-font-size:13px;
-color:#9ca3af;
-}
+.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.small{font-size:13px;color:#9ca3af;}
 
 .btn{
 width:100%;
@@ -54,16 +26,6 @@ font-weight:bold;
 cursor:pointer;
 margin-top:10px;
 color:#050812;
-}
-
-input{
-width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:10px;
-border:none;
-background:#111827;
-color:white;
 }
 </style>
 </head>
@@ -79,61 +41,43 @@ color:white;
 <div class="balance" id="balance">Loading...</div>
 </div>
 
-<!-- ADS -->
 <div class="task">
 <h3>🎯 Earn Ads</h3>
-<div class="small">Click ads and earn 10 Mice Coins</div>
+<div class="small">Click ads and earn Mice Coins</div>
 <button class="btn" onclick="startAd()">START AD</button>
 </div>
 
-<!-- OFFER WALL -->
 <div class="task">
 <h3>🎮 Offer Wall</h3>
-<div class="small">Surveys, installs & gaming offers (Bitlabs)</div>
+<div class="small">Surveys, installs & games</div>
 <button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
 </div>
 
-<!-- DAILY STREAK -->
-<div class="task">
-<h3>🔥 Daily Streak</h3>
-<div class="small">Claim daily rewards & increase earnings</div>
-<button class="btn" onclick="openStreak()">OPEN DAILY STREAK</button>
-</div>
-
-<!-- FAUCET -->
 <div class="task">
 <h3>🚰 Faucet</h3>
-<div class="small">Claim free coins every 24 hours</div>
+<div class="small">Claim once every 24h</div>
 <button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
-</div>
-
-<!-- WITHDRAW -->
-<div class="task">
-<h3>💸 Withdraw</h3>
-<div class="small">Minimum withdrawal: 1000 Coins</div>
-
-<input id="wallet" placeholder="Enter Litecoin Wallet Address">
-
-<button class="btn" onclick="withdraw()">WITHDRAW</button>
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+getAuth,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
 getFirestore,
 doc,
 getDoc,
 setDoc,
-updateDoc,
-addDoc,
-collection
+updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
+/* Firebase */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -149,16 +93,18 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-/* 🔥 STABLE AUTH STATE (NO BLINK LOOP) */
 let user = null;
-let ready = false;
+let authReady = false;
 
-setTimeout(() => ready = true, 300);
-
+/* =========================
+   FIXED AUTH FLOW (NO BLINK)
+========================= */
 onAuthStateChanged(auth, async (u) => {
 
+authReady = true;
+
 if (!u) {
-if (ready) window.location.replace("auth.html");
+window.location.replace("auth.html");
 return;
 }
 
@@ -168,20 +114,20 @@ const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 if (!snap.exists()) {
-await setDoc(ref, { coins: 0 });
+await setDoc(ref, { coins: 0, lastFaucet: 0 });
 }
 
-load();
+loadBalance();
 
 });
 
-/* LOAD BALANCE */
-async function load() {
+/* LOAD */
+async function loadBalance() {
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(snap.data()?.coins || 0);
+(snap.data()?.coins || 0) + " Mice Coins";
 }
 
 /* REWARD */
@@ -193,10 +139,10 @@ let c = snap.data().coins || 0;
 c += amount;
 
 await updateDoc(ref, { coins: c });
-load();
+loadBalance();
 }
 
-/* ADS SYSTEM */
+/* ADS */
 const ads = [
 "https://wrathful-piano.com/VFOZNk",
 "https://wrathful-piano.com/rIiayv",
@@ -204,6 +150,8 @@ const ads = [
 "https://thoroughgear.com/TpOLka",
 "https://wrathful-piano.com/398aSn",
 "https://wrathful-piano.com/ibU5KJ",
+"https://thoroughgear.com/40mbTS",
+"https://thoroughgear.com/FSas0E",
 "https://wrathful-piano.com/fJDG7O",
 "https://wrathful-piano.com/i1Tn5O"
 ];
@@ -212,7 +160,10 @@ let active = false;
 let start = 0;
 let lastAd = 0;
 
+/* START AD */
 window.startAd = function () {
+
+if (!user) return;
 
 if (Date.now() - lastAd < 30000) {
 alert("Cooldown active");
@@ -229,33 +180,29 @@ lastAd = Date.now();
 alert("Stay a few seconds then return");
 };
 
-/* ANTI-CHEAT */
+/* CHEAT PROTECTION */
 document.addEventListener("visibilitychange", async () => {
 
 if (document.visibilityState === "visible" && active) {
 
 let time = (Date.now() - start) / 1000;
 
-if (time < 8) {
 active = false;
+
+if (time < 8) {
 alert("Invalid session");
 return;
 }
 
-active = false;
 await reward(10);
 alert("+10 Coins Earned");
 }
+
 });
 
 /* OFFER WALL */
 window.openOfferWall = function () {
 window.location.href = "rewards.html";
-};
-
-/* DAILY STREAK */
-window.openStreak = function () {
-window.location.href = "daily-streak.html";
 };
 
 /* FAUCET */
@@ -267,7 +214,7 @@ const snap = await getDoc(ref);
 let data = snap.data();
 let now = Date.now();
 
-if (data.lastFaucet && now - data.lastFaucet < 86400000) {
+if (now - (data.lastFaucet || 0) < 86400000) {
 alert("Come back later");
 return;
 }
@@ -277,45 +224,11 @@ coins: (data.coins || 0) + 20,
 lastFaucet: now
 });
 
-load();
-alert("+20 Faucet");
-};
-
-/* WITHDRAW */
-window.withdraw = async function () {
-
-let wallet = document.getElementById("wallet").value;
-
-if (!wallet) {
-alert("Enter wallet");
-return;
-}
-
-const ref = doc(db, "users", user.uid);
-const snap = await getDoc(ref);
-
-let coins = snap.data().coins || 0;
-
-if (coins < 1000) {
-alert("Minimum 1000 coins required");
-return;
-}
-
-await addDoc(collection(db, "withdrawals"), {
-uid: user.uid,
-wallet: wallet,
-amount: coins,
-status: "pending",
-time: Date.now()
-});
-
-await updateDoc(ref, { coins: 0 });
-
-load();
-alert("Withdrawal submitted!");
+loadBalance();
+alert("+20 Faucet Claimed");
 };
 
 </script>
 
 </body>
-</html>
+  </html>
