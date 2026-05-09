@@ -153,13 +153,11 @@ background:#0f172a;
 color:white;  
 }  
 
-/* DOWNLOAD BUTTON SAME AS ACTIVATE */
 .download{  
 background:linear-gradient(90deg,#ffd84d,#ffcc00);  
 color:black;  
 }  
   
-/* HOW IT WORKS IMAGE */  
 .after-btn-img{
 width:100%;
 max-width:420px;
@@ -169,7 +167,6 @@ border-radius:15px;
 box-shadow:0 0 25px rgba(255,215,0,0.18);
 }
   
-/* INSTALL */  
 #installBtn{  
 width:100%;  
 padding:14px;  
@@ -184,7 +181,6 @@ display:none;
 font-size:15px;
 }  
   
-/* STATS */  
 .stats{  
 display:flex;  
 justify-content:space-around;  
@@ -194,13 +190,9 @@ flex-wrap:wrap;
 gap:10px;
 }  
   
-.stat{
-text-align:center;
-}
-
+.stat{text-align:center;}  
 .stat h3{color:#ffd84d;}  
   
-/* DASHBOARD */  
 .dashboard{  
 margin:20px;  
 padding:18px;  
@@ -209,53 +201,31 @@ border-radius:12px;
 text-align:center;  
 }  
   
-.balance{  
-font-size:28px;  
-color:#ffd84d;  
-}  
+.balance{font-size:28px;color:#ffd84d;}  
   
-/* FEATURES */  
 .features{margin:20px;}  
   
-.feature{  
-display:flex;  
-margin-bottom:15px;  
-}  
+.feature{display:flex;margin-bottom:15px;}  
   
 .icon{  
-width:40px;  
-height:40px;  
+width:40px;height:40px;  
 background:#111827;  
 border-radius:10px;  
-display:flex;  
-align-items:center;  
-justify-content:center;  
-margin-right:10px;  
-color:#ffd84d;  
+display:flex;align-items:center;justify-content:center;  
+margin-right:10px;color:#ffd84d;  
 }  
   
-/* SOCIAL */  
-.social{  
-margin:40px 20px;  
-text-align:center;  
-}  
-  
-.social h2{  
-color:#ffd84d;  
-margin-bottom:15px;  
-}  
+.social{margin:40px 20px;text-align:center;}  
+.social h2{color:#ffd84d;margin-bottom:15px;}  
   
 .social a{  
 display:inline-block;  
 padding:12px 20px;  
 border-radius:12px;  
 background:linear-gradient(90deg,#1877f2,#0d5ddb);  
-color:white;  
-font-weight:bold;  
-text-decoration:none;  
+color:white;font-weight:bold;text-decoration:none;  
 }  
   
-/* FOOTER */  
 .footer-links{  
 margin-top:25px;  
 text-align:center;  
@@ -264,25 +234,16 @@ opacity:0.8;
 }  
   
 .footer-links a{  
-color:#ffd84d;  
-text-decoration:none;  
-margin:0 5px;  
+color:#ffd84d;text-decoration:none;margin:0 5px;  
 }  
   
-.footer{  
-text-align:center;  
-font-size:12px;  
-opacity:0.5;  
-margin:20px;  
-}  
+.footer{text-align:center;font-size:12px;opacity:0.5;margin:20px;}  
   
 </style>  
-  
 </head>  
   
 <body>  
   
-<!-- HERO -->  
 <div class="hero">  
   
 <div class="logo">🐭 CRYPTOMICE</div>  
@@ -298,16 +259,17 @@ Cryptomice is a digital referral rewards platform built for online earning and e
 </p>  
   
 <div class="buttons">  
-<button class="activate" onclick="goPayment()">Activate Account</button>  
-<button class="login" onclick="goLogin()">Member Login</button>  
-<button class="login" onclick="navigateTo('guide.html')">How it works</button>  
+<button class="activate" onclick="goPayment()">Activate Account</button>
 
-<!-- DOWNLOAD BUTTON -->
-<button id="downloadBtn" class="download" onclick="openDownload()">
-Download App
+<!-- UPDATED BUTTON -->
+<button class="login" onclick="navigateTo('https://cryptomice.github.io/cryptomice/register.html')">
+Join Cryptomice Free Section
 </button>
 
-<!-- SECOND IMAGE -->
+<button class="login" onclick="navigateTo('guide.html')">How it works</button>  
+
+<button id="downloadBtn" class="download" onclick="openDownload()">Download App</button>
+
 <img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="after-btn-img" alt="How Cryptomice works">
 
 </div>  
@@ -316,7 +278,6 @@ Download App
   
 </div>  
   
-<!-- STATS -->  
 <div class="stats">  
 <div class="stat"><h3>10m+</h3><p>Members</p></div>  
 <div class="stat"><h3>50k+ LTC</h3><p>Earned</p></div>  
@@ -324,12 +285,10 @@ Download App
 <div class="stat"><h3>0.01 LTC</h3><p>Per Signup</p></div>  
 </div>  
   
-<!-- DASHBOARD -->  
 <div class="dashboard">  
 <div class="balance">Community Growing</div>  
 </div>  
   
-<!-- FEATURES -->  
 <div class="features">  
 <div class="feature"><div class="icon">⚡</div><div>Instant System</div></div>  
 <div class="feature"><div class="icon">🔒</div><div>Secure Access</div></div>  
@@ -337,15 +296,11 @@ Download App
 <div class="feature"><div class="icon">👥</div><div>Referral Network</div></div>  
 </div>  
   
-<!-- SOCIAL -->  
 <div class="social">  
 <h2>Join thousands talking about us</h2>  
-<a href="https://www.facebook.com/profile.php?id=61551847504420" target="_blank">  
-Follow us on Facebook  
-</a>  
+<a href="https://www.facebook.com/profile.php?id=61551847504420" target="_blank">Follow us on Facebook</a>  
 </div>  
   
-<!-- FOOTER LINKS -->  
 <div class="footer-links">  
 <a href="about.html">About</a> |  
 <a href="terms.html">Terms</a> |  
@@ -366,36 +321,28 @@ function goPayment(){
 navigateTo("payment.html");  
 }  
 
-function goLogin(){  
-navigateTo("login.html");  
+function openDownload(){  
+window.location.href = "https://cryptomice.github.io/cryptomice/download.html";  
 }  
 
-/* DOWNLOAD */
-function openDownload(){
-window.location.href = "https://cryptomice.github.io/cryptomice/download.html";
-}
+function isPWA(){  
+return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;  
+}  
 
-/* HIDE DOWNLOAD BUTTON INSIDE PWA */
-function isPWA(){
-return window.matchMedia('(display-mode: standalone)').matches ||
-window.navigator.standalone === true;
-}
+window.addEventListener("load", () => {  
+if(isPWA()){  
+document.getElementById("downloadBtn").style.display = "none";  
+}  
+});  
 
-window.addEventListener("load", () => {
-if(isPWA()){
-document.getElementById("downloadBtn").style.display = "none";
-}
-});
-
-/* INSTALL */  
 let deferredPrompt;  
-  
+
 window.addEventListener("beforeinstallprompt", (e) => {  
 e.preventDefault();  
 deferredPrompt = e;  
 document.getElementById("installBtn").style.display = "block";  
 });  
-  
+
 document.getElementById("installBtn").addEventListener("click", async () => {  
 if (!deferredPrompt) return;  
 deferredPrompt.prompt();  
@@ -403,8 +350,7 @@ await deferredPrompt.userChoice;
 deferredPrompt = null;  
 document.getElementById("installBtn").style.display = "none";  
 });  
-  
-/* SW */  
+
 if ("serviceWorker" in navigator) {  
 navigator.serviceWorker.register("sw.js");  
 }  
