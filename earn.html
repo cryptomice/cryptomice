@@ -3,28 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cryptomice Earn System</title>
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+<title>Cryptomice Daily Streak</title>
 
 <style>
-body{margin:0;background:#050812;color:white;font-family:Arial;}
-.header{text-align:center;padding:20px;background:#0b1220;}
-.logo{color:#facc15;font-size:28px;font-weight:bold;}
 
-.convert{
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#050812;
+font-family:Arial,sans-serif;
+color:white;
+}
+
+.header{
+padding:20px;
 text-align:center;
-padding:10px;
-background:#0f172a;
-font-size:13px;
-color:#facc15;
+background:#0b1220;
 border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
-.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
-.balance{font-size:34px;color:#facc15;}
+.logo{
+font-size:28px;
+font-weight:bold;
+color:#facc15;
+}
 
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
+.nav{
+margin-top:14px;
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+}
 
-.small{font-size:13px;color:#9ca3af;}
+.nav button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#111827;
+color:white;
+cursor:pointer;
+font-size:13px;
+}
+
+.container{
+padding:20px;
+max-width:600px;
+margin:auto;
+}
+
+.card{
+background:#111827;
+padding:20px;
+border-radius:18px;
+margin-bottom:18px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.balance{
+font-size:34px;
+font-weight:bold;
+color:#facc15;
+margin-top:8px;
+}
+
+.title{
+font-size:18px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.small{
+font-size:13px;
+color:#9ca3af;
+line-height:1.6;
+}
 
 .btn{
 width:100%;
@@ -34,8 +94,14 @@ border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
-margin-top:10px;
+margin-top:14px;
 color:#050812;
+font-size:15px;
+}
+
+.btn:disabled{
+opacity:0.5;
+cursor:not-allowed;
 }
 
 #loading{
@@ -44,92 +110,129 @@ padding:40px;
 color:#9ca3af;
 }
 
-#app{display:none;}
-
-input{
-width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:10px;
-border:none;
-background:#0b1220;
-color:white;
+#app{
+display:none;
 }
+
+.timer{
+margin-top:12px;
+font-size:14px;
+color:#facc15;
+text-align:center;
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="loading">Loading Cryptomice...</div>
+<div id="loading">
+Loading Daily Streak...
+</div>
 
 <div id="app">
 
 <div class="header">
-<div class="logo">🐭 Cryptomice Earn</div>
+
+<div class="logo">
+🐭 Cryptomice Daily Streak
 </div>
 
-<div class="convert">
-1 Mice Coin = 0.00044 LTC
+<div class="nav">
+
+<button onclick="goEarn()">
+Earn Page
+</button>
+
+<button onclick="goRewards()">
+Rewards Hub
+</button>
+
 </div>
 
-<div class="box">
-<div>Balance</div>
-<div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
-<div class="task">
-<h3>🎯 Earn Ads</h3>
-<div class="small">Watch 8–15 seconds to earn 0.002 Mice Coins</div>
-<button class="btn" onclick="startAd()">START AD</button>
+<div class="container">
+
+<!-- BALANCE -->
+<div class="card">
+
+<div class="small">
+Your Balance
 </div>
 
-<div class="task">
-<h3>🎮 Offer Wall</h3>
-<div class="small">Surveys, installs & games</div>
-<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
+<div class="balance" id="balance">
+0 Mice Coins
 </div>
 
-<div class="task">
-<h3>🚰 Faucet</h3>
-<div class="small">Claim 1.6 Mice Coins every 2 hours</div>
-<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
 </div>
 
-<div class="task">
-<h3>💸 Withdraw</h3>
-<div class="small">Minimum 1000 Mice Coins</div>
+<!-- DAILY CLAIM -->
+<div class="card">
 
-<input id="wallet" placeholder="Enter Litecoin wallet">
+<div class="title">
+📅 Daily Reward
+</div>
 
-<button class="btn" onclick="withdraw()">WITHDRAW</button>
+<div class="small">
+Claim a fixed reward of 16 Mice Coins every 24 hours.
+No bonuses. No multipliers.
+</div>
+
+<button class="btn" id="claimBtn" onclick="claimDaily()">
+CLAIM 16 MICE COINS
+</button>
+
+<div class="timer" id="timer">
+Checking availability...
+</div>
+
+</div>
+
+<!-- RETURN -->
+<div class="card">
+
+<div class="title">
+🚀 Continue Earning
+</div>
+
+<div class="small">
+Go back to the main earning system and continue earning Mice Coins.
+</div>
+
+<button class="btn" onclick="goEarn()">
+OPEN EARN PAGE
+</button>
+
+</div>
+
 </div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 getAuth,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
 getFirestore,
 doc,
 getDoc,
 setDoc,
-updateDoc,
-addDoc,
-collection,
-query,
-where,
-getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -145,12 +248,12 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-let user=null;
-let active=false;
-let start=0;
-let lastAd=0;
-let withdrawLock=false;
+let user = null;
 
+const DAILY_REWARD = 16;
+const DAILY_COOLDOWN = 86400000; // 24 hours
+
+/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
 
 if(!u){
@@ -158,173 +261,144 @@ location.replace("auth.html");
 return;
 }
 
-user=u;
+user = u;
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
+/* CREATE USER */
 if(!snap.exists()){
+
 await setDoc(ref,{
+email:user.email,
 coins:0,
+lastClaim:0,
 lastFaucet:0
 });
+
 }
 
-document.getElementById("loading").style.display="none";
-document.getElementById("app").style.display="block";
+document.getElementById("loading").style.display = "none";
+document.getElementById("app").style.display = "block";
 
 loadBalance();
+checkCooldown();
 
 });
 
+/* LOAD BALANCE */
 async function loadBalance(){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(Number(snap.data()?.coins||0).toFixed(4))+" Mice Coins";
+(Number(snap.data()?.coins || 0).toFixed(4)) + " Mice Coins";
+
 }
 
-async function reward(amount){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+/* DAILY CLAIM */
+window.claimDaily = async function(){
 
-let c=Number(snap.data().coins||0);
-c+=amount;
+const btn = document.getElementById("claimBtn");
 
-await updateDoc(ref,{coins:c});
-loadBalance();
-}
+btn.disabled = true;
 
-const ads=[
-"https://wrathful-piano.com/VFOZNk",
-"https://wrathful-piano.com/rIiayv",
-"https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka"
-];
+try{
 
-window.startAd=function(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-if(Date.now()-lastAd<30000){
-alert("Cooldown active");
+const data = snap.data() || {};
+
+const now = Date.now();
+const lastClaim = data.lastClaim || 0;
+
+/* CHECK TIME */
+if(now - lastClaim < DAILY_COOLDOWN){
+
+alert("Daily reward already claimed.");
+
+checkCooldown();
+
+btn.disabled = false;
+
 return;
 }
 
-window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");
-
-active=true;
-start=Date.now();
-lastAd=Date.now();
-
-alert("Watch 8–15 seconds");
-};
-
-document.addEventListener("visibilitychange",async()=>{
-
-if(document.visibilityState==="visible"&&active){
-
-active=false;
-
-let t=(Date.now()-start)/1000;
-
-if(t<8){
-alert("Invalid session");
-return;
-}
-
-await reward(0.002);
-alert("+0.002 Mice Coins");
-}
-
-});
-
-window.openOfferWall=function(){
-location.href="rewards.html";
-};
-
-window.claimFaucet=async function(){
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let d=snap.data();
-let now=Date.now();
-
-if(now-(d.lastFaucet||0)<7200000){
-alert("Wait 2 hours");
-return;
-}
+/* ADD FIXED 16 */
+const newCoins = Number(data.coins || 0) + DAILY_REWARD;
 
 await updateDoc(ref,{
-coins:(Number(d.coins||0))+1.6,
-lastFaucet:now
+coins:newCoins,
+lastClaim:now
 });
 
-loadBalance();
-alert("+1.6 Mice Coins");
+await loadBalance();
+
+alert("+16 Mice Coins");
+
+checkCooldown();
+
+}catch(e){
+
+console.error(e);
+
+alert("Failed to claim reward");
+
+btn.disabled = false;
+
+}
+
 };
 
-/* 🔥 UPDATED WITH DUPLICATE WITHDRAW PROTECTION */
-window.withdraw=async function(){
+/* COOLDOWN */
+async function checkCooldown(){
 
-if(withdrawLock) return;
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-let wallet=document.getElementById("wallet").value;
-if(!wallet){
-alert("Enter wallet");
+const data = snap.data() || {};
+
+const now = Date.now();
+const lastClaim = data.lastClaim || 0;
+
+const btn = document.getElementById("claimBtn");
+const timer = document.getElementById("timer");
+
+const remaining = DAILY_COOLDOWN - (now - lastClaim);
+
+if(remaining <= 0){
+
+btn.disabled = false;
+
+timer.innerText =
+"You can claim your 16 Mice Coins now.";
+
 return;
 }
 
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
+/* LOCK BUTTON */
+btn.disabled = true;
 
-let coins=Number(snap.data().coins||0);
+const hours = Math.floor(remaining / 3600000);
+const minutes = Math.floor((remaining % 3600000) / 60000);
 
-if(coins<1000){
-alert("Minimum 1000 required");
-return;
+timer.innerText =
+"Next claim in " + hours + "h " + minutes + "m";
+
 }
 
-/* CHECK EXISTING PENDING WITHDRAWALS */
-const q=query(
-collection(db,"withdrawals"),
-where("uid","==",user.uid),
-where("status","==","pending")
-);
+/* AUTO UPDATE TIMER */
+setInterval(checkCooldown,60000);
 
-const existing=await getDocs(q);
+/* NAVIGATION */
+window.goEarn = function(){
+location.href = "earn.html";
+};
 
-if(!existing.empty){
-alert("You already have a pending withdrawal request");
-return;
-}
-
-withdrawLock=true;
-
-await updateDoc(ref,{coins:coins-1000});
-
-await addDoc(collection(db,"withdrawals"),{
-uid:user.uid,
-email:user.email,
-wallet:wallet,
-amount:1000,
-status:"pending",
-time:Date.now()
-});
-
-await addDoc(collection(db,"cryptomice_free_withdrawals"),{
-uid:user.uid,
-email:user.email,
-wallet:wallet,
-amount:1000,
-status:"pending",
-time:Date.now()
-});
-
-withdrawLock=false;
-
-loadBalance();
-alert("Withdrawal sent (1000 deducted)");
+window.goRewards = function(){
+location.href = "rewards.html";
 };
 
 </script>
