@@ -1,312 +1,316 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cryptomice Earn System</title>
-
-<style>
-body{margin:0;background:#050812;color:white;font-family:Arial;}
-.header{text-align:center;padding:20px;background:#0b1220;}
-.logo{color:#facc15;font-size:28px;font-weight:bold;}
-
-.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}
-.balance{font-size:34px;color:#facc15;}
-
-.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}
-
-.small{font-size:13px;color:#9ca3af;}
-
-.btn{
-width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-background:linear-gradient(90deg,#facc15,#fde047);
-font-weight:bold;
-cursor:pointer;
-margin-top:10px;
-color:#050812;
-}
-
-#loading{
-text-align:center;
-padding:40px;
-color:#9ca3af;
-}
-
-#app{display:none;}
-
-input{
-width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:10px;
-border:none;
-background:#0b1220;
-color:white;
-}
-</style>
-</head>
-
-<body>
-
-<div id="loading">Loading Cryptomice...</div>
-
-<div id="app">
-
-<div class="header">
-<div class="logo">🐭 Cryptomice Earn</div>
-</div>
-
-<div class="box">
-<div>Balance</div>
-<div class="balance" id="balance">0 Mice Coins</div>
-</div>
-
-<div class="task">
-<h3>🎯 Earn Ads</h3>
-<div class="small">Watch 8–15 seconds to earn reward</div>
-<button class="btn" onclick="startAd()">START AD</button>
-</div>
-
-<div class="task">
-<h3>🎮 Offer Wall</h3>
-<div class="small">Surveys, installs & games</div>
-<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>
-</div>
-
-<div class="task">
-<h3>🚰 Faucet</h3>
-<div class="small">Claim every 2 hours</div>
-<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>
-</div>
-
-<div class="task">
-<h3>💸 Withdraw</h3>
-<div class="small">Minimum 500 Mice Coins</div>
-
-<input id="wallet" placeholder="Enter Litecoin wallet">
-
-<button class="btn" onclick="withdraw()">WITHDRAW</button>
-</div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-getAuth,
-onAuthStateChanged,
-setPersistence,
-browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-updateDoc,
-addDoc,
-collection
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
-authDomain: "cryptomice-free-section.firebaseapp.com",
-projectId: "cryptomice-free-section",
-storageBucket: "cryptomice-free-section.firebasestorage.app",
-messagingSenderId: "185364902129",
-appId: "1:185364902129:web:51953cbb27278fb05ef950"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-await setPersistence(auth, browserLocalPersistence);
-
-let user=null;
-let active=false;
-let start=0;
-let lastAd=0;
-let withdrawLock=false;
-
-/* AUTH */
-onAuthStateChanged(auth, async (u)=>{
-
-if(!u){
-location.replace("auth.html");
-return;
-}
-
-user=u;
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-if(!snap.exists()){
-await setDoc(ref,{
-coins:0,
-lastFaucet:0
-});
-}
-
-document.getElementById("loading").style.display="none";
-document.getElementById("app").style.display="block";
-
-loadBalance();
-
-});
-
-/* BALANCE */
-async function loadBalance(){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-document.getElementById("balance").innerText =
-(snap.data()?.coins||0)+" Mice Coins";
-}
-
-/* REWARD */
-async function reward(amount){
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let c=snap.data().coins||0;
-c+=amount;
-
-await updateDoc(ref,{coins:c});
-loadBalance();
-}
-
-/* ADS */
-const ads=[
-"https://wrathful-piano.com/VFOZNk",
-"https://wrathful-piano.com/rIiayv",
-"https://thoroughgear.com/jVLBPd",
-"https://thoroughgear.com/TpOLka"
-];
-
-window.startAd=function(){
-
-if(Date.now()-lastAd<30000){
-alert("Cooldown active");
-return;
-}
-
-window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");
-
-active=true;
-start=Date.now();
-lastAd=Date.now();
-
-alert("Watch 8–15 seconds");
-};
-
-/* CHEAT CHECK */
-document.addEventListener("visibilitychange",async()=>{
-
-if(document.visibilityState==="visible"&&active){
-
-active=false;
-
-let t=(Date.now()-start)/1000;
-
-if(t<8){
-alert("Invalid session");
-return;
-}
-
-await reward(10);
-alert("+10 Coins");
-}
-
-});
-
-/* OFFER WALL */
-window.openOfferWall=function(){
-location.href="rewards.html";
-};
-
-/* FAUCET */
-window.claimFaucet=async function(){
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let d=snap.data();
-let now=Date.now();
-
-if(now-(d.lastFaucet||0)<7200000){
-alert("Wait 2 hours");
-return;
-}
-
-await updateDoc(ref,{
-coins:(d.coins||0)+5,
-lastFaucet:now
-});
-
-loadBalance();
-alert("+Faucet Reward");
-};
-
-/* WITHDRAW FIXED (ANTI DOUBLE + ADMIN READY) */
-window.withdraw=async function(){
-
-if(withdrawLock) return;
-
-let wallet=document.getElementById("wallet").value;
-if(!wallet){
-alert("Enter wallet");
-return;
-}
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let coins=snap.data().coins||0;
-
-if(coins<500){
-alert("Minimum 500 required");
-return;
-}
-
-withdrawLock=true;
-
-/* deduct first */
-await updateDoc(ref,{coins:coins-500});
-
-/* send to admin */
-await addDoc(collection(db,"withdrawals"),{
-uid:user.uid,
-email:user.email,
-wallet:wallet,
-amount:500,
-status:"pending",
-time:Date.now()
-});
-
-/* ALSO send free section copy (admin requirement) */
-await addDoc(collection(db,"cryptomice_free_withdrawals"),{
-uid:user.uid,
-email:user.email,
-wallet:wallet,
-amount:500,
-status:"pending",
-time:Date.now()
-});
-
-withdrawLock=false;
-
-loadBalance();
-alert("Withdrawal sent (500 deducted)");
-};
-
-</script>
-
-</body>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Cryptomice Earn System</title>  
+  
+<style>  
+body{margin:0;background:#050812;color:white;font-family:Arial;}  
+.header{text-align:center;padding:20px;background:#0b1220;}  
+.logo{color:#facc15;font-size:28px;font-weight:bold;}  
+
+/* NEW CONVERSION BAR */  
+.convert{  
+text-align:center;  
+padding:10px;  
+background:#0f172a;  
+font-size:13px;  
+color:#facc15;  
+border-bottom:1px solid rgba(255,255,255,0.08);  
+}  
+  
+.box{margin:20px;padding:20px;background:#111827;border-radius:16px;}  
+.balance{font-size:34px;color:#facc15;}  
+  
+.task{margin:20px;padding:20px;background:#0f172a;border-radius:16px;}  
+  
+.small{font-size:13px;color:#9ca3af;}  
+  
+.btn{  
+width:100%;  
+padding:14px;  
+border:none;  
+border-radius:12px;  
+background:linear-gradient(90deg,#facc15,#fde047);  
+font-weight:bold;  
+cursor:pointer;  
+margin-top:10px;  
+color:#050812;  
+}  
+  
+#loading{  
+text-align:center;  
+padding:40px;  
+color:#9ca3af;  
+}  
+  
+#app{display:none;}  
+  
+input{  
+width:100%;  
+padding:12px;  
+margin-top:10px;  
+border-radius:10px;  
+border:none;  
+background:#0b1220;  
+color:white;  
+}  
+</style>  
+</head>  
+  
+<body>  
+  
+<div id="loading">Loading Cryptomice...</div>  
+  
+<div id="app">  
+  
+<div class="header">  
+<div class="logo">🐭 Cryptomice Earn</div>  
+</div>  
+
+<!-- NEW CONVERSION SCALE -->  
+<div class="convert">  
+1 Mice Coin = 0.00044 LTC  
+</div>  
+  
+<div class="box">  
+<div>Balance</div>  
+<div class="balance" id="balance">0 Mice Coins</div>  
+</div>  
+  
+<div class="task">  
+<h3>🎯 Earn Ads</h3>  
+<div class="small">Watch 8–15 seconds to earn 0.002 Mice Coins</div>  
+<button class="btn" onclick="startAd()">START AD</button>  
+</div>  
+  
+<div class="task">  
+<h3>🎮 Offer Wall</h3>  
+<div class="small">Surveys, installs & games</div>  
+<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>  
+</div>  
+  
+<div class="task">  
+<h3>🚰 Faucet</h3>  
+<div class="small">Claim 1.6 Mice Coins every 2 hours</div>  
+<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>  
+</div>  
+  
+<div class="task">  
+<h3>💸 Withdraw</h3>  
+<div class="small">Minimum 1000 Mice Coins</div>  
+  
+<input id="wallet" placeholder="Enter Litecoin wallet">  
+  
+<button class="btn" onclick="withdraw()">WITHDRAW</button>  
+</div>  
+  
+</div>  
+  
+<script type="module">  
+  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
+import {  
+getAuth,  
+onAuthStateChanged,  
+setPersistence,  
+browserLocalPersistence  
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";  
+  
+import {  
+getFirestore,  
+doc,  
+getDoc,  
+setDoc,  
+updateDoc,  
+addDoc,  
+collection  
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
+  
+const firebaseConfig = {  
+apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",  
+authDomain: "cryptomice-free-section.firebaseapp.com",  
+projectId: "cryptomice-free-section",  
+storageBucket: "cryptomice-free-section.firebasestorage.app",  
+messagingSenderId: "185364902129",  
+appId: "1:185364902129:web:51953cbb27278fb05ef950"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const auth = getAuth(app);  
+const db = getFirestore(app);  
+  
+await setPersistence(auth, browserLocalPersistence);  
+  
+let user=null;  
+let active=false;  
+let start=0;  
+let lastAd=0;  
+let withdrawLock=false;  
+  
+onAuthStateChanged(auth, async (u)=>{  
+  
+if(!u){  
+location.replace("auth.html");  
+return;  
+}  
+  
+user=u;  
+  
+const ref=doc(db,"users",user.uid);  
+const snap=await getDoc(ref);  
+  
+if(!snap.exists()){  
+await setDoc(ref,{  
+coins:0,  
+lastFaucet:0  
+});  
+}  
+  
+document.getElementById("loading").style.display="none";  
+document.getElementById("app").style.display="block";  
+  
+loadBalance();  
+  
+});  
+  
+async function loadBalance(){  
+const ref=doc(db,"users",user.uid);  
+const snap=await getDoc(ref);  
+  
+document.getElementById("balance").innerText =  
+(snap.data()?.coins||0)+" Mice Coins";  
+}  
+  
+async function reward(amount){  
+const ref=doc(db,"users",user.uid);  
+const snap=await getDoc(ref);  
+  
+let c=snap.data().coins||0;  
+c+=amount;  
+  
+await updateDoc(ref,{coins:c});  
+loadBalance();  
+}  
+  
+const ads=[  
+"https://wrathful-piano.com/VFOZNk",  
+"https://wrathful-piano.com/rIiayv",  
+"https://thoroughgear.com/jVLBPd",  
+"https://thoroughgear.com/TpOLka"  
+];  
+  
+window.startAd=function(){  
+  
+if(Date.now()-lastAd<30000){  
+alert("Cooldown active");  
+return;  
+}  
+  
+window.open(ads[Math.floor(Math.random()*ads.length)],"_blank");  
+  
+active=true;  
+start=Date.now();  
+lastAd=Date.now();  
+  
+alert("Watch 8–15 seconds");  
+};  
+  
+document.addEventListener("visibilitychange",async()=>{  
+  
+if(document.visibilityState==="visible"&&active){  
+  
+active=false;  
+  
+let t=(Date.now()-start)/1000;  
+  
+if(t<8){  
+alert("Invalid session");  
+return;  
+}  
+  
+await reward(0.002);  
+alert("+0.002 Mice Coins");  
+}  
+  
+});  
+  
+window.openOfferWall=function(){  
+location.href="rewards.html";  
+};  
+  
+window.claimFaucet=async function(){  
+  
+const ref=doc(db,"users",user.uid);  
+const snap=await getDoc(ref);  
+  
+let d=snap.data();  
+let now=Date.now();  
+  
+if(now-(d.lastFaucet||0)<7200000){  
+alert("Wait 2 hours");  
+return;  
+}  
+  
+await updateDoc(ref,{  
+coins:(d.coins||0)+1.6,  
+lastFaucet:now  
+});  
+  
+loadBalance();  
+alert("+1.6 Mice Coins");  
+};  
+  
+window.withdraw=async function(){  
+  
+if(withdrawLock) return;  
+  
+let wallet=document.getElementById("wallet").value;  
+if(!wallet){  
+alert("Enter wallet");  
+return;  
+}  
+  
+const ref=doc(db,"users",user.uid);  
+const snap=await getDoc(ref);  
+  
+let coins=snap.data().coins||0;  
+  
+if(coins<1000){  
+alert("Minimum 1000 required");  
+return;  
+}  
+  
+withdrawLock=true;  
+  
+await updateDoc(ref,{coins:coins-1000});  
+  
+await addDoc(collection(db,"withdrawals"),{  
+uid:user.uid,  
+email:user.email,  
+wallet:wallet,  
+amount:1000,  
+status:"pending",  
+time:Date.now()  
+});  
+  
+await addDoc(collection(db,"cryptomice_free_withdrawals"),{  
+uid:user.uid,  
+email:user.email,  
+wallet:wallet,  
+amount:1000,  
+status:"pending",  
+time:Date.now()  
+});  
+  
+withdrawLock=false;  
+  
+loadBalance();  
+alert("Withdrawal sent (1000 deducted)");  
+};  
+  
+</script>  
+  
+</body>  
   </html>
