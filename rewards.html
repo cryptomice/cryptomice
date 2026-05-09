@@ -314,43 +314,19 @@ document.getElementById("balance").innerText =
 
 }
 
-/* OPEN BITLABS */
+/* OPEN OFFER WALL */
 window.openBitlabs = function(){
 
-/* REPLACE WITH YOUR REAL BITLABS LINK */
-const bitlabsOfferwallURL =
-"https://YOUR-BITLABS-OFFERWALL-LINK";
-
-window.open(bitlabsOfferwallURL,"_blank");
+location.href =
+"https://cryptomice.github.io/cryptomice/coming-soon.html";
 
 };
 
 /* BONUS TASK */
-let lastBonus = 0;
+window.bonusTask = function(){
 
-window.bonusTask = async function(){
-
-if(Date.now() - lastBonus < 30000){
-alert("Wait before doing another bonus task");
-return;
-}
-
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
-let coins = snap.data()?.coins || 0;
-
-coins += 10;
-
-await updateDoc(ref,{
-coins:coins
-});
-
-lastBonus = Date.now();
-
-loadBalance();
-
-alert("+10 Coins Added");
+location.href =
+"https://cryptomice.github.io/cryptomice/coming-soon.html";
 
 };
 
