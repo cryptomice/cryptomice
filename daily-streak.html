@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="referrer" content="no-referrer-when-downgrade" />
-
 <title>Cryptomice Daily Streak</title>
 
 <style>
@@ -212,16 +210,14 @@ OPEN EARN PAGE
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 getAuth,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence
-}
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
 getFirestore,
@@ -229,8 +225,7 @@ doc,
 getDoc,
 setDoc,
 updateDoc
-}
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
 const firebaseConfig = {
@@ -251,7 +246,7 @@ await setPersistence(auth, browserLocalPersistence);
 let user = null;
 
 const DAILY_REWARD = 16;
-const DAILY_COOLDOWN = 86400000; // 24 hours
+const DAILY_COOLDOWN = 86400000;
 
 /* AUTH */
 onAuthStateChanged(auth, async (u)=>{
@@ -266,16 +261,14 @@ user = u;
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-/* CREATE USER */
+/* CREATE USER (ONLY OWN DOC) */
 if(!snap.exists()){
-
 await setDoc(ref,{
 email:user.email,
 coins:0,
 lastClaim:0,
 lastFaucet:0
 });
-
 }
 
 document.getElementById("loading").style.display = "none";
@@ -286,79 +279,71 @@ checkCooldown();
 
 });
 
-/* LOAD BALANCE */
+/* BALANCE */
 async function loadBalance(){
+
+if(!user) return;
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
+if(!snap.exists()) return;
+
 document.getElementById("balance").innerText =
-(Number(snap.data()?.coins || 0).toFixed(4)) + " Mice Coins";
+(snap.data().coins || 0) + " Mice Coins";
 
 }
 
-/* DAILY CLAIM */
+/* CLAIM */
 window.claimDaily = async function(){
 
+if(!user) return;
+
 const btn = document.getElementById("claimBtn");
-
 btn.disabled = true;
-
-try{
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data() || {};
+if(!snap.exists()){
+alert("User not initialized");
+return;
+}
+
+const data = snap.data();
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
 
-/* CHECK TIME */
 if(now - lastClaim < DAILY_COOLDOWN){
-
 alert("Daily reward already claimed.");
-
 checkCooldown();
-
-btn.disabled = false;
-
 return;
 }
 
-/* ADD FIXED 16 */
-const newCoins = Number(data.coins || 0) + DAILY_REWARD;
-
 await updateDoc(ref,{
-coins:newCoins,
+coins:(data.coins || 0) + DAILY_REWARD,
 lastClaim:now
 });
 
 await loadBalance();
 
 alert("+16 Mice Coins");
-
 checkCooldown();
-
-}catch(e){
-
-console.error(e);
-
-alert("Failed to claim reward");
-
-btn.disabled = false;
-
-}
 
 };
 
 /* COOLDOWN */
 async function checkCooldown(){
 
+if(!user) return;
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data() || {};
+if(!snap.exists()) return;
+
+const data = snap.data();
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
@@ -369,30 +354,23 @@ const timer = document.getElementById("timer");
 const remaining = DAILY_COOLDOWN - (now - lastClaim);
 
 if(remaining <= 0){
-
 btn.disabled = false;
-
-timer.innerText =
-"You can claim your 16 Mice Coins now.";
-
+timer.innerText = "You can claim your 16 Mice Coins now.";
 return;
 }
 
-/* LOCK BUTTON */
 btn.disabled = true;
 
 const hours = Math.floor(remaining / 3600000);
 const minutes = Math.floor((remaining % 3600000) / 60000);
 
-timer.innerText =
-"Next claim in " + hours + "h " + minutes + "m";
+timer.innerText = "Next claim in " + hours + "h " + minutes + "m";
 
 }
 
-/* AUTO UPDATE TIMER */
 setInterval(checkCooldown,60000);
 
-/* NAVIGATION */
+/* NAV */
 window.goEarn = function(){
 location.href = "earn.html";
 };
