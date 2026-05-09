@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
 <title>Cryptomice Daily Streak</title>
 
 <style>
@@ -276,7 +278,6 @@ lastFaucet:0
 
 }
 
-/* SHOW PAGE */
 document.getElementById("loading").style.display = "none";
 document.getElementById("app").style.display = "block";
 
@@ -292,7 +293,7 @@ const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(snap.data()?.coins || 0) + " Mice Coins";
+(Number(snap.data()?.coins || 0).toFixed(4)) + " Mice Coins";
 
 }
 
@@ -303,10 +304,12 @@ const btn = document.getElementById("claimBtn");
 
 btn.disabled = true;
 
+try{
+
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data();
+const data = snap.data() || {};
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
@@ -318,11 +321,13 @@ alert("Daily reward already claimed.");
 
 checkCooldown();
 
+btn.disabled = false;
+
 return;
 }
 
 /* ADD FIXED 16 */
-const newCoins = (data.coins || 0) + DAILY_REWARD;
+const newCoins = Number(data.coins || 0) + DAILY_REWARD;
 
 await updateDoc(ref,{
 coins:newCoins,
@@ -335,6 +340,16 @@ alert("+16 Mice Coins");
 
 checkCooldown();
 
+}catch(e){
+
+console.error(e);
+
+alert("Failed to claim reward");
+
+btn.disabled = false;
+
+}
+
 };
 
 /* COOLDOWN */
@@ -343,7 +358,7 @@ async function checkCooldown(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data();
+const data = snap.data() || {};
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
@@ -389,4 +404,4 @@ location.href = "rewards.html";
 </script>
 
 </body>
-</html>
+  </html>
