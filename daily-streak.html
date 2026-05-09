@@ -1,43 +1,54 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cryptomice Daily Streak</title><style>
-body{
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cryptomice Daily Streak</title>
+
+<style>
+
+*{
 margin:0;
-font-family:Arial,sans-serif;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
 background:#050812;
+font-family:Arial,sans-serif;
 color:white;
 }
 
 .header{
-padding:15px 20px;
+padding:20px;
 text-align:center;
 background:#0b1220;
 border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .logo{
-font-size:24px;
+font-size:28px;
 font-weight:bold;
 color:#facc15;
 }
 
 .nav{
-margin-top:10px;
+margin-top:14px;
 display:flex;
-gap:10px;
 justify-content:center;
+gap:10px;
 flex-wrap:wrap;
 }
 
-.nav a{
-text-decoration:none;
-color:#d1d5db;
-background:#111827;
-padding:8px 12px;
+.nav button{
+padding:10px 14px;
+border:none;
 border-radius:10px;
+background:#111827;
+color:white;
+cursor:pointer;
 font-size:13px;
-border:1px solid rgba(255,255,255,0.05);
 }
 
 .container{
@@ -48,30 +59,32 @@ margin:auto;
 
 .card{
 background:#111827;
-padding:18px;
+padding:20px;
 border-radius:18px;
-margin-bottom:15px;
+margin-bottom:18px;
 border:1px solid rgba(255,255,255,0.05);
 }
 
 .balance{
-font-size:32px;
-color:#facc15;
+font-size:34px;
 font-weight:bold;
+color:#facc15;
+margin-top:8px;
 }
 
 .title{
 font-size:18px;
-margin-bottom:10px;
 font-weight:bold;
+margin-bottom:10px;
 }
 
 .small{
 font-size:13px;
 color:#9ca3af;
+line-height:1.6;
 }
 
-button{
+.btn{
 width:100%;
 padding:14px;
 border:none;
@@ -79,140 +92,301 @@ border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
-margin-top:10px;
+margin-top:14px;
+color:#050812;
+font-size:15px;
 }
 
-button:disabled{
+.btn:disabled{
 opacity:0.5;
 cursor:not-allowed;
 }
 
-.badge{
-display:inline-block;
-padding:5px 10px;
-background:#0b1220;
-border-radius:50px;
-font-size:12px;
-margin-right:5px;
-color:#d1d5db;
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
 }
-</style></head><body><div class="header">
-<div class="logo">🐭 Cryptomice Daily Streak</div><div class="nav">
-<a href="https://cryptomice.github.io/cryptomice/earn.html">Earn Page</a>
-<a href="https://cryptomice.github.io/cryptomice/rewards.html">Rewards</a>
-</div></div><div class="container"><div class="card">
-<div class="small">Your Balance</div>
-<div class="balance" id="balance">Loading...</div>
-</div><!-- DAILY STREAK --><div class="card">
-<div class="title">🔥 Daily Streak Reward</div>
-<div class="small">Claim your fixed daily reward of 16 Mice Coins every 24 hours.</div>
-<button id="claimBtn" onclick="claimDaily()">Claim 16 Coins</button>
-<div class="small" id="timer" style="margin-top:10px;"></div>
-</div><!-- NAV BUTTON --><div class="card">
-<div class="title">🚀 Go to Earn Page</div>
-<div class="small">Continue earning more Mice Coins through offers and tasks.</div>
-<button onclick="goEarn()">Open Earn Page</button>
-</div></div><script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+#app{
+display:none;
+}
 
+.timer{
+margin-top:12px;
+font-size:14px;
+color:#facc15;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="loading">
+Loading Daily Streak...
+</div>
+
+<div id="app">
+
+<div class="header">
+
+<div class="logo">
+🐭 Cryptomice Daily Streak
+</div>
+
+<div class="nav">
+
+<button onclick="goEarn()">
+Earn Page
+</button>
+
+<button onclick="goRewards()">
+Rewards Hub
+</button>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<!-- BALANCE -->
+<div class="card">
+
+<div class="small">
+Your Balance
+</div>
+
+<div class="balance" id="balance">
+0 Mice Coins
+</div>
+
+</div>
+
+<!-- DAILY CLAIM -->
+<div class="card">
+
+<div class="title">
+📅 Daily Reward
+</div>
+
+<div class="small">
+Claim a fixed reward of 16 Mice Coins every 24 hours.
+No bonuses. No multipliers.
+</div>
+
+<button class="btn" id="claimBtn" onclick="claimDaily()">
+CLAIM 16 MICE COINS
+</button>
+
+<div class="timer" id="timer">
+Checking availability...
+</div>
+
+</div>
+
+<!-- RETURN -->
+<div class="card">
+
+<div class="title">
+🚀 Continue Earning
+</div>
+
+<div class="small">
+Go back to the main earning system and continue earning Mice Coins.
+</div>
+
+<button class="btn" onclick="goEarn()">
+OPEN EARN PAGE
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+getAuth,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE */
 const firebaseConfig = {
-apiKey: "YOUR_API_KEY",
+apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
 projectId: "cryptomice-free-section",
 storageBucket: "cryptomice-free-section.firebasestorage.app",
 messagingSenderId: "185364902129",
-appId: "YOUR_APP_ID"
+appId: "1:185364902129:web:51953cbb27278fb05ef950"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+await setPersistence(auth, browserLocalPersistence);
+
 let user = null;
-const REWARD = 16;
-const COOLDOWN = 24 * 60 * 60 * 1000;
 
+const DAILY_REWARD = 16;
+const DAILY_COOLDOWN = 86400000; // 24 hours
+
+/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
-if(!u){ window.location.href="auth.html"; return; }
-user = u;
-await ensureUser();
-loadData();
-});
 
-async function ensureUser(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-if(!snap.exists()){
-await setDoc(ref,{ email:user.email, coins:0, lastClaim:0 });
-}
-}
-
-async function loadData(){
-await loadBalance();
-await updateTimer();
-}
-
-async function loadBalance(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-document.getElementById("balance").innerText = (snap.data()?.coins || 0) + " Mice Coins";
-}
-
-window.claimDaily = async function(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-const data = snap.data();
-
-const now = Date.now();
-const last = data.lastClaim || 0;
-
-if(now - last < COOLDOWN){
-alert("You already claimed today. Come back later.");
+if(!u){
+location.replace("auth.html");
 return;
 }
 
-const newCoins = (data.coins || 0) + REWARD;
+user = u;
 
-await updateDoc(ref,{ coins:newCoins, lastClaim:now });
-
-loadBalance();
-updateTimer();
-
-alert("You received 16 Mice Coins!");
-};
-
-window.goEarn = function(){
-window.location.href = "https://cryptomice.github.io/cryptomice/earn.html";
-};
-
-async function updateTimer(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
-const last = snap.data()?.lastClaim || 0;
+
+/* CREATE USER */
+if(!snap.exists()){
+
+await setDoc(ref,{
+email:user.email,
+coins:0,
+lastClaim:0,
+lastFaucet:0
+});
+
+}
+
+/* SHOW PAGE */
+document.getElementById("loading").style.display = "none";
+document.getElementById("app").style.display = "block";
+
+loadBalance();
+checkCooldown();
+
+});
+
+/* LOAD BALANCE */
+async function loadBalance(){
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+document.getElementById("balance").innerText =
+(snap.data()?.coins || 0) + " Mice Coins";
+
+}
+
+/* DAILY CLAIM */
+window.claimDaily = async function(){
+
+const btn = document.getElementById("claimBtn");
+
+btn.disabled = true;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+const data = snap.data();
+
 const now = Date.now();
+const lastClaim = data.lastClaim || 0;
+
+/* CHECK TIME */
+if(now - lastClaim < DAILY_COOLDOWN){
+
+alert("Daily reward already claimed.");
+
+checkCooldown();
+
+return;
+}
+
+/* ADD FIXED 16 */
+const newCoins = (data.coins || 0) + DAILY_REWARD;
+
+await updateDoc(ref,{
+coins:newCoins,
+lastClaim:now
+});
+
+await loadBalance();
+
+alert("+16 Mice Coins");
+
+checkCooldown();
+
+};
+
+/* COOLDOWN */
+async function checkCooldown(){
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+const data = snap.data();
+
+const now = Date.now();
+const lastClaim = data.lastClaim || 0;
 
 const btn = document.getElementById("claimBtn");
 const timer = document.getElementById("timer");
 
-if(now - last >= COOLDOWN){
+const remaining = DAILY_COOLDOWN - (now - lastClaim);
+
+if(remaining <= 0){
+
 btn.disabled = false;
-timer.innerText = "You can claim now.";
+
+timer.innerText =
+"You can claim your 16 Mice Coins now.";
+
 return;
 }
 
+/* LOCK BUTTON */
 btn.disabled = true;
-const remaining = COOLDOWN - (now - last);
 
-const hrs = Math.floor(remaining / 3600000);
-const mins = Math.floor((remaining % 3600000) / 60000);
+const hours = Math.floor(remaining / 3600000);
+const minutes = Math.floor((remaining % 3600000) / 60000);
 
-timer.innerText = `Next claim in ${hrs}h ${mins}m`;
+timer.innerText =
+"Next claim in " + hours + "h " + minutes + "m";
+
 }
 
-setInterval(updateTimer, 60000);
+/* AUTO UPDATE TIMER */
+setInterval(checkCooldown,60000);
 
-</script></body>
-  </html>
+/* NAVIGATION */
+window.goEarn = function(){
+location.href = "earn.html";
+};
+
+window.goRewards = function(){
+location.href = "rewards.html";
+};
+
+</script>
+
+</body>
+</html>
