@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="referrer" content="no-referrer-when-downgrade" />
-
 <title>Cryptomice Daily Streak</title>
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
 
 <style>
 
@@ -278,11 +278,12 @@ lastFaucet:0
 
 }
 
+/* SHOW PAGE */
 document.getElementById("loading").style.display = "none";
 document.getElementById("app").style.display = "block";
 
-loadBalance();
-checkCooldown();
+await loadBalance();
+await checkCooldown();
 
 });
 
@@ -300,16 +301,16 @@ document.getElementById("balance").innerText =
 /* DAILY CLAIM */
 window.claimDaily = async function(){
 
+try{
+
 const btn = document.getElementById("claimBtn");
 
 btn.disabled = true;
 
-try{
-
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data() || {};
+const data = snap.data();
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
@@ -319,15 +320,15 @@ if(now - lastClaim < DAILY_COOLDOWN){
 
 alert("Daily reward already claimed.");
 
-checkCooldown();
-
-btn.disabled = false;
+await checkCooldown();
 
 return;
 }
 
 /* ADD FIXED 16 */
-const newCoins = Number(data.coins || 0) + DAILY_REWARD;
+const currentCoins = Number(data.coins || 0);
+
+const newCoins = currentCoins + DAILY_REWARD;
 
 await updateDoc(ref,{
 coins:newCoins,
@@ -336,17 +337,17 @@ lastClaim:now
 
 await loadBalance();
 
-alert("+16 Mice Coins");
+alert("+16 Mice Coins credited successfully");
 
-checkCooldown();
+await checkCooldown();
 
-}catch(e){
+}catch(err){
 
-console.error(e);
+console.error(err);
 
 alert("Failed to claim reward");
 
-btn.disabled = false;
+document.getElementById("claimBtn").disabled = false;
 
 }
 
@@ -358,7 +359,7 @@ async function checkCooldown(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-const data = snap.data() || {};
+const data = snap.data();
 
 const now = Date.now();
 const lastClaim = data.lastClaim || 0;
