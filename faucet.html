@@ -22,7 +22,7 @@ border-bottom:1px solid rgba(255,255,255,0.08);
 
 .logo{
 color:#facc15;
-font-size:26px;
+font-size:28px;
 font-weight:bold;
 }
 
@@ -31,19 +31,18 @@ margin:20px;
 padding:20px;
 background:#111827;
 border-radius:16px;
+text-align:center;
 }
 
 .balance{
-font-size:32px;
+font-size:34px;
 color:#facc15;
-text-align:center;
 }
 
 .small{
-text-align:center;
 font-size:13px;
 color:#9ca3af;
-margin-top:8px;
+margin-top:6px;
 }
 
 .btn{
@@ -54,40 +53,36 @@ border-radius:12px;
 background:linear-gradient(90deg,#facc15,#fde047);
 font-weight:bold;
 cursor:pointer;
-margin-top:15px;
+margin-top:12px;
 color:#050812;
 }
 
+.btn:disabled{
+opacity:0.5;
+cursor:not-allowed;
+}
+
 #msg{
-text-align:center;
 margin-top:10px;
 font-size:13px;
 color:#9ca3af;
 }
-
-#loading{
-text-align:center;
-padding:40px;
-color:#9ca3af;
-}
-
-#app{display:none;}
 </style>
 </head>
 
 <body>
-
-<div id="loading">Loading Faucet...</div>
-
-<div id="app">
 
 <div class="header">
 <div class="logo">🚰 Cryptomice Faucet</div>
 </div>
 
 <div class="box">
-<div class="balance" id="balance">0 Mice Coins</div>
-<div class="small">Claim 1.6 Mice Coins every 2 hours</div>
+<div class="small">Your Balance</div>
+<div class="balance" id="balance">0</div>
+
+<div class="small">
+Claim 1.6 Mice Coins every 2 hours
+</div>
 
 <button class="btn" id="claimBtn" onclick="claimFaucet()">
 CLAIM FAUCET
@@ -96,26 +91,10 @@ CLAIM FAUCET
 <div id="msg"></div>
 </div>
 
-<div class="box">
-<button class="btn" onclick="smartNavigate('earn.html')">
-BACK TO EARN
-</button>
-</div>
-
-</div>
-
-<!-- SMARTLINK SYSTEM -->
-<script src="smartlink.js"></script>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-getAuth,
-onAuthStateChanged,
-setPersistence,
-browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
 getFirestore,
@@ -125,7 +104,6 @@ setDoc,
 updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE CONFIG */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -139,14 +117,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-await setPersistence(auth, browserLocalPersistence);
-
 let user = null;
-
 const FAUCET_REWARD = 1.6;
 const COOLDOWN = 2 * 60 * 60 * 1000;
 
-/* AUTH CHECK */
 onAuthStateChanged(auth, async (u)=>{
 
 if(!u){
@@ -166,24 +140,19 @@ lastFaucet:0
 });
 }
 
-document.getElementById("loading").style.display="none";
-document.getElementById("app").style.display="block";
-
 loadBalance();
 checkCooldown();
 
 });
 
-/* LOAD BALANCE */
 async function loadBalance(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
-(Number(snap.data()?.coins || 0).toFixed(4)) + " Mice Coins";
+(Number(snap.data()?.coins||0)) + " Mice Coins";
 }
 
-/* FAUCET CLAIM */
 window.claimFaucet = async function(){
 
 const ref = doc(db,"users",user.uid);
@@ -192,57 +161,43 @@ const snap = await getDoc(ref);
 const data = snap.data();
 const now = Date.now();
 
-const msg = document.getElementById("msg");
-const btn = document.getElementById("claimBtn");
-
 if(now - (data.lastFaucet || 0) < COOLDOWN){
-msg.innerText = "⏳ You already claimed. Wait for cooldown.";
+document.getElementById("msg").innerText =
+"❌ Wait for cooldown to finish";
 return;
 }
-
-btn.disabled = true;
-msg.innerText = "Processing reward...";
 
 let newCoins = (data.coins || 0) + FAUCET_REWARD;
 
 await updateDoc(ref,{
-coins:newCoins,
-lastFaucet:now
+coins: newCoins,
+lastFaucet: now
 });
 
-msg.innerText = "+1.6 Mice Coins added!";
-loadBalance();
+document.getElementById("balance").innerText =
+newCoins + " Mice Coins";
 
-checkCooldown();
+document.getElementById("msg").innerText =
+"✅ +1.6 Mice Coins claimed!";
+};
 
-}
-
-/* COOLDOWN DISPLAY */
-function checkCooldown(){
-
-setInterval(async ()=>{
-
+async function checkCooldown(){
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
+
 const data = snap.data();
-
 const now = Date.now();
-const remaining = COOLDOWN - (now - (data.lastFaucet || 0));
 
-const btn = document.getElementById("claimBtn");
-
-if(remaining <= 0){
-btn.disabled = false;
-return;
+if(now - (data.lastFaucet || 0) < COOLDOWN){
+document.getElementById("claimBtn").disabled = true;
+} else {
+document.getElementById("claimBtn").disabled = false;
+}
 }
 
-btn.disabled = true;
-
-}, 30000);
-
-}
+setInterval(checkCooldown, 30000);
 
 </script>
 
 </body>
-  </html>
+</html>
