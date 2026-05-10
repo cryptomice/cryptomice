@@ -39,12 +39,6 @@ font-size:34px;
 color:#facc15;
 }
 
-.small{
-font-size:13px;
-color:#9ca3af;
-margin-top:6px;
-}
-
 .btn{
 width:100%;
 padding:14px;
@@ -67,28 +61,36 @@ margin-top:10px;
 font-size:13px;
 color:#9ca3af;
 }
+
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
+}
 </style>
 </head>
 
 <body>
+
+<div id="loading">Loading faucet...</div>
+
+<div id="app" style="display:none;">
 
 <div class="header">
 <div class="logo">🚰 Cryptomice Faucet</div>
 </div>
 
 <div class="box">
-<div class="small">Your Balance</div>
+<div>Your Balance</div>
 <div class="balance" id="balance">0</div>
 
-<div class="small">
-Claim 1.6 Mice Coins every 2 hours
-</div>
-
-<button class="btn" id="claimBtn" onclick="claimFaucet()">
+<button class="btn" id="claimBtn" onclick="claimFaucet()" disabled>
 CLAIM FAUCET
 </button>
 
 <div id="msg"></div>
+</div>
+
 </div>
 
 <script type="module">
@@ -118,42 +120,68 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let user = null;
-const FAUCET_REWARD = 1.6;
+
+const REWARD = 1.6;
 const COOLDOWN = 2 * 60 * 60 * 1000;
 
-onAuthStateChanged(auth, async (u)=>{
+const loading = document.getElementById("loading");
+const appUI = document.getElementById("app");
 
-if(!u){
-location.href="auth.html";
+onAuthStateChanged(auth, async (u) => {
+
+if (!u) {
+location.href = "auth.html";
 return;
 }
 
 user = u;
 
-const ref = doc(db,"users",user.uid);
+try {
+
+const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
-if(!snap.exists()){
-await setDoc(ref,{
-coins:0,
-lastFaucet:0
+if (!snap.exists()) {
+await setDoc(ref, {
+coins: 0,
+lastFaucet: 0
 });
 }
 
-loadBalance();
-checkCooldown();
+loading.style.display = "none";
+appUI.style.display = "block";
+
+await loadBalance();
+await checkCooldown();
+
+} catch (e) {
+loading.innerText = "Error loading faucet: " + e.message;
+}
 
 });
 
 async function loadBalance(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
+const snap = await getDoc(doc(db,"users",user.uid));
 document.getElementById("balance").innerText =
-(Number(snap.data()?.coins||0)) + " Mice Coins";
+(snap.data()?.coins || 0) + " Mice Coins";
+}
+
+async function checkCooldown(){
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const last = snap.data()?.lastFaucet || 0;
+const now = Date.now();
+
+const btn = document.getElementById("claimBtn");
+
+btn.disabled = (now - last < COOLDOWN);
 }
 
 window.claimFaucet = async function(){
+
+const msg = document.getElementById("msg");
+
+try {
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
@@ -162,12 +190,11 @@ const data = snap.data();
 const now = Date.now();
 
 if(now - (data.lastFaucet || 0) < COOLDOWN){
-document.getElementById("msg").innerText =
-"❌ Wait for cooldown to finish";
+msg.innerText = "❌ Wait for cooldown";
 return;
 }
 
-let newCoins = (data.coins || 0) + FAUCET_REWARD;
+const newCoins = (data.coins || 0) + REWARD;
 
 await updateDoc(ref,{
 coins: newCoins,
@@ -177,25 +204,15 @@ lastFaucet: now
 document.getElementById("balance").innerText =
 newCoins + " Mice Coins";
 
-document.getElementById("msg").innerText =
-"✅ +1.6 Mice Coins claimed!";
-};
+msg.innerText = "✅ +1.6 Mice Coins claimed!";
 
-async function checkCooldown(){
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
-const data = snap.data();
-const now = Date.now();
-
-if(now - (data.lastFaucet || 0) < COOLDOWN){
 document.getElementById("claimBtn").disabled = true;
-} else {
-document.getElementById("claimBtn").disabled = false;
-}
+
+} catch (e) {
+msg.innerText = "❌ Error: " + e.message;
 }
 
-setInterval(checkCooldown, 30000);
+};
 
 </script>
 
