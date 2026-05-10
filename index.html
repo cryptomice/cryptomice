@@ -20,7 +20,6 @@
 <link rel="canonical" href="https://cryptomice.github.io/cryptomice/">      
 
 <style>      
-/* KEEP YOUR ORIGINAL STYLES UNCHANGED */      
 *{margin:0;padding:0;box-sizing:border-box;}      
 body{font-family:Arial;background:#03060c;color:white;overflow-x:hidden;}      
 .hero{display:flex;flex-direction:column;padding:20px;background:radial-gradient(circle at top,#0b1f3a,#03060c);}      
@@ -42,7 +41,6 @@ body{font-family:Arial;background:#03060c;color:white;overflow-x:hidden;}
 .feature{display:flex;margin-bottom:15px;}      
 .icon{width:40px;height:40px;background:#111827;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:10px;color:#ffd84d;}      
 .social{text-align:center;margin:40px 20px;}      
-.footer-links{text-align:center;font-size:14px;}      
 .footer{text-align:center;font-size:12px;opacity:0.5;margin:20px;}      
 </style>      
       
@@ -61,11 +59,11 @@ body{font-family:Arial;background:#03060c;color:white;overflow-x:hidden;}
 
 <div class="buttons">      
 
-<!-- SMARTLINK SYSTEM NOW APPLIES -->      
-<button class="activate" onclick="smartGo('payment.html')">Activate Account</button>      
-<button class="login" onclick="smartGo('register.html')">Join Free Section</button>      
-<button class="login" onclick="smartGo('guide.html')">How it works</button>      
-<button class="download" onclick="openDownload()">Download App</button>      
+<!-- SMARTLINK NAVIGATION APPLIED HERE -->      
+<button class="activate" onclick="smartNavigate('payment.html')">Activate Account</button>      
+<button class="login" onclick="smartNavigate('register.html')">Join Free Section</button>      
+<button class="login" onclick="smartNavigate('guide.html')">How it works</button>      
+<button class="download" onclick="smartNavigate('download.html')">Download App</button>      
 
 <img src="file_00000000718071f6afa79b2c74eeac4a.jpg" class="hero-img">      
 
@@ -96,23 +94,8 @@ body{font-family:Arial;background:#03060c;color:white;overflow-x:hidden;}
 
 <div class="footer">© 2026 Cryptomice</div>      
 
-<!-- IMPORTANT: LOAD SMART LINK ENGINE -->
+<!-- SMART LINK ENGINE (ONLY ONCE, GLOBAL) -->
 <script src="smartlink.js"></script>
 
-<script>
-/* GLOBAL SMART NAV FUNCTION */
-function smartGo(page){
-  if(window.navigateToSmartLink){
-    window.navigateToSmartLink(page);
-  } else {
-    window.location.href = page;
-  }
-}
-
-function openDownload(){
-  smartGo("download.html");
-}
-</script>
-
 </body>      
-    </html>
+      </html>
