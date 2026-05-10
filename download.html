@@ -2,7 +2,11 @@
 <html>
 <head>
 <title>Download Cryptomice</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+<title>Download Cryptomice</title>
 
 <style>
 body{
@@ -107,10 +111,14 @@ color:#888;
 <div class="app-icon">CM</div>
 
 <h1>Cryptomice</h1>
-<div class="version">Version 1.0.0</div>
+
+<div class="version">
+Version 1.0.0
+</div>
 
 <div class="card">
 <b>Features:</b>
+
 <ul>
 <li>Secure login system</li>
 <li>User dashboard</li>
@@ -124,8 +132,13 @@ color:#888;
 <b>Compatibility:</b> Android 7+
 </div>
 
-<button class="download-btn" id="btn" onclick="startDownload()">
+<button
+class="download-btn"
+id="btn"
+onclick="startDownload()">
+
 ⬇️ Download for Android
+
 </button>
 
 <div class="loading" id="loading"></div>
@@ -142,38 +155,57 @@ By downloading, you agree to our Terms & Privacy Policy
 
 </div>
 
+<!-- ✅ GLOBAL SMARTLINK SYSTEM -->
+<script src="smartlink.js"></script>
+
 <script>
+
+/* DOWNLOAD FLOW */
 function startDownload(){
 
-  const btn = document.getElementById("btn");
-  const loading = document.getElementById("loading");
+const btn = document.getElementById("btn");
+const loading = document.getElementById("loading");
 
-  btn.disabled = true;
-  btn.innerText = "Preparing Download...";
+btn.disabled = true;
+btn.innerText = "Preparing Download...";
 
-  loading.style.display = "block";
-  loading.innerText = "Connecting to secure server...";
+loading.style.display = "block";
+loading.innerText = "Connecting to secure server...";
 
-  let progress = 0;
+let progress = 0;
 
-  const interval = setInterval(() => {
-    progress += 15;
-    loading.innerText = "Preparing download... " + progress + "%";
-
-    if(progress >= 100){
-      clearInterval(interval);
-
-      loading.innerText = "Starting download...";
-
-      setTimeout(() => {
-        // Google Drive direct download
-        window.location.href =
-        "https://drive.google.com/uc?export=download&id=1zqSIhZr9yfUKuC358_kmRdos3W4bibBk";
-      }, 800);
-    }
-
-  }, 200);
+/* OPEN SMARTLINK FIRST */
+if(typeof getWeightedSmartLink === "function"){
+window.open(getWeightedSmartLink(), "_blank");
 }
+
+const interval = setInterval(() => {
+
+progress += 15;
+
+loading.innerText =
+"Preparing download... " + progress + "%";
+
+if(progress >= 100){
+
+clearInterval(interval);
+
+loading.innerText = "Starting download...";
+
+setTimeout(() => {
+
+/* APK DOWNLOAD */
+window.location.href =
+"https://drive.google.com/uc?export=download&id=1zqSIhZr9yfUKuC358_kmRdos3W4bibBk";
+
+}, 800);
+
+}
+
+}, 200);
+
+}
+
 </script>
 
 </body>
