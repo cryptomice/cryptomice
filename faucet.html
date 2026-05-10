@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cryptomice Faucet</title>
+
+<style>
+body{
+margin:0;
+background:#050812;
+color:white;
+font-family:Arial;
+}
+
+.header{
+text-align:center;
+padding:20px;
+background:#0b1220;
+border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+color:#facc15;
+font-size:26px;
+font-weight:bold;
+}
+
+.box{
+margin:20px;
+padding:20px;
+background:#111827;
+border-radius:16px;
+}
+
+.balance{
+font-size:32px;
+color:#facc15;
+text-align:center;
+}
+
+.small{
+text-align:center;
+font-size:13px;
+color:#9ca3af;
+margin-top:8px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#facc15,#fde047);
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+color:#050812;
+}
+
+#msg{
+text-align:center;
+margin-top:10px;
+font-size:13px;
+color:#9ca3af;
+}
+
+#loading{
+text-align:center;
+padding:40px;
+color:#9ca3af;
+}
+
+#app{display:none;}
+</style>
+</head>
+
+<body>
+
+<div id="loading">Loading Faucet...</div>
+
+<div id="app">
+
+<div class="header">
+<div class="logo">🚰 Cryptomice Faucet</div>
+</div>
+
+<div class="box">
+<div class="balance" id="balance">0 Mice Coins</div>
+<div class="small">Claim 1.6 Mice Coins every 2 hours</div>
+
+<button class="btn" id="claimBtn" onclick="claimFaucet()">
+CLAIM FAUCET
+</button>
+
+<div id="msg"></div>
+</div>
+
+<div class="box">
+<button class="btn" onclick="smartNavigate('earn.html')">
+BACK TO EARN
+</button>
+</div>
+
+</div>
+
+<!-- SMARTLINK SYSTEM -->
+<script src="smartlink.js"></script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+getAuth,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE CONFIG */
+const firebaseConfig = {
+apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
+authDomain: "cryptomice-free-section.firebaseapp.com",
+projectId: "cryptomice-free-section",
+storageBucket: "cryptomice-free-section.firebasestorage.app",
+messagingSenderId: "185364902129",
+appId: "1:185364902129:web:51953cbb27278fb05ef950"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+await setPersistence(auth, browserLocalPersistence);
+
+let user = null;
+
+const FAUCET_REWARD = 1.6;
+const COOLDOWN = 2 * 60 * 60 * 1000;
+
+/* AUTH CHECK */
+onAuthStateChanged(auth, async (u)=>{
+
+if(!u){
+location.href="auth.html";
+return;
+}
+
+user = u;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if(!snap.exists()){
+await setDoc(ref,{
+coins:0,
+lastFaucet:0
+});
+}
+
+document.getElementById("loading").style.display="none";
+document.getElementById("app").style.display="block";
+
+loadBalance();
+checkCooldown();
+
+});
+
+/* LOAD BALANCE */
+async function loadBalance(){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+document.getElementById("balance").innerText =
+(Number(snap.data()?.coins || 0).toFixed(4)) + " Mice Coins";
+}
+
+/* FAUCET CLAIM */
+window.claimFaucet = async function(){
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+const data = snap.data();
+const now = Date.now();
+
+const msg = document.getElementById("msg");
+const btn = document.getElementById("claimBtn");
+
+if(now - (data.lastFaucet || 0) < COOLDOWN){
+msg.innerText = "⏳ You already claimed. Wait for cooldown.";
+return;
+}
+
+btn.disabled = true;
+msg.innerText = "Processing reward...";
+
+let newCoins = (data.coins || 0) + FAUCET_REWARD;
+
+await updateDoc(ref,{
+coins:newCoins,
+lastFaucet:now
+});
+
+msg.innerText = "+1.6 Mice Coins added!";
+loadBalance();
+
+checkCooldown();
+
+}
+
+/* COOLDOWN DISPLAY */
+function checkCooldown(){
+
+setInterval(async ()=>{
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+const data = snap.data();
+
+const now = Date.now();
+const remaining = COOLDOWN - (now - (data.lastFaucet || 0));
+
+const btn = document.getElementById("claimBtn");
+
+if(remaining <= 0){
+btn.disabled = false;
+return;
+}
+
+btn.disabled = true;
+
+}, 30000);
+
+}
+
+</script>
+
+</body>
+  </html>
