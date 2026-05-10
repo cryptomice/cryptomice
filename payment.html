@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
 /* RESET */
 *{
 margin:0;
@@ -42,13 +41,8 @@ z-index:0;
 100%{transform:scale(1.15);}
 }
 
-/* LAYER FIX */
-body > *{
-position:relative;
-z-index:1;
-}
+body > *{position:relative;z-index:1;}
 
-/* HEADER */
 .header{
 padding:15px;
 text-align:center;
@@ -57,29 +51,24 @@ border-bottom:1px solid rgba(255,215,0,0.15);
 }
 
 .header h2{
-margin:0;
 color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
 }
 
-/* CONTAINER */
 .container{
 max-width:500px;
 margin:20px auto;
 padding:15px;
 }
 
-/* CARD */
 .card{
 background:rgba(11,18,32,0.90);
 border:1px solid rgba(255,215,0,0.15);
 border-radius:14px;
 padding:15px;
 margin-bottom:20px;
-box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-/* INPUT */
 input{
 width:100%;
 padding:13px;
@@ -88,10 +77,8 @@ border-radius:10px;
 border:1px solid rgba(255,215,0,0.18);
 background:rgba(15,23,42,0.9);
 color:white;
-font-size:14px;
 }
 
-/* BUTTONS */
 button{
 width:100%;
 padding:14px;
@@ -100,7 +87,6 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 margin-top:12px;
-display:block;
 }
 
 .primary{
@@ -113,7 +99,6 @@ background:#1f2937;
 color:white;
 }
 
-/* ADDRESS */
 .address{
 background:#0f172a;
 padding:10px;
@@ -122,20 +107,17 @@ border:1px solid rgba(255,215,0,0.15);
 word-break:break-all;
 }
 
-/* SOCIAL */
 .social{
-margin:25px 0;
 text-align:center;
+margin:25px 0;
 }
 
-/* 👇 NEW SMALL TEXT */
 .social-text{
 font-size:13px;
 opacity:0.8;
 margin-bottom:10px;
 }
 
-/* FACEBOOK BUTTON */
 .social a{
 display:inline-block;
 padding:12px 20px;
@@ -146,7 +128,6 @@ font-weight:bold;
 text-decoration:none;
 }
 
-/* FOOTER */
 .footer{
 text-align:center;
 padding:15px;
@@ -161,11 +142,6 @@ text-decoration:none;
 margin:0 5px;
 }
 
-.footer a:hover{
-text-decoration:underline;
-}
-
-/* TXID TEXT LINK */
 .txid-link{
 display:block;
 margin-top:10px;
@@ -173,7 +149,6 @@ color:#ffd84d;
 text-decoration:underline;
 font-size:13px;
 }
-
 </style>
 </head>
 
@@ -189,7 +164,7 @@ font-size:13px;
 <div class="card">
 <h3>1. Activate Access</h3>
 
-<p>Send <b>0.0364 Litecoin (LTC)</b> to platform address:</p>
+<p>Send <b>0.0364 Litecoin (LTC)</b>:</p>
 
 <div class="address">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
@@ -198,7 +173,9 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <input id="email" placeholder="Enter email">
 <input id="txid" placeholder="Enter TXID">
 
-<button id="payBtn" class="primary">Submit Payment</button>
+<button class="primary" onclick="smartGo('payment.html')">
+Submit Payment
+</button>
 
 </div>
 
@@ -206,10 +183,12 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <div class="card">
 <h3>2. Member Login</h3>
 
-<input id="loginEmail" placeholder="Email">
-<input id="loginPassword" type="password" placeholder="Password">
+<input placeholder="Email">
+<input type="password" placeholder="Password">
 
-<button id="loginBtn" class="secondary">Login</button>
+<button class="secondary" onclick="smartGo('dashboard.html')">
+Login
+</button>
 
 </div>
 
@@ -217,10 +196,7 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 <div class="card">
 <h3>3. Create Account</h3>
 
-<p>If approved, continue to signup.</p>
-
-<button class="primary"
-onclick="window.location.href='https://cryptomice.github.io/cryptomice/signup.html'">
+<button class="primary" onclick="smartGo('signup.html')">
 GO TO SIGN UP
 </button>
 
@@ -229,9 +205,7 @@ GO TO SIGN UP
 <!-- SOCIAL -->
 <div class="social">
 
-<div class="social-text">
-Join thousands talking about us
-</div>
+<div class="social-text">Join thousands talking about us</div>
 
 <a href="https://www.facebook.com/profile.php?id=61551847504420" target="_blank">
 Follow us on Facebook
@@ -243,6 +217,7 @@ Follow us on Facebook
 
 <!-- FOOTER -->
 <div class="footer">
+
 <a href="about.html">About</a> |
 <a href="terms.html">Terms</a> |
 <a href="privacy.html">Privacy</a> |
@@ -255,59 +230,18 @@ Follow us on Facebook
 
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+<!-- SMARTLINK ENGINE -->
+<script src="smartlink.js"></script>
 
-const firebaseConfig = {
-apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-authDomain: "cryptomice-635eb.firebaseapp.com",
-projectId: "cryptomice-635eb",
-storageBucket: "cryptomice-635eb.firebasestorage.app",
-messagingSenderId: "831908710470",
-appId: "1:831908710470:web:e95e1bdacb90309a046247"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* PAYMENT */
-document.getElementById("payBtn").addEventListener("click", async () => {
-
-const email = document.getElementById("email").value.trim().toLowerCase();
-const txid = document.getElementById("txid").value.trim();
-
-if(!email || !txid){
-alert("Fill all fields");
-return;
+<script>
+/* UNIVERSAL SMART NAVIGATION */
+function smartGo(page){
+  if(window.smartNavigate){
+    window.smartNavigate(page);
+  } else {
+    window.location.href = page;
+  }
 }
-
-await setDoc(doc(db,"payments",txid),{
-email,
-txid,
-status:"pending",
-createdAt:new Date()
-});
-
-alert("Payment submitted");
-});
-
-/* LOGIN */
-document.getElementById("loginBtn").addEventListener("click", async () => {
-
-const email = document.getElementById("loginEmail").value;
-const password = document.getElementById("loginPassword").value;
-
-try{
-await signInWithEmailAndPassword(auth,email,password);
-window.location.href="https://cryptomice.github.io/cryptomice/dashboard.html";
-}catch(e){
-alert(e.message);
-}
-
-});
 </script>
 
 </body>
