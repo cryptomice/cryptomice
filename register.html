@@ -105,7 +105,6 @@ Create your free account
 </div>
 
 <input type="email" id="email" placeholder="Email Address">
-
 <input type="password" id="password" placeholder="Password">
 
 <button onclick="signUp()">
@@ -119,11 +118,13 @@ Already have an account?
 
 </div>
 
+<!-- SMART LINK ENGINE -->
+<script src="smartlink.js"></script>
+
 <!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
 getAuth,
 createUserWithEmailAndPassword,
@@ -147,11 +148,9 @@ appId: "1:185364902129:web:51953cbb27278fb05ef950"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// KEEP USER LOGGED IN
 setPersistence(auth, browserLocalPersistence);
 
 // SIGNUP
@@ -165,7 +164,6 @@ alert("Please fill all fields");
 return;
 }
 
-// BASIC PASSWORD PROTECTION
 if(password.length < 6){
 alert("Password must be at least 6 characters");
 return;
@@ -174,33 +172,29 @@ return;
 try{
 
 const userCredential =
-await createUserWithEmailAndPassword(
-auth,
-email,
-password
-);
+await createUserWithEmailAndPassword(auth,email,password);
 
 const user = userCredential.user;
 
-// CREATE USER DATABASE
 await setDoc(doc(db, "users", user.uid), {
-
 email: user.email,
 coins: 0,
 tasksCompleted: 0,
 referrals: 0,
 createdAt: Date.now()
-
 });
 
 alert("Account created successfully!");
 
+// SMART NAVIGATION (NOW CONSISTENT SYSTEM)
+if(window.smartNavigate){
+smartNavigate("earn.html");
+} else {
 window.location.href = "earn.html";
+}
 
 }catch(error){
-
 alert(error.message);
-
 }
 
 };
