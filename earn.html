@@ -89,13 +89,13 @@ color:white;
 <div class="task">  
 <h3>🎮 Offer Wall</h3>  
 <div class="small">Surveys, installs & games</div>  
-<button class="btn" onclick="openOfferWall()">OPEN OFFER WALL</button>  
+<button class="btn" onclick="smartNavigate('rewards.html')">OPEN OFFER WALL</button>  
 </div>  
 
 <div class="task">  
 <h3>🚰 Faucet</h3>  
 <div class="small">Claim 1.6 Mice Coins every 2 hours</div>  
-<button class="btn" onclick="claimFaucet()">CLAIM FAUCET</button>  
+<button class="btn" onclick="smartNavigate('faucet.html')">CLAIM FAUCET</button>  
 </div>  
 
 <div class="task">  
@@ -104,10 +104,13 @@ color:white;
 
 <input id="wallet" placeholder="Enter Litecoin wallet">  
 
-<button class="btn" onclick="withdraw()">WITHDRAW</button>  
+<button class="btn" onclick="smartNavigate('withdraw.html')">WITHDRAW</button>  
 </div>  
 
 </div>  
+
+<!-- SMARTLINK ENGINE (GLOBAL SYSTEM) -->  
+<script src="smartlink.js"></script>  
 
 <script type="module">  
 
@@ -136,40 +139,6 @@ let start=0;
 let lastAd=0;  
 let withdrawLock=false;  
 
-/* SMART LINKS */  
-const SMART_LINKS = [  
-"https://omg10.com/4/10987288",
-"https://omg10.com/4/10987286",
-"https://omg10.com/4/10987290",
-"https://omg10.com/4/10987285",
-"https://omg10.com/4/10987293",
-"https://omg10.com/4/10987291",
-"https://omg10.com/4/10987289",
-"https://omg10.com/4/10987284",
-"https://omg10.com/4/10987292",
-"https://omg10.com/4/10987287"
-];
-
-let lastIndex = -1;
-
-function getSmartLink(){
-let i;
-do {
-i = Math.floor(Math.random() * SMART_LINKS.length);
-} while(i === lastIndex);
-lastIndex = i;
-return SMART_LINKS[i];
-}
-
-/* ROUTER FOR BUTTONS (EXCEPT ADS BUTTON) */
-function route(page){
-window.open(getSmartLink(), "_blank");
-setTimeout(()=>{
-window.location.href = page;
-}, 1500);
-}
-
-/* AUTH */
 onAuthStateChanged(auth, async (u)=>{  
 
 if(!u){  
@@ -212,7 +181,7 @@ await updateDoc(ref,{coins:c});
 loadBalance();  
 }  
 
-/* ❗ ADS BUTTON LEFT EXACTLY AS YOU WANTED */
+/* ❗ ADS BUTTON COMPLETELY UNTOUCHED (AS REQUESTED) */
 window.startAd=function(){  
 
 if(Date.now()-lastAd<45000){  
@@ -248,20 +217,7 @@ alert("+0.002 Mice Coins");
 
 });  
 
-/* OTHER BUTTONS ONLY */  
-window.openOfferWall=function(){  
-route("rewards.html");  
-};  
-
-window.claimFaucet=function(){  
-route("faucet.html");  
-};  
-
-window.withdraw=function(){  
-route("withdraw.html");  
-};  
-
 </script>  
 
 </body>  
-</html>
+  </html>
