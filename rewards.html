@@ -125,18 +125,11 @@ Loading Rewards Hub...
 
 <div class="container">
 
-<!-- BALANCE -->
 <div class="card">
-
 <div class="small">Your Balance</div>
-
-<div class="balance" id="balance">
-0 Mice Coins
+<div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
-</div>
-
-<!-- BITLABS -->
 <div class="card">
 
 <div class="title">
@@ -144,25 +137,22 @@ Loading Rewards Hub...
 </div>
 
 <div class="small">
-Complete surveys, gaming offers, installs and high paying tasks to earn Mice Coins instantly.
+Complete surveys, gaming offers, installs and high paying tasks.
 </div>
 
-<button class="btn" onclick="openBitlabs()">
+<button class="btn" onclick="smartNavigate('coming-soon.html')">
 OPEN OFFER WALL
 </button>
 
 <div class="section">
-
 <span class="badge">📊 Surveys</span>
 <span class="badge">🎮 Gaming Offers</span>
 <span class="badge">📱 App Installs</span>
 <span class="badge">💰 High Rewards</span>
-
 </div>
 
 </div>
 
-<!-- BONUS TASK -->
 <div class="card">
 
 <div class="title">
@@ -173,13 +163,12 @@ OPEN OFFER WALL
 Complete bonus tasks while waiting for new offers.
 </div>
 
-<button class="btn" onclick="bonusTask()">
+<button class="btn" onclick="smartNavigate('coming-soon.html')">
 COMPLETE BONUS TASK (+10)
 </button>
 
 </div>
 
-<!-- DAILY STREAK -->
 <div class="card">
 
 <div class="title">
@@ -187,16 +176,15 @@ COMPLETE BONUS TASK (+10)
 </div>
 
 <div class="small">
-Claim streak rewards every day and increase your earnings.
+Claim streak rewards every day and increase earnings.
 </div>
 
-<button class="btn" onclick="openStreak()">
+<button class="btn" onclick="smartNavigate('daily-streak.html')">
 OPEN DAILY STREAK
 </button>
 
 </div>
 
-<!-- BACK -->
 <div class="card">
 
 <div class="title">
@@ -207,7 +195,7 @@ OPEN DAILY STREAK
 Go back to the main earn page.
 </div>
 
-<button class="btn btn-dark" onclick="goEarn()">
+<button class="btn btn-dark" onclick="smartNavigate('earn.html')">
 BACK TO EARN
 </button>
 
@@ -217,29 +205,18 @@ BACK TO EARN
 
 </div>
 
+<!-- SMARTLINK ENGINE (GLOBAL ONLY) -->
+<script src="smartlink.js"></script>
+
+<!-- FIREBASE -->
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-getAuth,
-onAuthStateChanged,
-setPersistence,
-browserLocalPersistence
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-updateDoc
-}
+import { getFirestore, doc, getDoc, setDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -253,14 +230,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* KEEP LOGIN */
-setPersistence(auth, browserLocalPersistence)
-.catch(()=>{});
+await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
 let ready = false;
 
-/* FAIL SAFE */
 setTimeout(()=>{
 if(!ready){
 document.getElementById("loading").innerText =
@@ -268,7 +242,6 @@ document.getElementById("loading").innerText =
 }
 },4000);
 
-/* AUTH */
 onAuthStateChanged(auth, async (u)=>{
 
 ready = true;
@@ -284,7 +257,6 @@ const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-
 await setDoc(ref,{
 email:user.email,
 coins:0,
@@ -292,10 +264,8 @@ lastFaucet:0,
 streak:0,
 lastClaim:0
 });
-
 }
 
-/* SHOW APP */
 document.getElementById("loading").style.display = "none";
 document.getElementById("app").style.display = "block";
 
@@ -303,7 +273,6 @@ loadBalance();
 
 });
 
-/* LOAD BALANCE */
 async function loadBalance(){
 
 const ref = doc(db,"users",user.uid);
@@ -313,32 +282,6 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 
 }
-
-/* OPEN OFFER WALL */
-window.openBitlabs = function(){
-
-location.href =
-"https://cryptomice.github.io/cryptomice/coming-soon.html";
-
-};
-
-/* BONUS TASK */
-window.bonusTask = function(){
-
-location.href =
-"https://cryptomice.github.io/cryptomice/coming-soon.html";
-
-};
-
-/* DAILY STREAK */
-window.openStreak = function(){
-location.href = "daily-streak.html";
-};
-
-/* BACK */
-window.goEarn = function(){
-location.href = "earn.html";
-};
 
 </script>
 
