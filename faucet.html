@@ -62,6 +62,12 @@ font-size:13px;
 color:#9ca3af;
 }
 
+#timer{
+margin-top:10px;
+font-size:14px;
+color:#facc15;
+}
+
 #loading{
 text-align:center;
 padding:40px;
@@ -88,6 +94,7 @@ color:#9ca3af;
 CLAIM FAUCET
 </button>
 
+<div id="timer">Loading timer...</div>
 <div id="msg"></div>
 </div>
 
@@ -122,10 +129,14 @@ const db = getFirestore(app);
 let user = null;
 
 const REWARD = 1.6;
-const COOLDOWN = 2 * 60 * 60 * 1000;
+const COOLDOWN = 2 * 60 * 60 * 1000; // 2 hours
+
+let lastClaimTime = 0;
+let countdownInterval;
 
 const loading = document.getElementById("loading");
 const appUI = document.getElementById("app");
+const timerEl = document.getElementById("timer");
 
 onAuthStateChanged(auth, async (u) => {
 
@@ -135,8 +146,6 @@ return;
 }
 
 user = u;
-
-try {
 
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
@@ -152,11 +161,7 @@ loading.style.display = "none";
 appUI.style.display = "block";
 
 await loadBalance();
-await checkCooldown();
-
-} catch (e) {
-loading.innerText = "Error loading faucet: " + e.message;
-}
+await setupTimer();
 
 });
 
@@ -166,22 +171,47 @@ document.getElementById("balance").innerText =
 (snap.data()?.coins || 0) + " Mice Coins";
 }
 
-async function checkCooldown(){
-const snap = await getDoc(doc(db,"users",user.uid));
+async function setupTimer(){
 
-const last = snap.data()?.lastFaucet || 0;
+const snap = await getDoc(doc(db,"users",user.uid));
+lastClaimTime = snap.data()?.lastFaucet || 0;
+
+updateCountdown();
+countdownInterval = setInterval(updateCountdown, 1000);
+
+}
+
+function formatTime(ms){
+let total = Math.floor(ms / 1000);
+
+let h = Math.floor(total / 3600);
+let m = Math.floor((total % 3600) / 60);
+let s = total % 60;
+
+return `${h}h ${m}m ${s}s`;
+}
+
+function updateCountdown(){
+
 const now = Date.now();
+const remaining = COOLDOWN - (now - lastClaimTime);
 
 const btn = document.getElementById("claimBtn");
 
-btn.disabled = (now - last < COOLDOWN);
+if (remaining <= 0) {
+timerEl.innerText = "✅ Ready to claim";
+btn.disabled = false;
+return;
+}
+
+btn.disabled = true;
+timerEl.innerText = "⏳ Come back in " + formatTime(remaining);
+
 }
 
 window.claimFaucet = async function(){
 
 const msg = document.getElementById("msg");
-
-try {
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
@@ -189,8 +219,8 @@ const snap = await getDoc(ref);
 const data = snap.data();
 const now = Date.now();
 
-if(now - (data.lastFaucet || 0) < COOLDOWN){
-msg.innerText = "❌ Wait for cooldown";
+if (now - (data.lastFaucet || 0) < COOLDOWN){
+msg.innerText = "⏳ Come back in 2 hours";
 return;
 }
 
@@ -201,16 +231,13 @@ coins: newCoins,
 lastFaucet: now
 });
 
+lastClaimTime = now;
 document.getElementById("balance").innerText =
 newCoins + " Mice Coins";
 
 msg.innerText = "✅ +1.6 Mice Coins claimed!";
 
-document.getElementById("claimBtn").disabled = true;
-
-} catch (e) {
-msg.innerText = "❌ Error: " + e.message;
-}
+updateCountdown();
 
 };
 
