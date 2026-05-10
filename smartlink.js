@@ -1,4 +1,4 @@
-<script>
+/* SMART LINK ENGINE (GLOBAL) */
 
 const SMART_LINKS = [
 "https://omg10.com/4/10987288",
@@ -33,35 +33,41 @@ const SMART_LINKS = [
 "https://wrathful-piano.com/i1Tn5O"
 ];
 
-/* RANDOM SELECT */
+/* avoid immediate repeats */
+let lastIndex = -1;
+
 function getSmartLink(){
-return SMART_LINKS[Math.floor(Math.random() * SMART_LINKS.length)];
+let i;
+do {
+i = Math.floor(Math.random() * SMART_LINKS.length);
+} while(i === lastIndex);
+lastIndex = i;
+return SMART_LINKS[i];
 }
 
-/* CORE FUNCTION (USED BY ALL PAGES) */
+/* GLOBAL NAVIGATION (SAFE CORE) */
 window.smartNavigate = function(page){
 
 const unlock = localStorage.getItem("smartlink_unlock");
 const now = Date.now();
 
-/* If user already unlocked */
+/* if unlocked → direct navigation */
 if(unlock && now < parseInt(unlock)){
 window.location.href = page;
 return;
 }
 
-/* Save target */
+/* store destination */
 localStorage.setItem("target_page", page);
 localStorage.setItem("awaiting_return", "yes");
 
-/* OPEN SMART LINK */
+/* open smart link */
 window.open(getSmartLink(), "_blank");
 
-alert("Complete the step and return to continue.");
-
+alert("Return to continue...");
 };
 
-/* RETURN DETECTOR */
+/* RETURN DETECTOR (GLOBAL) */
 window.addEventListener("focus", () => {
 
 const waiting = localStorage.getItem("awaiting_return");
@@ -70,8 +76,8 @@ if(waiting === "yes"){
 
 localStorage.removeItem("awaiting_return");
 
-const expires = Date.now() + (10 * 60 * 1000);
-localStorage.setItem("smartlink_unlock", expires);
+const expire = Date.now() + (10 * 60 * 1000);
+localStorage.setItem("smartlink_unlock", expire);
 
 const target = localStorage.getItem("target_page") || "index.html";
 
@@ -79,5 +85,3 @@ window.location.href = target;
 }
 
 });
-
-</script>
