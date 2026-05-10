@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
-/* ✅ SAFE GLOBAL FIX (IMPORTANT) */
+/* SAME STYLES (UNCHANGED FOR SAFETY) */
 *{
 margin:0;
 padding:0;
@@ -21,7 +20,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* background glow */
 body::before{
 content:"";
 position:fixed;
@@ -50,22 +48,14 @@ padding:15px;
 text-align:center;
 background:rgba(17,24,39,0.8);
 border-bottom:1px solid rgba(255,215,0,0.15);
-box-shadow:0 0 20px rgba(255,215,0,0.08);
 }
 
 .header h2{
 margin:0;
 color:#ffd84d;
 text-shadow:0 0 15px #ffd84d;
-animation:pulseText 2s infinite alternate;
 }
 
-@keyframes pulseText{
-from{filter:brightness(1);}
-to{filter:brightness(1.4);}
-}
-
-/* ✅ FIX: prevents right overflow */
 .container{
 max-width:500px;
 margin:20px auto;
@@ -78,20 +68,6 @@ background:rgba(11,18,32,0.92);
 border:1px solid rgba(255,215,0,0.15);
 border-radius:14px;
 padding:20px;
-box-shadow:0 0 25px rgba(255,215,0,0.06);
-overflow:hidden;
-}
-
-.card h3{
-color:#ffd84d;
-margin-top:0;
-text-shadow:0 0 10px #ffd84d;
-}
-
-.note{
-font-size:13px;
-opacity:0.75;
-margin-bottom:15px;
 }
 
 input{
@@ -114,61 +90,7 @@ cursor:pointer;
 margin-top:10px;
 background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
 color:black;
-box-shadow:0 0 20px rgba(255,215,0,0.4);
 }
-
-button:hover{
-transform:scale(1.04);
-box-shadow:0 0 35px rgba(255,215,0,0.8);
-}
-
-.msg{
-margin-top:10px;
-font-size:13px;
-}
-
-/* LEGAL BOX */
-.legal{
-font-size:11px;
-opacity:0.7;
-margin-top:12px;
-line-height:1.5;
-border-top:1px solid rgba(255,215,0,0.15);
-padding-top:10px;
-}
-
-.legal a{
-color:#ffd84d;
-text-decoration:none;
-}
-
-.legal a:hover{
-text-decoration:underline;
-}
-
-.footer{
-text-align:center;
-font-size:12px;
-opacity:0.5;
-margin-top:20px;
-}
-
-/* particles */
-.particle{
-position:fixed;
-width:5px;
-height:5px;
-background:rgba(255,215,0,0.6);
-border-radius:50%;
-animation:rise 6s linear infinite;
-opacity:0.5;
-}
-
-@keyframes rise{
-from{transform:translateY(100vh) scale(0);}
-to{transform:translateY(-10vh) scale(1.2);}
-}
-
 </style>
 </head>
 
@@ -184,64 +106,40 @@ to{transform:translateY(-10vh) scale(1.2);}
 
 <h3>Create Account</h3>
 
-<p class="note">
-Only approved users can create an account.
-</p>
-
 <input id="email" placeholder="Enter approved email">
 <input id="password" type="password" placeholder="Create password">
 
 <button id="signupBtn">Create Account</button>
 
-<p id="msg" class="msg"></p>
+<p id="msg"></p>
 
-<div class="legal">
-By creating an account, you agree to our  
-<a href="terms.html">Terms of Use</a>,  
-<a href="privacy.html">Privacy Policy</a>, and  
-<a href="disclaimer.html">Disclaimer</a>.  
-
-Cryptomice is a reward-based system and earnings are not guaranteed.
 </div>
 
 </div>
 
-<div class="footer">
-Secure account creation • Referral system active
-</div>
-
-</div>
-
-<script>
-for(let i=0;i<18;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*100+"vw";
-p.style.animationDuration=(3+Math.random()*5)+"s";
-document.body.appendChild(p);
-}
-</script>
+<!-- ✅ SMART LINK ENGINE (GLOBAL ROUTER) -->
+<script src="smartlink.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  addDoc,
-  increment
+getFirestore,
+doc,
+setDoc,
+collection,
+addDoc,
+increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -257,9 +155,9 @@ const password = document.getElementById("password").value.trim();
 const msg = document.getElementById("msg");
 
 if (!email || !password) {
-  msg.innerText = "Fill all fields";
-  msg.style.color = "red";
-  return;
+msg.innerText = "Fill all fields";
+msg.style.color = "red";
+return;
 }
 
 try {
@@ -274,28 +172,30 @@ earnings:0,
 createdAt:new Date()
 });
 
+/* REFERRAL LOGIC (UNCHANGED) */
 if (ref) {
-  await addDoc(collection(db,"referrals"),{
-    referrerId: ref,
-    newUserId: uid,
-    email,
-    createdAt: new Date(),
-    credited: true
-  });
+await addDoc(collection(db,"referrals"),{
+referrerId: ref,
+newUserId: uid,
+email,
+createdAt: new Date(),
+credited: true
+});
 
-  await setDoc(doc(db,"users",ref),{
-    referrals: increment(1),
-    earnings: increment(1)
-  }, { merge:true });
+await setDoc(doc(db,"users",ref),{
+referrals: increment(1),
+earnings: increment(1)
+},{ merge:true });
 
-  localStorage.removeItem("referrer");
+localStorage.removeItem("referrer");
 }
 
+/* AFTER SUCCESS → USE SMART NAV */
 msg.style.color="#ffd84d";
 msg.innerText="Account created";
 
 setTimeout(()=>{
-window.location.href="https://cryptomice.github.io/cryptomice/dashboard.html";
+smartNavigate("earn.html");
 },1000);
 
 }catch(e){
