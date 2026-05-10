@@ -124,27 +124,18 @@ text-align:center;
 
 <body>
 
-<div id="loading">
-Loading Daily Streak...
-</div>
+<div id="loading">Loading Daily Streak...</div>
 
 <div id="app">
 
 <div class="header">
 
-<div class="logo">
-🐭 Cryptomice Daily Streak
-</div>
+<div class="logo">🐭 Cryptomice Daily Streak</div>
 
 <div class="nav">
 
-<button onclick="goEarn()">
-Earn Page
-</button>
-
-<button onclick="goRewards()">
-Rewards Hub
-</button>
+<button onclick="openLockedPage('earn.html')">Earn Page</button>
+<button onclick="openLockedPage('rewards.html')">Rewards Hub</button>
 
 </div>
 
@@ -152,53 +143,40 @@ Rewards Hub
 
 <div class="container">
 
-<!-- BALANCE -->
 <div class="card">
 
-<div class="small">
-Your Balance
-</div>
+<div class="small">Your Balance</div>
 
-<div class="balance" id="balance">
-0 Mice Coins
-</div>
+<div class="balance" id="balance">0 Mice Coins</div>
 
 </div>
 
-<!-- DAILY CLAIM -->
 <div class="card">
 
-<div class="title">
-📅 Daily Reward
-</div>
+<div class="title">📅 Daily Reward</div>
 
 <div class="small">
-Claim a fixed reward of 16 Mice Coins every 24 hours.
+Claim a fixed reward of 8 Mice Coins every 24 hours.
 No bonuses. No multipliers.
 </div>
 
 <button class="btn" id="claimBtn" onclick="claimDaily()">
-CLAIM 16 MICE COINS
+CLAIM 8 MICE COINS
 </button>
 
-<div class="timer" id="timer">
-Checking availability...
-</div>
+<div class="timer" id="timer">Checking availability...</div>
 
 </div>
 
-<!-- RETURN -->
 <div class="card">
 
-<div class="title">
-🚀 Continue Earning
-</div>
+<div class="title">🚀 Continue Earning</div>
 
 <div class="small">
 Go back to the main earning system and continue earning Mice Coins.
 </div>
 
-<button class="btn" onclick="goEarn()">
+<button class="btn" onclick="openLockedPage('earn.html')">
 OPEN EARN PAGE
 </button>
 
@@ -208,26 +186,122 @@ OPEN EARN PAGE
 
 </div>
 
+<!-- ================= SMART LINK SYSTEM ================= -->
+<script>
+
+const SMART_LINKS = [
+"https://omg10.com/4/10987288",
+"https://omg10.com/4/10987286",
+"https://omg10.com/4/10987290",
+"https://omg10.com/4/10987285",
+"https://omg10.com/4/10987293",
+"https://omg10.com/4/10987291",
+"https://omg10.com/4/10987289",
+"https://omg10.com/4/10987284",
+"https://omg10.com/4/10987292",
+"https://omg10.com/4/10987287",
+"https://www.profitablecpmratenetwork.com/s8k5ehp1?key=45d4890534ac4bbaeb9f23b2da7ae0c4",
+"https://www.profitablecpmratenetwork.com/ix64kcqv?key=513b6a1c69d3509f2f492583b4ca2e4f",
+"https://www.profitablecpmratenetwork.com/mh7etds8ti?key=e5d712029b02ef37b39eaa5a23b6d2cb",
+"https://www.profitablecpmratenetwork.com/p5hphnf9fc?key=269305bebed62f9337be731bb78da522",
+"https://www.profitablecpmratenetwork.com/eturs0ae8?key=efefb3c0c0b67d21b77a40bb5584efc6",
+"https://www.profitablecpmratenetwork.com/zh4amdhffs?key=2e6acaf3fa289c0903bebf5d0a32ccdd",
+"https://www.profitablecpmratenetwork.com/m5gndkqs2?key=377462ac4a412fbfd04b5918482fa8ae",
+"https://www.profitablecpmratenetwork.com/t5vyxa92na?key=b719961a22436d3955e425b991b75a6b",
+"https://www.profitablecpmratenetwork.com/ubwvyy95m?key=32feb6352dabaff4fedd9f7853c697f3",
+"https://www.profitablecpmratenetwork.com/mn25weh3?key=6ee72c09a76e4e690de3ab57af8977d0",
+"https://wrathful-piano.com/VFOZNk",
+"https://wrathful-piano.com/rIiayv",
+"https://thoroughgear.com/jVLBPd",
+"https://thoroughgear.com/TpOLka",
+"https://wrathful-piano.com/398aSn",
+"https://wrathful-piano.com/ibU5KJ",
+"https://thoroughgear.com/40mbTS",
+"https://thoroughgear.com/FSas0E",
+"https://wrathful-piano.com/fJDG7O",
+"https://wrathful-piano.com/i1Tn5O"
+];
+
+let lastIndex = -1;
+
+/* NON-REPEATING LINK */
+function getRandomSmartLink(){
+if(SMART_LINKS.length === 1) return SMART_LINKS[0];
+
+let index;
+do {
+index = Math.floor(Math.random() * SMART_LINKS.length);
+} while(index === lastIndex);
+
+lastIndex = index;
+return SMART_LINKS[index];
+}
+
+const ACCESS_TIME = 10 * 60 * 1000;
+
+/* ANTI-REPLAY SESSION */
+function newSessionToken(){
+return Math.random().toString(36).substring(2) + Date.now();
+}
+
+/* SMART LINK GATE */
+window.openLockedPage = function(page){
+
+const unlock = localStorage.getItem("smartlink_unlock");
+const now = Date.now();
+
+/* already unlocked */
+if(unlock && now < parseInt(unlock)){
+window.location.href = page;
+return;
+}
+
+/* prevent spam trigger */
+if(sessionStorage.getItem("active_session")){
+return;
+}
+
+sessionStorage.setItem("active_session", newSessionToken());
+
+localStorage.setItem("target_page", page);
+localStorage.setItem("awaiting_return", "yes");
+
+window.open(getRandomSmartLink(), "_blank");
+
+alert("Return back to continue access.");
+
+};
+
+/* RETURN DETECTION */
+window.addEventListener("focus", ()=>{
+
+if(localStorage.getItem("awaiting_return") === "yes"){
+
+localStorage.removeItem("awaiting_return");
+sessionStorage.removeItem("active_session");
+
+const expires = Date.now() + ACCESS_TIME;
+localStorage.setItem("smartlink_unlock", expires);
+
+const target = localStorage.getItem("target_page") || "earn.html";
+
+window.location.href = target;
+
+}
+
+});
+
+</script>
+
+<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-getAuth,
-onAuthStateChanged,
-setPersistence,
-browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
 authDomain: "cryptomice-free-section.firebaseapp.com",
@@ -245,7 +319,7 @@ await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
 
-const DAILY_REWARD = 16;
+const DAILY_REWARD = 8;
 const DAILY_COOLDOWN = 86400000;
 
 /* AUTH */
@@ -261,7 +335,6 @@ user = u;
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-/* CREATE USER (ONLY OWN DOC) */
 if(!snap.exists()){
 await setDoc(ref,{
 email:user.email,
@@ -279,44 +352,27 @@ checkCooldown();
 
 });
 
-/* BALANCE */
 async function loadBalance(){
-
-if(!user) return;
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
-
-if(!snap.exists()) return;
 
 document.getElementById("balance").innerText =
 (snap.data().coins || 0) + " Mice Coins";
 
 }
 
-/* CLAIM */
 window.claimDaily = async function(){
-
-if(!user) return;
-
-const btn = document.getElementById("claimBtn");
-btn.disabled = true;
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-if(!snap.exists()){
-alert("User not initialized");
-return;
-}
-
 const data = snap.data();
 
 const now = Date.now();
-const lastClaim = data.lastClaim || 0;
 
-if(now - lastClaim < DAILY_COOLDOWN){
-alert("Daily reward already claimed.");
+if(now - (data.lastClaim || 0) < DAILY_COOLDOWN){
+alert("Already claimed");
 checkCooldown();
 return;
 }
@@ -326,58 +382,41 @@ coins:(data.coins || 0) + DAILY_REWARD,
 lastClaim:now
 });
 
-await loadBalance();
-
-alert("+16 Mice Coins");
+loadBalance();
 checkCooldown();
+
+alert("+8 Mice Coins");
 
 };
 
-/* COOLDOWN */
 async function checkCooldown(){
-
-if(!user) return;
 
 const ref = doc(db,"users",user.uid);
 const snap = await getDoc(ref);
 
-if(!snap.exists()) return;
-
 const data = snap.data();
 
 const now = Date.now();
-const lastClaim = data.lastClaim || 0;
+const remaining = DAILY_COOLDOWN - (now - (data.lastClaim || 0));
 
 const btn = document.getElementById("claimBtn");
 const timer = document.getElementById("timer");
 
-const remaining = DAILY_COOLDOWN - (now - lastClaim);
-
 if(remaining <= 0){
 btn.disabled = false;
-timer.innerText = "You can claim your 16 Mice Coins now.";
+timer.innerText = "Ready to claim";
 return;
 }
 
 btn.disabled = true;
 
-const hours = Math.floor(remaining / 3600000);
-const minutes = Math.floor((remaining % 3600000) / 60000);
-
-timer.innerText = "Next claim in " + hours + "h " + minutes + "m";
+timer.innerText =
+Math.floor(remaining/3600000) + "h " +
+Math.floor((remaining%3600000)/60000) + "m left";
 
 }
 
 setInterval(checkCooldown,60000);
-
-/* NAV */
-window.goEarn = function(){
-location.href = "earn.html";
-};
-
-window.goRewards = function(){
-location.href = "rewards.html";
-};
 
 </script>
 
