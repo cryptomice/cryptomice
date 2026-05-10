@@ -88,7 +88,6 @@ margin-top:10px;
 .primary{
 background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
-box-shadow:0 0 20px rgba(255,215,0,0.5);
 }
 
 .secondary{
@@ -132,7 +131,7 @@ margin-top:8px;
 <div class="card">
 <div class="small">Available Earnings</div>
 <div class="balance">LTC <span id="earnings">0</span></div>
-<div class="small">User ID: ••••••• (hidden)</div>
+<div class="small">User ID hidden</div>
 </div>
 
 <div class="card">
@@ -168,6 +167,9 @@ margin-top:8px;
 <p id="withdrawMsg" class="msg"></p>
 </div>
 
+<!-- ✅ GLOBAL SMART ROUTER -->
+<script src="smartlink.js"></script>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -199,10 +201,11 @@ const db = getFirestore(app);
 let currentUID = null;
 let currentUserEmail = null;
 
+/* AUTH */
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
-window.location.href = "https://cryptomice.github.io/cryptomice/payment.html";
+smartNavigate("payment.html");
 return;
 }
 
@@ -226,10 +229,13 @@ document.getElementById("earnings").innerText = data.earnings || 0;
 });
 
 window.copyLink = function(){
-navigator.clipboard.writeText(document.getElementById("refLink").innerText);
+navigator.clipboard.writeText(
+document.getElementById("refLink").innerText
+);
 alert("Copied!");
 };
 
+/* WITHDRAW */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -261,13 +267,11 @@ msg.innerText="Insufficient balance";
 return;
 }
 
-const safeEmail = data.email || currentUserEmail || "unknown";
-
 await addDoc(collection(db,"withdrawals"),{
 userId: currentUID,
-email: safeEmail,
-amount: amount,
-wallet: wallet,
+email: data.email || currentUserEmail,
+amount,
+wallet,
 coin:"LTC",
 status:"pending",
 createdAt: serverTimestamp()
@@ -277,7 +281,8 @@ await updateDoc(userRef,{
 earnings: earnings - amount
 });
 
-document.getElementById("earnings").innerText = earnings - amount;
+document.getElementById("earnings").innerText =
+earnings - amount;
 
 msg.style.color="lime";
 msg.innerText="Withdrawal sent";
