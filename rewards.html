@@ -126,8 +126,13 @@ Loading Rewards Hub...
 <div class="container">
 
 <div class="card">
+
 <div class="small">Your Balance</div>
-<div class="balance" id="balance">0 Mice Coins</div>
+
+<div class="balance" id="balance">
+0 Mice Coins
+</div>
+
 </div>
 
 <div class="card">
@@ -140,7 +145,8 @@ Loading Rewards Hub...
 Complete surveys, gaming offers, installs and high paying tasks.
 </div>
 
-<button class="btn" onclick="smartNavigate('https://cryptomice.github.io/cryptomice/coming-soon.html')">
+<button class="btn"
+onclick="smartNavigate('https://cryptomice.github.io/cryptomice/coming-soon.html', true)">
 OPEN OFFER WALL
 </button>
 
@@ -163,7 +169,8 @@ OPEN OFFER WALL
 Sing up to maximize your earning by 50% with our partner
 </div>
 
-<button class="btn" onclick="smartNavigate('https://www.slicethepie.com/join/U6686311')">
+<button class="btn"
+onclick="smartNavigate('https://www.slicethepie.com/join/U6686311')">
 Sing up your account today
 </button>
 
@@ -179,7 +186,8 @@ Sing up your account today
 Claim streak rewards every day and increase earnings.
 </div>
 
-<button class="btn" onclick="smartNavigate('daily-streak.html')">
+<button class="btn"
+onclick="smartNavigate('daily-streak.html')">
 OPEN DAILY STREAK
 </button>
 
@@ -195,7 +203,8 @@ OPEN DAILY STREAK
 Go back to the main earn page.
 </div>
 
-<button class="btn btn-dark" onclick="smartNavigate('earn.html')">
+<button class="btn btn-dark"
+onclick="smartNavigate('earn.html')">
 BACK TO EARN
 </button>
 
@@ -212,34 +221,60 @@ BACK TO EARN
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence }
+
+import {
+getAuth,
+onAuthStateChanged,
+setPersistence,
+browserLocalPersistence
+}
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc }
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc
+}
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
+
 authDomain: "cryptomice-free-section.firebaseapp.com",
+
 projectId: "cryptomice-free-section",
+
 storageBucket: "cryptomice-free-section.firebasestorage.app",
+
 messagingSenderId: "185364902129",
+
 appId: "1:185364902129:web:51953cbb27278fb05ef950"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
+
 let ready = false;
 
 setTimeout(()=>{
+
 if(!ready){
+
 document.getElementById("loading").innerText =
 "Loading failed. Refresh page.";
+
 }
+
 },4000);
 
 onAuthStateChanged(auth, async (u)=>{
@@ -247,26 +282,39 @@ onAuthStateChanged(auth, async (u)=>{
 ready = true;
 
 if(!u){
+
 location.replace("auth.html");
+
 return;
+
 }
 
 user = u;
 
 const ref = doc(db,"users",user.uid);
+
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
+
 await setDoc(ref,{
+
 email:user.email,
+
 coins:0,
+
 lastFaucet:0,
+
 streak:0,
+
 lastClaim:0
+
 });
+
 }
 
 document.getElementById("loading").style.display = "none";
+
 document.getElementById("app").style.display = "block";
 
 loadBalance();
@@ -276,6 +324,7 @@ loadBalance();
 async function loadBalance(){
 
 const ref = doc(db,"users",user.uid);
+
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
@@ -286,4 +335,4 @@ document.getElementById("balance").innerText =
 </script>
 
 </body>
-</html>
+  </html>
