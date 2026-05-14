@@ -140,8 +140,9 @@ Loading Rewards Hub...
 Complete surveys, gaming offers, installs and high paying tasks.
 </div>
 
+<!-- UPDATED SMARTLINK BUTTON -->
 <button class="btn"
-onclick="smartNavigate('https://cryptomice.github.io/cryptomice/coming-soon.html')">
+onclick="openOfferWall()">
 OPEN OFFER WALL
 </button>
 
@@ -212,23 +213,44 @@ BACK TO EARN
 <!-- SMARTLINK ENGINE -->
 <script>
 
-function smartNavigate(url){
-
-const adLinks = [
+/* YOUR REAL SMART LINKS */
+const SMART_LINKS = [
 
 "https://wrathful-piano.com/yourlink",
 "https://thoroughgear.com/yourlink"
 
 ];
 
+/* NORMAL SMART NAVIGATION */
+function smartNavigate(url){
+
 const randomAd =
-adLinks[Math.floor(Math.random() * adLinks.length)];
+SMART_LINKS[Math.floor(Math.random() * SMART_LINKS.length)];
 
 window.open(randomAd, "_blank");
 
 setTimeout(()=>{
 
 window.location.href = url;
+
+},3000);
+
+}
+
+/* OFFER WALL SYSTEM */
+function openOfferWall(){
+
+const randomAd =
+SMART_LINKS[Math.floor(Math.random() * SMART_LINKS.length)];
+
+/* OPEN REAL SMART LINK FIRST */
+window.open(randomAd, "_blank");
+
+/* THEN GO TO COMING SOON PAGE */
+setTimeout(()=>{
+
+window.location.href =
+"https://cryptomice.github.io/cryptomice/coming-soon.html";
 
 },3000);
 
@@ -340,4 +362,4 @@ document.getElementById("balance").innerText =
 </script>
 
 </body>
-  </html>
+</html>
