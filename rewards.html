@@ -126,13 +126,8 @@ Loading Rewards Hub...
 <div class="container">
 
 <div class="card">
-
 <div class="small">Your Balance</div>
-
-<div class="balance" id="balance">
-0 Mice Coins
-</div>
-
+<div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
 <div class="card">
@@ -146,7 +141,7 @@ Complete surveys, gaming offers, installs and high paying tasks.
 </div>
 
 <button class="btn"
-onclick="smartNavigate('https://cryptomice.github.io/cryptomice/coming-soon.html', true)">
+onclick="smartNavigate('https://cryptomice.github.io/cryptomice/coming-soon.html')">
 OPEN OFFER WALL
 </button>
 
@@ -214,8 +209,32 @@ BACK TO EARN
 
 </div>
 
-<!-- SMARTLINK ENGINE (GLOBAL ONLY) -->
-<script src="smartlink.js"></script>
+<!-- SMARTLINK ENGINE -->
+<script>
+
+function smartNavigate(url){
+
+const adLinks = [
+
+"https://wrathful-piano.com/yourlink",
+"https://thoroughgear.com/yourlink"
+
+];
+
+const randomAd =
+adLinks[Math.floor(Math.random() * adLinks.length)];
+
+window.open(randomAd, "_blank");
+
+setTimeout(()=>{
+
+window.location.href = url;
+
+},3000);
+
+}
+
+</script>
 
 <!-- FIREBASE -->
 <script type="module">
@@ -239,19 +258,12 @@ setDoc
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-
 apiKey: "AIzaSyAKcPG7Iq1YkHNAGIZuvVH56AzhPgTMriY",
-
 authDomain: "cryptomice-free-section.firebaseapp.com",
-
 projectId: "cryptomice-free-section",
-
 storageBucket: "cryptomice-free-section.firebasestorage.app",
-
 messagingSenderId: "185364902129",
-
 appId: "1:185364902129:web:51953cbb27278fb05ef950"
-
 };
 
 const app = initializeApp(firebaseConfig);
@@ -263,7 +275,6 @@ const db = getFirestore(app);
 await setPersistence(auth, browserLocalPersistence);
 
 let user = null;
-
 let ready = false;
 
 setTimeout(()=>{
@@ -298,17 +309,11 @@ const snap = await getDoc(ref);
 if(!snap.exists()){
 
 await setDoc(ref,{
-
 email:user.email,
-
 coins:0,
-
 lastFaucet:0,
-
 streak:0,
-
 lastClaim:0
-
 });
 
 }
