@@ -113,9 +113,7 @@ color:#d1d5db;
 
 <body>
 
-<div id="loading">
-Loading Rewards Hub...
-</div>
+<div id="loading">Loading Rewards Hub...</div>
 
 <div id="app">
 
@@ -130,19 +128,15 @@ Loading Rewards Hub...
 <div class="balance" id="balance">0 Mice Coins</div>
 </div>
 
+<!-- ================= OFFER WALL ================= -->
 <div class="card">
-
-<div class="title">
-🔥 Earn with BitLabs Offer Wall
-</div>
+<div class="title">🔥 Earn with BitLabs Offer Wall</div>
 
 <div class="small">
 Complete surveys, gaming offers, installs and high paying tasks.
 </div>
 
-<!-- UPDATED SMARTLINK BUTTON -->
-<button class="btn"
-onclick="openOfferWall()">
+<button class="btn" onclick="smartNavigate('coming-soon.html')">
 OPEN OFFER WALL
 </button>
 
@@ -152,117 +146,137 @@ OPEN OFFER WALL
 <span class="badge">📱 App Installs</span>
 <span class="badge">💰 High Rewards</span>
 </div>
-
 </div>
 
+<!-- ================= PARTNER ================= -->
 <div class="card">
-
-<div class="title">
-🎁 Earn more with our official partner
-</div>
+<div class="title">🎁 Earn more with our official partner</div>
 
 <div class="small">
-Sing up to maximize your earning by 50% with our partner
+Sign up to maximize your earning by 50% with our partner
 </div>
 
-<button class="btn"
-onclick="smartNavigate('https://www.slicethepie.com/join/U6686311')">
-Sing up your account today
+<button class="btn" onclick="smartNavigate('https://www.slicethepie.com/join/U6686311')">
+SIGN UP YOUR ACCOUNT TODAY
 </button>
-
 </div>
 
+<!-- ================= DAILY STREAK ================= -->
 <div class="card">
-
-<div class="title">
-📅 Daily Streak
-</div>
+<div class="title">📅 Daily Streak</div>
 
 <div class="small">
 Claim streak rewards every day and increase earnings.
 </div>
 
-<button class="btn"
-onclick="smartNavigate('daily-streak.html')">
+<button class="btn" onclick="smartNavigate('daily-streak.html')">
 OPEN DAILY STREAK
 </button>
-
 </div>
 
+<!-- ================= BACK ================= -->
 <div class="card">
-
-<div class="title">
-⬅ Return
-</div>
+<div class="title">⬅ Return</div>
 
 <div class="small">
 Go back to the main earn page.
 </div>
 
-<button class="btn btn-dark"
-onclick="smartNavigate('earn.html')">
+<button class="btn btn-dark" onclick="smartNavigate('earn.html')">
 BACK TO EARN
 </button>
-
 </div>
 
 </div>
-
 </div>
 
-<!-- SMARTLINK ENGINE -->
+<!-- ================= SMARTLINK ENGINE ================= -->
 <script>
 
-/* YOUR REAL SMART LINKS */
+/* =========================
+   SMART LINKS
+   ========================= */
 const SMART_LINKS = [
-
-"https://wrathful-piano.com/yourlink",
-"https://thoroughgear.com/yourlink"
-
+"https://omg10.com/4/10987288",
+"https://omg10.com/4/10987286",
+"https://omg10.com/4/10987290",
+"https://wrathful-piano.com/VFOZNk",
+"https://thoroughgear.com/jVLBPd",
+"https://wrathful-piano.com/i1Tn5O"
 ];
 
-/* NORMAL SMART NAVIGATION */
-function smartNavigate(url){
+let lastIndex = -1;
+let recentLinks = [];
 
-const randomAd =
-SMART_LINKS[Math.floor(Math.random() * SMART_LINKS.length)];
+function getSmartLink(){
 
-window.open(randomAd, "_blank");
+let i;
+do {
+i = Math.floor(Math.random() * SMART_LINKS.length);
+} while(i === lastIndex || recentLinks.includes(i));
 
-setTimeout(()=>{
+lastIndex = i;
+recentLinks.push(i);
 
-window.location.href = url;
-
-},3000);
-
+if(recentLinks.length > 5){
+recentLinks.shift();
 }
 
-/* OFFER WALL SYSTEM */
-function openOfferWall(){
-
-const randomAd =
-SMART_LINKS[Math.floor(Math.random() * SMART_LINKS.length)];
-
-/* OPEN REAL SMART LINK FIRST */
-window.open(randomAd, "_blank");
-
-/* THEN GO TO COMING SOON PAGE */
-setTimeout(()=>{
-
-window.location.href =
-"https://cryptomice.github.io/cryptomice/coming-soon.html";
-
-},3000);
-
+return SMART_LINKS[i];
 }
+
+/* =========================
+   SMART NAVIGATION SYSTEM
+   ========================= */
+window.smartNavigate = function(page){
+
+const unlock = localStorage.getItem("smartlink_unlock");
+const now = Date.now();
+
+/* already unlocked */
+if(unlock && now < parseInt(unlock)){
+window.location.href = page;
+return;
+}
+
+/* store target */
+localStorage.setItem("target_page", page);
+localStorage.setItem("awaiting_return", "yes");
+
+/* open ad first */
+window.open(getSmartLink(), "_blank");
+
+/* return system trigger */
+alert("Return to continue access.");
+};
+
+/* =========================
+   RETURN DETECTOR
+   ========================= */
+window.addEventListener("focus", ()=>{
+
+const waiting = localStorage.getItem("awaiting_return");
+
+if(waiting === "yes"){
+
+localStorage.removeItem("awaiting_return");
+
+const expires = Date.now() + (10 * 60 * 1000);
+localStorage.setItem("smartlink_unlock", expires);
+
+const target = localStorage.getItem("target_page") || "index.html";
+
+window.location.href = target;
+}
+
+});
 
 </script>
 
-<!-- FIREBASE -->
+<!-- ================= FIREBASE (UNCHANGED) ================= -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
 getAuth,
 onAuthStateChanged,
@@ -289,9 +303,7 @@ appId: "1:185364902129:web:51953cbb27278fb05ef950"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
@@ -302,10 +314,8 @@ let ready = false;
 setTimeout(()=>{
 
 if(!ready){
-
 document.getElementById("loading").innerText =
 "Loading failed. Refresh page.";
-
 }
 
 },4000);
@@ -315,21 +325,16 @@ onAuthStateChanged(auth, async (u)=>{
 ready = true;
 
 if(!u){
-
 location.replace("auth.html");
-
 return;
-
 }
 
 user = u;
 
 const ref = doc(db,"users",user.uid);
-
 const snap = await getDoc(ref);
 
 if(!snap.exists()){
-
 await setDoc(ref,{
 email:user.email,
 coins:0,
@@ -337,11 +342,9 @@ lastFaucet:0,
 streak:0,
 lastClaim:0
 });
-
 }
 
 document.getElementById("loading").style.display = "none";
-
 document.getElementById("app").style.display = "block";
 
 loadBalance();
@@ -351,7 +354,6 @@ loadBalance();
 async function loadBalance(){
 
 const ref = doc(db,"users",user.uid);
-
 const snap = await getDoc(ref);
 
 document.getElementById("balance").innerText =
