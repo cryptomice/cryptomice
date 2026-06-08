@@ -182,7 +182,7 @@ Copy Litecoin Address
 <div class="instructions">
 <ul>
 <li>Send the required activation amount</li>
-<li>Submit correct payment proof</li>
+<li>Submit correct payment proof (TXID)</li>
 <li>Fill the confirmation form below</li>
 <li>Your account will be activated after verification</li>
 </ul>
@@ -198,7 +198,7 @@ Copy Litecoin Address
 
 <input id="phone" type="text" placeholder="Phone Number" required>
 
-<input id="txid" type="text" placeholder="Transaction ID / Reference" required>
+<input id="txid" type="text" placeholder="Transaction ID / Payment Proof" required>
 
 <textarea id="notes" rows="4" placeholder="Additional Information"></textarea>
 
@@ -237,7 +237,7 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* GLOBAL FUNCTION */
+/* PAYMENT SUBMIT */
 window.submitMoMoPayment = async function (event) {
 event.preventDefault();
 
@@ -246,8 +246,9 @@ const phone = document.getElementById("phone").value.trim();
 const txid = document.getElementById("txid").value.trim();
 const notes = document.getElementById("notes").value.trim();
 
+/* FIXED VALIDATION */
 if (!username || !phone || !txid) {
-alert("Please fill all required fields (Username, Phone, TXID).");
+alert("Please fill in Username, Phone, and Payment Proof (TXID).");
 return;
 }
 
@@ -257,6 +258,7 @@ await addDoc(collection(db, "payments"), {
 email: username,
 phone: phone,
 txid: txid,
+proof: txid,
 notes: notes || "N/A",
 method: "MoMo Zambia",
 status: "pending",
@@ -274,7 +276,6 @@ document.getElementById("notes").value = "";
 console.error(error);
 alert("Submission failed: " + error.message);
 }
-
 };
 
 window.copyAddress = function () {
@@ -282,7 +283,6 @@ const text = document.getElementById("ltcAddress").innerText;
 navigator.clipboard.writeText(text);
 alert("Litecoin address copied!");
 };
-
 </script>
 
 </body>
