@@ -125,13 +125,16 @@ cursor:pointer;
 🔄 Refresh Data
 </button>
 
+<!-- ORIGINAL PAYMENTS -->
 <h3 class="section-title">💰 Payment Requests</h3>
 <div id="payments" class="card"></div>
 
-<h3 class="section-title">💸 Withdrawals</h3>
+<!-- ORIGINAL WITHDRAWALS -->
+<h3 class="section-title">💸 Withdrawals (Main System)</h3>
 <div id="withdrawals" class="card"></div>
 
-<h3 class="section-title">🐭 Free Withdrawals</h3>
+<!-- NEW FREE SECTION -->
+<h3 class="section-title">🐭 Cryptomice Free Section Withdrawals</h3>
 <div id="freeWithdrawals" class="card"></div>
 
 <script type="module">
@@ -158,131 +161,98 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* SAFE RUNNER */
-async function safe(fn){
-try{
-await fn();
-}catch(e){
-console.error("Admin error:", e);
-}
-}
-
 /* ---------------- PAYMENTS ---------------- */
 async function loadPayments(){
-const box = document.getElementById("payments");
-if(!box) return;
-
-try{
-box.innerHTML = "";
+const container = document.getElementById("payments");
+container.innerHTML = "";
 
 const snap = await getDocs(collection(db,"payments"));
 
 if(snap.empty){
-box.innerHTML = "<div class='empty'>No payment requests</div>";
+container.innerHTML = "<div class='empty'>No payment requests</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-box.innerHTML += `
+container.innerHTML += `
 <div class="item">
-<p><b>User:</b> ${data.email || "N/A"}</p>
-<p><b>Phone:</b> ${data.phone || "N/A"}</p>
-<p><b>TXID:</b> ${data.txid || "N/A"}</p>
-<p><b>Method:</b> ${data.method || "Unknown"}</p>
-<p><b>Status:</b> ${data.status || "pending"}</p>
+<p><b>Email:</b> ${data.email}</p>
+<p><b>TXID:</b> ${data.txid}</p>
+<p>Status: ${data.status}</p>
 
-<button class="approve" onclick="approve('${d.id}')">Approve</button>
-<button class="delete" onclick="removePay('${d.id}')">Delete</button>
+<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
+<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
 </div>
 `;
 });
-}catch(e){
-box.innerHTML = "<div class='empty'>Error loading payments</div>";
-console.error(e);
-}
 }
 
-/* ---------------- WITHDRAWALS ---------------- */
+/* ---------------- MAIN WITHDRAWALS ---------------- */
 async function loadWithdrawals(){
-const box = document.getElementById("withdrawals");
-if(!box) return;
-
-try{
-box.innerHTML = "";
+const container = document.getElementById("withdrawals");
+container.innerHTML = "";
 
 const snap = await getDocs(collection(db,"withdrawals"));
 
 if(snap.empty){
-box.innerHTML = "<div class='empty'>No withdrawals</div>";
+container.innerHTML = "<div class='empty'>No withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-box.innerHTML += `
+container.innerHTML += `
 <div class="item">
 <p><b>Email:</b> ${data.email || "N/A"}</p>
-<p><b>Amount:</b> ${data.amount || "0"}</p>
-<p><b>Wallet:</b> ${data.wallet || "N/A"}</p>
-<p><b>Status:</b> ${data.status || "pending"}</p>
+<p><b>Amount:</b> ${data.amount}</p>
+<p><b>Wallet:</b> ${data.wallet || "No wallet"}</p>
 
 <button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteW('${d.id}')">Delete</button>
+<button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
 </div>
 `;
 });
-}catch(e){
-box.innerHTML = "<div class='empty'>Error loading withdrawals</div>";
-console.error(e);
-}
 }
 
-/* ---------------- FREE ---------------- */
-async function loadFree(){
-const box = document.getElementById("freeWithdrawals");
-if(!box) return;
-
-try{
-box.innerHTML = "";
+/* ---------------- FREE SECTION WITHDRAWALS ---------------- */
+async function loadFreeWithdrawals(){
+const container = document.getElementById("freeWithdrawals");
+container.innerHTML = "";
 
 const snap = await getDocs(collection(db,"cryptomice_free_withdrawals"));
 
 if(snap.empty){
-box.innerHTML = "<div class='empty'>No free withdrawals</div>";
+container.innerHTML = "<div class='empty'>No free section withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-box.innerHTML += `
+container.innerHTML += `
 <div class="item">
-<p><b>User:</b> ${data.uid || "N/A"}</p>
-<p><b>Coins:</b> ${data.amount || "0"}</p>
-<p><b>Wallet:</b> ${data.wallet || "N/A"}</p>
-<p><b>Status:</b> ${data.status || "pending"}</p>
+<p><b>User:</b> ${data.uid}</p>
+<p><b>Coins:</b> ${data.amount} Mice Coins</p>
+<p><b>Wallet:</b> ${data.wallet}</p>
+<p>Status: ${data.status}</p>
 
-<button class="paid" onclick="markFree('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteF('${d.id}')">Delete</button>
+<button class="paid" onclick="markFreePaid('${d.id}')">Mark Paid</button>
+<button class="delete" onclick="deleteFree('${d.id}')">Delete</button>
 </div>
 `;
 });
-}catch(e){
-box.innerHTML = "<div class='empty'>Error loading free withdrawals</div>";
-console.error(e);
-}
 }
 
 /* ---------------- ACTIONS ---------------- */
-window.approve = async (id)=>{
+window.approvePayment = async (id)=>{
 await updateDoc(doc(db,"payments",id),{status:"approved"});
 loadPayments();
 };
 
-window.removePay = async (id)=>{
+window.deletePayment = async (id)=>{
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
 };
@@ -292,33 +262,35 @@ await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
 loadWithdrawals();
 };
 
-window.deleteW = async (id)=>{
+window.deleteWithdraw = async (id)=>{
 await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
-window.markFree = async (id)=>{
+/* FREE SECTION ACTIONS */
+window.markFreePaid = async (id)=>{
 await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
-loadFree();
+loadFreeWithdrawals();
 };
 
-window.deleteF = async (id)=>{
+window.deleteFree = async (id)=>{
 await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
-loadFree();
+loadFreeWithdrawals();
 };
 
+/* MANUAL REFRESH ONLY */
 window.manualRefresh = function(){
-safe(loadPayments);
-safe(loadWithdrawals);
-safe(loadFree);
+loadPayments();
+loadWithdrawals();
+loadFreeWithdrawals();
 };
 
-/* INIT SAFE */
-safe(loadPayments);
-safe(loadWithdrawals);
-safe(loadFree);
+/* INIT */
+loadPayments();
+loadWithdrawals();
+loadFreeWithdrawals();
 
 </script>
 
 </body>
-  </html>
+</html>
