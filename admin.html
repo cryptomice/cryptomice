@@ -97,12 +97,6 @@ background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
 }
 
-.empty{
-opacity:0.6;
-font-size:13px;
-padding:10px;
-}
-
 .refresh-btn{
 margin:10px 15px;
 padding:10px;
@@ -111,6 +105,12 @@ border:1px solid #ffd84d;
 color:#ffd84d;
 border-radius:8px;
 cursor:pointer;
+}
+
+.empty{
+opacity:0.6;
+font-size:13px;
+padding:10px;
 }
 </style>
 </head>
@@ -121,19 +121,21 @@ cursor:pointer;
 <h2>🐭 CRYPTOMICE ADMIN</h2>
 </div>
 
-<button class="refresh-btn" onclick="manualRefresh()">
-🔄 Refresh Data
-</button>
+<button class="refresh-btn" onclick="manualRefresh()">🔄 Refresh Data</button>
+
+<!-- PAYMENT PROOFS (NEW SECTION) -->
+<h3 class="section-title">📩 Payment Proof Submissions</h3>
+<div id="paymentProofs" class="card"></div>
 
 <!-- ORIGINAL PAYMENTS -->
 <h3 class="section-title">💰 Payment Requests</h3>
 <div id="payments" class="card"></div>
 
-<!-- ORIGINAL WITHDRAWALS -->
+<!-- WITHDRAWALS -->
 <h3 class="section-title">💸 Withdrawals (Main System)</h3>
 <div id="withdrawals" class="card"></div>
 
-<!-- NEW FREE SECTION -->
+<!-- FREE WITHDRAWALS -->
 <h3 class="section-title">🐭 Cryptomice Free Section Withdrawals</h3>
 <div id="freeWithdrawals" class="card"></div>
 
@@ -161,7 +163,37 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ---------------- PAYMENTS ---------------- */
+/* ---------------- PAYMENT PROOFS ---------------- */
+async function loadPaymentProofs(){
+const container = document.getElementById("paymentProofs");
+container.innerHTML = "";
+
+const snap = await getDocs(collection(db,"payments"));
+
+if(snap.empty){
+container.innerHTML = "<div class='empty'>No payment proofs submitted</div>";
+return;
+}
+
+snap.forEach(d=>{
+const data = d.data();
+
+container.innerHTML += `
+<div class="item">
+<p><b>Username:</b> ${data.email || "N/A"}</p>
+<p><b>Phone:</b> ${data.phone || "N/A"}</p>
+<p><b>TXID:</b> ${data.txid}</p>
+<p><b>Status:</b> ${data.status}</p>
+<p><b>Date:</b> ${data.createdAt || "N/A"}</p>
+
+<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
+<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
+</div>
+`;
+});
+}
+
+/* ---------------- PAYMENTS (SAME COLLECTION VIEW) ---------------- */
 async function loadPayments(){
 const container = document.getElementById("payments");
 container.innerHTML = "";
@@ -189,7 +221,7 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- MAIN WITHDRAWALS ---------------- */
+/* ---------------- WITHDRAWALS ---------------- */
 async function loadWithdrawals(){
 const container = document.getElementById("withdrawals");
 container.innerHTML = "";
@@ -217,7 +249,7 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- FREE SECTION WITHDRAWALS ---------------- */
+/* ---------------- FREE WITHDRAWALS ---------------- */
 async function loadFreeWithdrawals(){
 const container = document.getElementById("freeWithdrawals");
 container.innerHTML = "";
@@ -250,11 +282,13 @@ container.innerHTML += `
 window.approvePayment = async (id)=>{
 await updateDoc(doc(db,"payments",id),{status:"approved"});
 loadPayments();
+loadPaymentProofs();
 };
 
 window.deletePayment = async (id)=>{
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
+loadPaymentProofs();
 };
 
 window.markPaid = async (id)=>{
@@ -267,7 +301,6 @@ await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
-/* FREE SECTION ACTIONS */
 window.markFreePaid = async (id)=>{
 await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
 loadFreeWithdrawals();
@@ -278,14 +311,16 @@ await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
 loadFreeWithdrawals();
 };
 
-/* MANUAL REFRESH ONLY */
+/* ---------------- REFRESH ---------------- */
 window.manualRefresh = function(){
+loadPaymentProofs();
 loadPayments();
 loadWithdrawals();
 loadFreeWithdrawals();
 };
 
-/* INIT */
+/* ---------------- INIT ---------------- */
+loadPaymentProofs();
 loadPayments();
 loadWithdrawals();
 loadFreeWithdrawals();
@@ -293,4 +328,4 @@ loadFreeWithdrawals();
 </script>
 
 </body>
-</html>
+  </html>
