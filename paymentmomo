@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+<meta name='admaven-placement' content='Bqjs5qdC4'>
+
+<title>Cryptomice Payment</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0a0a0a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+.logo{
+text-align:center;
+font-size:40px;
+font-weight:bold;
+color:#FFD700;
+margin-bottom:20px;
+text-shadow:0 0 15px #FFD700;
+}
+
+.card{
+background:#111;
+border:2px solid #FFD700;
+border-radius:20px;
+padding:25px;
+margin-bottom:20px;
+box-shadow:0 0 20px rgba(255,215,0,0.3);
+}
+
+.card h2{
+color:#FFD700;
+margin-bottom:15px;
+}
+
+.price{
+font-size:30px;
+font-weight:bold;
+color:#FFD700;
+margin:15px 0;
+}
+
+.address{
+background:#1b1b1b;
+padding:15px;
+border-radius:10px;
+word-break:break-all;
+border:1px solid #333;
+margin-top:10px;
+}
+
+.copy-btn{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+background:#FFD700;
+color:black;
+font-weight:bold;
+border-radius:10px;
+cursor:pointer;
+}
+
+.copy-btn:hover{
+background:#ffea75;
+}
+
+.momo-number{
+font-size:24px;
+font-weight:bold;
+color:#FFD700;
+text-align:center;
+padding:15px;
+background:#1b1b1b;
+border-radius:12px;
+margin-top:10px;
+}
+
+.instructions{
+line-height:1.8;
+color:#ddd;
+margin-top:15px;
+}
+
+form{
+margin-top:15px;
+}
+
+input, textarea{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border:none;
+border-radius:10px;
+background:#1b1b1b;
+color:white;
+}
+
+button.submit{
+width:100%;
+padding:14px;
+background:#FFD700;
+color:black;
+font-weight:bold;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:16px;
+}
+
+button.submit:hover{
+background:#ffea75;
+}
+
+.notice{
+text-align:center;
+color:#bbb;
+margin-top:15px;
+font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="logo">
+CRYPTOMICE
+</div>
+
+<div class="card">
+<h2>🚀 Activate Your Account</h2>
+
+<div class="price">
+$2 Activation Fee
+</div>
+
+<p>Choose your preferred payment method below.</p>
+</div>
+
+<div class="card">
+<h2>₿ Crypto Payment (Litecoin)</h2>
+
+<p>Send exactly <b>$2 worth of LTC</b> to:</p>
+
+<div class="address" id="ltcAddress">
+YOUR_LTC_WALLET_ADDRESS_HERE
+</div>
+
+<button class="copy-btn" onclick="copyAddress()">
+Copy Litecoin Address
+</button>
+</div>
+
+<div class="card">
+<h2>📱 MTN / Airtel MoMo Zambia</h2>
+
+<p>Send your activation payment to:</p>
+
+<div class="momo-number">
++260966497705
+</div>
+
+<div class="instructions">
+<ul>
+<li>Send the required activation amount.</li>
+<li>Take a screenshot of the transaction.</li>
+<li>Fill the confirmation form below.</li>
+<li>Your account will be activated after verification.</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>✅ Payment Confirmation</h2>
+
+<form>
+
+<input type="text" placeholder="Your Username" required>
+
+<input type="text" placeholder="Phone Number" required>
+
+<input type="text" placeholder="Transaction ID / Reference" required>
+
+<textarea rows="4" placeholder="Additional Information"></textarea>
+
+<button type="submit" class="submit">
+Submit Payment
+</button>
+
+</form>
+
+<div class="notice">
+Activation is usually processed within a few minutes after verification.
+</div>
+
+</div>
+
+</div>
+
+<script>
+function copyAddress(){
+const text =
+document.getElementById("ltcAddress").innerText;
+
+navigator.clipboard.writeText(text);
+
+alert("Litecoin address copied!");
+}
+</script>
+
+</body>
+</html>
