@@ -168,7 +168,7 @@ Activation is usually processed within a few minutes after verification.
 
 </div>
 
-<!-- FIREBASE (STABLE VERSION) -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
@@ -185,7 +185,6 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* WAIT FOR EVERYTHING TO LOAD */
 window.addEventListener("DOMContentLoaded", () => {
 
 const form = document.getElementById("paymentForm");
@@ -196,8 +195,6 @@ e.preventDefault();
 const username = document.getElementById("username").value.trim();
 const phone = document.getElementById("phone").value.trim();
 const txid = document.getElementById("txid").value.trim();
-
-console.log("INPUTS:", { username, phone, txid });
 
 if (!username || !phone || !txid) {
 alert("Missing information. Fill all fields.");
@@ -211,6 +208,7 @@ phone: phone,
 txid: txid,
 proof: txid,
 status: "pending",
+type: "proof_submission",
 createdAt: new Date().toISOString()
 });
 
