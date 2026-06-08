@@ -1,3 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cryptomice Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#03060c;
+color:white;
+overflow-x:hidden;
+}
+
+/* GOLD BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.15), transparent 40%),
+radial-gradient(circle at 80% 60%, rgba(255,215,0,0.08), transparent 50%);
+animation:move 8s infinite alternate;
+z-index:0;
+}
+
+@keyframes move{
+from{transform:scale(1);}
+to{transform:scale(1.2);}
+}
+
+*{position:relative;z-index:1;}
+
+.header{
+text-align:center;
+padding:15px;
+border-bottom:1px solid rgba(255,215,0,0.2);
+}
+
+.header h2{
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
+
+.section-title{
+margin:20px 15px 10px;
+color:#ffd84d;
+text-shadow:0 0 10px #ffd84d;
+}
+
+.card{
+margin:15px;
+padding:15px;
+border-radius:12px;
+background:#0b1220;
+border:1px solid rgba(255,215,0,0.2);
+box-shadow:0 0 20px rgba(255,215,0,0.08);
+}
+
+.item{
+background:#0f172a;
+padding:12px;
+border-radius:10px;
+margin-bottom:10px;
+border:1px solid rgba(255,215,0,0.15);
+}
+
+.item p{
+margin:4px 0;
+font-size:13px;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-right:5px;
+margin-top:5px;
+font-weight:bold;
+}
+
+.approve{
+background:linear-gradient(90deg,#00ff88,#00cc66);
+color:black;
+}
+
+.delete{
+background:linear-gradient(90deg,#ff4d4d,#cc0000);
+color:white;
+}
+
+.paid{
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+}
+
+.empty{
+opacity:0.6;
+font-size:13px;
+padding:10px;
+}
+
+.refresh-btn{
+margin:10px 15px;
+padding:10px;
+background:#111827;
+border:1px solid #ffd84d;
+color:#ffd84d;
+border-radius:8px;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>🐭 CRYPTOMICE ADMIN</h2>
+</div>
+
+<button class="refresh-btn" onclick="manualRefresh()">
+🔄 Refresh Data
+</button>
+
+<h3 class="section-title">💰 Payment Requests</h3>
+<div id="payments" class="card"></div>
+
+<h3 class="section-title">💸 Withdrawals</h3>
+<div id="withdrawals" class="card"></div>
+
+<h3 class="section-title">🐭 Free Withdrawals</h3>
+<div id="freeWithdrawals" class="card"></div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -22,52 +158,71 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* SAFE LOADER */
+/* SAFE RUNNER */
+async function safe(fn){
+try{
+await fn();
+}catch(e){
+console.error("Admin error:", e);
+}
+}
+
+/* ---------------- PAYMENTS ---------------- */
 async function loadPayments(){
-const container = document.getElementById("payments");
-container.innerHTML = "";
+const box = document.getElementById("payments");
+if(!box) return;
+
+try{
+box.innerHTML = "";
 
 const snap = await getDocs(collection(db,"payments"));
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No payment requests</div>";
+box.innerHTML = "<div class='empty'>No payment requests</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-container.innerHTML += `
+box.innerHTML += `
 <div class="item">
-<p><b>Email/User:</b> ${data.email || "N/A"}</p>
+<p><b>User:</b> ${data.email || "N/A"}</p>
 <p><b>Phone:</b> ${data.phone || "N/A"}</p>
 <p><b>TXID:</b> ${data.txid || "N/A"}</p>
 <p><b>Method:</b> ${data.method || "Unknown"}</p>
 <p><b>Status:</b> ${data.status || "pending"}</p>
 
-<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
-<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
+<button class="approve" onclick="approve('${d.id}')">Approve</button>
+<button class="delete" onclick="removePay('${d.id}')">Delete</button>
 </div>
 `;
 });
+}catch(e){
+box.innerHTML = "<div class='empty'>Error loading payments</div>";
+console.error(e);
+}
 }
 
-/* WITHDRAWALS */
+/* ---------------- WITHDRAWALS ---------------- */
 async function loadWithdrawals(){
-const container = document.getElementById("withdrawals");
-container.innerHTML = "";
+const box = document.getElementById("withdrawals");
+if(!box) return;
+
+try{
+box.innerHTML = "";
 
 const snap = await getDocs(collection(db,"withdrawals"));
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No withdrawals</div>";
+box.innerHTML = "<div class='empty'>No withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-container.innerHTML += `
+box.innerHTML += `
 <div class="item">
 <p><b>Email:</b> ${data.email || "N/A"}</p>
 <p><b>Amount:</b> ${data.amount || "0"}</p>
@@ -75,48 +230,59 @@ container.innerHTML += `
 <p><b>Status:</b> ${data.status || "pending"}</p>
 
 <button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
+<button class="delete" onclick="deleteW('${d.id}')">Delete</button>
 </div>
 `;
 });
+}catch(e){
+box.innerHTML = "<div class='empty'>Error loading withdrawals</div>";
+console.error(e);
+}
 }
 
-/* FREE WITHDRAWALS */
-async function loadFreeWithdrawals(){
-const container = document.getElementById("freeWithdrawals");
-container.innerHTML = "";
+/* ---------------- FREE ---------------- */
+async function loadFree(){
+const box = document.getElementById("freeWithdrawals");
+if(!box) return;
+
+try{
+box.innerHTML = "";
 
 const snap = await getDocs(collection(db,"cryptomice_free_withdrawals"));
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No free section withdrawals</div>";
+box.innerHTML = "<div class='empty'>No free withdrawals</div>";
 return;
 }
 
 snap.forEach(d=>{
 const data = d.data();
 
-container.innerHTML += `
+box.innerHTML += `
 <div class="item">
 <p><b>User:</b> ${data.uid || "N/A"}</p>
 <p><b>Coins:</b> ${data.amount || "0"}</p>
 <p><b>Wallet:</b> ${data.wallet || "N/A"}</p>
 <p><b>Status:</b> ${data.status || "pending"}</p>
 
-<button class="paid" onclick="markFreePaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteFree('${d.id}')">Delete</button>
+<button class="paid" onclick="markFree('${d.id}')">Mark Paid</button>
+<button class="delete" onclick="deleteF('${d.id}')">Delete</button>
 </div>
 `;
 });
+}catch(e){
+box.innerHTML = "<div class='empty'>Error loading free withdrawals</div>";
+console.error(e);
+}
 }
 
-/* ACTIONS */
-window.approvePayment = async (id)=>{
+/* ---------------- ACTIONS ---------------- */
+window.approve = async (id)=>{
 await updateDoc(doc(db,"payments",id),{status:"approved"});
 loadPayments();
 };
 
-window.deletePayment = async (id)=>{
+window.removePay = async (id)=>{
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
 };
@@ -126,30 +292,33 @@ await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
 loadWithdrawals();
 };
 
-window.deleteWithdraw = async (id)=>{
+window.deleteW = async (id)=>{
 await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
-window.markFreePaid = async (id)=>{
+window.markFree = async (id)=>{
 await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
-loadFreeWithdrawals();
+loadFree();
 };
 
-window.deleteFree = async (id)=>{
+window.deleteF = async (id)=>{
 await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
-loadFreeWithdrawals();
+loadFree();
 };
 
 window.manualRefresh = function(){
-loadPayments();
-loadWithdrawals();
-loadFreeWithdrawals();
+safe(loadPayments);
+safe(loadWithdrawals);
+safe(loadFree);
 };
 
-/* INIT */
-loadPayments();
-loadWithdrawals();
-loadFreeWithdrawals();
+/* INIT SAFE */
+safe(loadPayments);
+safe(loadWithdrawals);
+safe(loadFree);
 
-  </script>
+</script>
+
+</body>
+  </html>
