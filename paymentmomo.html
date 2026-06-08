@@ -192,7 +192,7 @@ Copy Litecoin Address
 <div class="card">
 <h2>✅ Payment Confirmation</h2>
 
-<form onsubmit="event.preventDefault(); submitMoMoPayment();">
+<form onsubmit="submitMoMoPayment(event)">
 
 <input id="username" type="text" placeholder="Your Username" required>
 
@@ -216,8 +216,8 @@ Activation is usually processed within a few minutes after verification.
 
 </div>
 
+<!-- FIREBASE -->
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import {
 getFirestore,
@@ -237,15 +237,17 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.submitMoMoPayment = async function () {
+/* GLOBAL FUNCTION */
+window.submitMoMoPayment = async function (event) {
+event.preventDefault();
 
-const username = document.getElementById("username").value;
-const phone = document.getElementById("phone").value;
-const txid = document.getElementById("txid").value;
-const notes = document.getElementById("notes").value;
+const username = document.getElementById("username").value.trim();
+const phone = document.getElementById("phone").value.trim();
+const txid = document.getElementById("txid").value.trim();
+const notes = document.getElementById("notes").value.trim();
 
 if (!username || !phone || !txid) {
-alert("Please fill in all required fields.");
+alert("Please fill all required fields (Username, Phone, TXID).");
 return;
 }
 
@@ -255,10 +257,10 @@ await addDoc(collection(db, "payments"), {
 email: username,
 phone: phone,
 txid: txid,
-notes: notes,
+notes: notes || "N/A",
 method: "MoMo Zambia",
 status: "pending",
-createdAt: Date.now()
+createdAt: new Date().toISOString()
 });
 
 alert("Payment submitted successfully!");
@@ -269,7 +271,8 @@ document.getElementById("txid").value = "";
 document.getElementById("notes").value = "";
 
 } catch (error) {
-alert("Error: " + error.message);
+console.error(error);
+alert("Submission failed: " + error.message);
 }
 
 };
@@ -283,4 +286,4 @@ alert("Litecoin address copied!");
 </script>
 
 </body>
-  </html>
+</html>
