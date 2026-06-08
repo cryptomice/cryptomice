@@ -235,7 +235,9 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* PAYMENT SUBMIT */
+/* FIXED VERSION */
+window.onload = function () {
+
 window.submitMoMoPayment = async function (event) {
 event.preventDefault();
 
@@ -243,7 +245,7 @@ const username = document.getElementById("username").value.trim();
 const phone = document.getElementById("phone").value.trim();
 const txid = document.getElementById("txid").value.trim();
 
-/* VALIDATION */
+/* SAFE VALIDATION */
 if (!username || !phone || !txid) {
 alert("Please fill in Username, Phone, and Payment Proof (TXID).");
 return;
@@ -271,6 +273,8 @@ document.getElementById("txid").value = "";
 console.error(error);
 alert("Submission failed: " + error.message);
 }
+};
+
 };
 
 window.copyAddress = function () {
