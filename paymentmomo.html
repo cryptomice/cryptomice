@@ -78,10 +78,6 @@ border-radius:10px;
 cursor:pointer;
 }
 
-.copy-btn:hover{
-background:#ffea75;
-}
-
 .momo-number{
 font-size:24px;
 font-weight:bold;
@@ -91,16 +87,6 @@ padding:15px;
 background:#1b1b1b;
 border-radius:12px;
 margin-top:10px;
-}
-
-.instructions{
-line-height:1.8;
-color:#ddd;
-margin-top:15px;
-}
-
-form{
-margin-top:15px;
 }
 
 input{
@@ -125,10 +111,6 @@ cursor:pointer;
 font-size:16px;
 }
 
-button.submit:hover{
-background:#ffea75;
-}
-
 .notice{
 text-align:center;
 color:#bbb;
@@ -142,86 +124,54 @@ font-size:14px;
 
 <div class="container">
 
-<div class="logo">
-CRYPTOMICE
-</div>
+<div class="logo">CRYPTOMICE</div>
 
 <div class="card">
 <h2>🚀 Activate Your Account</h2>
-
-<div class="price">
-20 ZMW Activation Fee
-</div>
-
+<div class="price">20 ZMW Activation Fee</div>
 <p>Choose your preferred payment method below.</p>
 </div>
 
 <div class="card">
 <h2>💰 Crypto Payment (Litecoin)</h2>
-
 <p>Send exactly <b>0.0364 LTC</b> to:</p>
 
 <div class="address" id="ltcAddress">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
 </div>
 
-<button class="copy-btn" onclick="copyAddress()">
-Copy Litecoin Address
-</button>
+<button class="copy-btn" onclick="copyAddress()">Copy Litecoin Address</button>
 </div>
 
 <div class="card">
 <h2>📱 MTN MoMo Zambia</h2>
-
-<p>Send your payment to:</p>
-
-<div class="momo-number">
-+260966497705
-</div>
-
-<div class="instructions">
-<ul>
-<li>Send the required activation amount</li>
-<li>Submit correct payment proof (TXID)</li>
-<li>Fill the confirmation form below</li>
-<li>Your account will be activated after verification</li>
-</ul>
-</div>
+<div class="momo-number">+260966497705</div>
 </div>
 
 <div class="card">
 <h2>✅ Payment Confirmation</h2>
 
-<form onsubmit="submitMoMoPayment(event)">
+<form id="paymentForm">
 
 <input id="username" type="text" placeholder="Your Username" required>
-
 <input id="phone" type="text" placeholder="Phone Number" required>
-
 <input id="txid" type="text" placeholder="Transaction ID / Payment Proof" required>
 
-<button type="submit" class="submit">
-Submit Payment
-</button>
+<button type="submit" class="submit">Submit Payment</button>
 
 </form>
 
 <div class="notice">
 Activation is usually processed within a few minutes after verification.
 </div>
-
 </div>
 
 </div>
 
-<!-- FIREBASE -->
+<!-- FIREBASE (STABLE VERSION) -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import {
-getFirestore,
-collection,
-addDoc
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -235,54 +185,54 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* FIXED VERSION */
-window.onload = function () {
+/* WAIT FOR EVERYTHING TO LOAD */
+window.addEventListener("DOMContentLoaded", () => {
 
-window.submitMoMoPayment = async function (event) {
-event.preventDefault();
+const form = document.getElementById("paymentForm");
+
+form.addEventListener("submit", async (e) => {
+e.preventDefault();
 
 const username = document.getElementById("username").value.trim();
 const phone = document.getElementById("phone").value.trim();
 const txid = document.getElementById("txid").value.trim();
 
-/* SAFE VALIDATION */
+console.log("INPUTS:", { username, phone, txid });
+
 if (!username || !phone || !txid) {
-alert("Please fill in Username, Phone, and Payment Proof (TXID).");
+alert("Missing information. Fill all fields.");
 return;
 }
 
 try {
-
 await addDoc(collection(db, "payments"), {
 email: username,
 phone: phone,
 txid: txid,
 proof: txid,
-method: "MoMo Zambia",
 status: "pending",
 createdAt: new Date().toISOString()
 });
 
 alert("Payment submitted successfully!");
-
-document.getElementById("username").value = "";
-document.getElementById("phone").value = "";
-document.getElementById("txid").value = "";
+form.reset();
 
 } catch (error) {
-console.error(error);
-alert("Submission failed: " + error.message);
+console.error("FIREBASE ERROR:", error);
+alert(error.message);
 }
-};
 
-};
+});
 
+});
+
+/* COPY FUNCTION */
 window.copyAddress = function () {
 const text = document.getElementById("ltcAddress").innerText;
 navigator.clipboard.writeText(text);
-alert("Litecoin address copied!");
+alert("Copied!");
 };
 </script>
 
 </body>
-  </html>
+</html>
