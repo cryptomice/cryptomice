@@ -103,7 +103,7 @@ form{
 margin-top:15px;
 }
 
-input, textarea{
+input{
 width:100%;
 padding:12px;
 margin-bottom:12px;
@@ -200,8 +200,6 @@ Copy Litecoin Address
 
 <input id="txid" type="text" placeholder="Transaction ID / Payment Proof" required>
 
-<textarea id="notes" rows="4" placeholder="Additional Information"></textarea>
-
 <button type="submit" class="submit">
 Submit Payment
 </button>
@@ -244,9 +242,8 @@ event.preventDefault();
 const username = document.getElementById("username").value.trim();
 const phone = document.getElementById("phone").value.trim();
 const txid = document.getElementById("txid").value.trim();
-const notes = document.getElementById("notes").value.trim();
 
-/* FIXED VALIDATION */
+/* VALIDATION */
 if (!username || !phone || !txid) {
 alert("Please fill in Username, Phone, and Payment Proof (TXID).");
 return;
@@ -259,7 +256,6 @@ email: username,
 phone: phone,
 txid: txid,
 proof: txid,
-notes: notes || "N/A",
 method: "MoMo Zambia",
 status: "pending",
 createdAt: new Date().toISOString()
@@ -270,7 +266,6 @@ alert("Payment submitted successfully!");
 document.getElementById("username").value = "";
 document.getElementById("phone").value = "";
 document.getElementById("txid").value = "";
-document.getElementById("notes").value = "";
 
 } catch (error) {
 console.error(error);
@@ -286,4 +281,4 @@ alert("Litecoin address copied!");
 </script>
 
 </body>
-</html>
+  </html>
