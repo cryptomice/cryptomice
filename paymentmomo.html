@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer-when-downgrade" />
-<meta name="admaven-placement" content="Bqjs5qdC4">
+<meta name='admaven-placement' content='Bqjs5qdC4'>
 
 <title>Cryptomice Payment</title>
 
 <style>
-body{
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial,sans-serif;
+}
+
+body{
 background:#0a0a0a;
 color:white;
 padding:20px;
@@ -35,53 +40,82 @@ text-shadow:0 0 15px #FFD700;
 background:#111;
 border:2px solid #FFD700;
 border-radius:20px;
-padding:20px;
+padding:25px;
 margin-bottom:20px;
+box-shadow:0 0 20px rgba(255,215,0,0.3);
+}
+
+.card h2{
+color:#FFD700;
+margin-bottom:15px;
 }
 
 .price{
-font-size:28px;
-color:#FFD700;
+font-size:30px;
 font-weight:bold;
+color:#FFD700;
+margin:15px 0;
 }
 
 .address{
 background:#1b1b1b;
-padding:12px;
+padding:15px;
 border-radius:10px;
 word-break:break-all;
+border:1px solid #333;
+margin-top:10px;
+}
+
+.copy-btn{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+background:#FFD700;
+color:black;
+font-weight:bold;
+border-radius:10px;
+cursor:pointer;
+}
+
+.momo-number{
+font-size:24px;
+font-weight:bold;
+color:#FFD700;
+text-align:center;
+padding:15px;
+background:#1b1b1b;
+border-radius:12px;
 margin-top:10px;
 }
 
 input{
 width:100%;
 padding:12px;
-margin-bottom:10px;
-border-radius:10px;
+margin-bottom:12px;
 border:none;
+border-radius:10px;
 background:#1b1b1b;
 color:white;
 }
 
-button{
+button.submit{
 width:100%;
-padding:12px;
+padding:14px;
+background:#FFD700;
+color:black;
+font-weight:bold;
 border:none;
 border-radius:10px;
-background:#FFD700;
-font-weight:bold;
 cursor:pointer;
-}
-
-button:hover{
-background:#ffea75;
+font-size:16px;
 }
 
 .notice{
-font-size:13px;
-color:#bbb;
 text-align:center;
-margin-top:10px;
+color:#bbb;
+margin-top:15px;
+font-size:14px;
 }
 </style>
 </head>
@@ -93,37 +127,48 @@ margin-top:10px;
 <div class="logo">CRYPTOMICE</div>
 
 <div class="card">
-<h2>Activate Account</h2>
-<div class="price">20 ZMW</div>
+<h2>🚀 Activate Your Account</h2>
+<div class="price">20 ZMW Activation Fee</div>
+<p>Choose your preferred payment method below.</p>
 </div>
 
 <div class="card">
-<h3>Litecoin Payment</h3>
-<div class="address">ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5</div>
+<h2>💰 Crypto Payment (Litecoin)</h2>
+<p>Send exactly <b>0.0364 LTC</b> to:</p>
+
+<div class="address" id="ltcAddress">
+ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5
+</div>
+
+<button class="copy-btn" onclick="copyAddress()">Copy Litecoin Address</button>
 </div>
 
 <div class="card">
-<h3>Payment Form</h3>
+<h2>📱 MTN MoMo Zambia</h2>
+<div class="momo-number">+260966497705</div>
+</div>
+
+<div class="card">
+<h2>✅ Payment Confirmation</h2>
 
 <form id="paymentForm">
 
-<input id="username" type="text" placeholder="Username" required>
+<input id="username" type="text" placeholder="Your Username" required>
 <input id="phone" type="text" placeholder="Phone Number" required>
-<input id="txid" type="text" placeholder="Payment TXID / Proof" required>
+<input id="txid" type="text" placeholder="Transaction ID / Payment Proof" required>
 
-<button type="submit">Submit Payment</button>
+<button type="submit" class="submit">Submit Payment</button>
 
 </form>
 
 <div class="notice">
-Your payment will be verified shortly.
+Activation is usually processed within a few minutes after verification.
+</div>
 </div>
 
 </div>
 
-</div>
-
-<!-- FIREBASE (STABLE) -->
+<!-- FIREBASE (STABLE VERSION) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
@@ -140,8 +185,8 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* WAIT FOR DOM */
-document.addEventListener("DOMContentLoaded", () => {
+/* WAIT FOR EVERYTHING TO LOAD */
+window.addEventListener("DOMContentLoaded", () => {
 
 const form = document.getElementById("paymentForm");
 
@@ -173,14 +218,21 @@ alert("Payment submitted successfully!");
 form.reset();
 
 } catch (error) {
-console.error("Firebase Error:", error);
+console.error("FIREBASE ERROR:", error);
 alert(error.message);
 }
 
 });
 
 });
+
+/* COPY FUNCTION */
+window.copyAddress = function () {
+const text = document.getElementById("ltcAddress").innerText;
+navigator.clipboard.writeText(text);
+alert("Copied!");
+};
 </script>
 
 </body>
-</html>
+  </html>
