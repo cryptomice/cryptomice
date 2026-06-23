@@ -167,7 +167,6 @@ margin-top:8px;
 <p id="withdrawMsg" class="msg"></p>
 </div>
 
-<!-- ✅ GLOBAL SMART ROUTER -->
 <script src="smartlink.js"></script>
 
 <script type="module">
@@ -235,61 +234,67 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
-/* WITHDRAW */
+/* WITHDRAW (FIXED) */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
 const wallet = document.getElementById("withdrawWallet").value.trim();
 const msg = document.getElementById("withdrawMsg");
 
-try{
+try {
 
-msg.innerText="Processing...";
+msg.style.color = "white";
+msg.innerText = "Processing...";
 
-if(!amount || amount<0.01){
-msg.innerText="Minimum 0.01 LTC";
+if (!amount || amount < 0.01) {
+msg.innerText = "Minimum 0.01 LTC";
 return;
 }
 
-if(!wallet){
-msg.innerText="Enter wallet";
+if (!wallet) {
+msg.innerText = "Enter wallet";
 return;
 }
 
-const userRef = doc(db,"users",currentUID);
+const userRef = doc(db, "users", currentUID);
 const snap = await getDoc(userRef);
+
+if (!snap.exists()) {
+msg.innerText = "User data not found";
+return;
+}
 
 const data = snap.data();
 const earnings = data.earnings || 0;
 
-if(amount>earnings){
-msg.innerText="Insufficient balance";
+if (amount > earnings) {
+msg.innerText = "Insufficient balance";
 return;
 }
 
-await addDoc(collection(db,"withdrawals"),{
+await addDoc(collection(db, "withdrawals"), {
 userId: currentUID,
-email: data.email || currentUserEmail,
-amount,
-wallet,
-coin:"LTC",
-status:"pending",
+email: currentUserEmail,
+amount: amount,
+wallet: wallet,
+coin: "LTC",
+status: "pending",
 createdAt: serverTimestamp()
 });
 
-await updateDoc(userRef,{
+await updateDoc(userRef, {
 earnings: earnings - amount
 });
 
-document.getElementById("earnings").innerText =
-earnings - amount;
+document.getElementById("earnings").innerText = earnings - amount;
 
-msg.style.color="lime";
-msg.innerText="Withdrawal sent";
+msg.style.color = "lime";
+msg.innerText = "Withdrawal sent successfully";
 
-}catch(e){
-msg.style.color="red";
-msg.innerText=e.message;
+} catch (e) {
+console.error(e);
+msg.style.color = "red";
+msg.innerText = e.message;
 }
 
 });
