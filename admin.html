@@ -10,28 +10,7 @@ margin:0;
 font-family:Arial, sans-serif;
 background:#03060c;
 color:white;
-overflow-x:hidden;
 }
-
-/* GOLD BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 20% 20%, rgba(255,215,0,0.15), transparent 40%),
-radial-gradient(circle at 80% 60%, rgba(255,215,0,0.08), transparent 50%);
-animation:move 8s infinite alternate;
-z-index:0;
-}
-
-@keyframes move{
-from{transform:scale(1);}
-to{transform:scale(1.2);}
-}
-
-*{position:relative;z-index:1;}
 
 .header{
 text-align:center;
@@ -47,7 +26,6 @@ text-shadow:0 0 15px #ffd84d;
 .section-title{
 margin:20px 15px 10px;
 color:#ffd84d;
-text-shadow:0 0 10px #ffd84d;
 }
 
 .card{
@@ -56,7 +34,6 @@ padding:15px;
 border-radius:12px;
 background:#0b1220;
 border:1px solid rgba(255,215,0,0.2);
-box-shadow:0 0 20px rgba(255,215,0,0.08);
 }
 
 .item{
@@ -64,12 +41,6 @@ background:#0f172a;
 padding:12px;
 border-radius:10px;
 margin-bottom:10px;
-border:1px solid rgba(255,215,0,0.15);
-}
-
-.item p{
-margin:4px 0;
-font-size:13px;
 }
 
 button{
@@ -123,20 +94,13 @@ padding:10px;
 
 <button class="refresh-btn" onclick="manualRefresh()">🔄 Refresh Data</button>
 
-<!-- PAYMENT PROOFS (NEW SECTION) -->
-<h3 class="section-title">📩 Payment Proof Submissions</h3>
-<div id="paymentProofs" class="card"></div>
-
-<!-- ORIGINAL PAYMENTS -->
-<h3 class="section-title">💰 Payment Requests</h3>
+<h3 class="section-title">📩 Payment Submissions</h3>
 <div id="payments" class="card"></div>
 
-<!-- WITHDRAWALS -->
-<h3 class="section-title">💸 Withdrawals (Main System)</h3>
+<h3 class="section-title">💸 Withdrawals</h3>
 <div id="withdrawals" class="card"></div>
 
-<!-- FREE WITHDRAWALS -->
-<h3 class="section-title">🐭 Cryptomice Free Section Withdrawals</h3>
+<h3 class="section-title">🐭 Free Withdrawals</h3>
 <div id="freeWithdrawals" class="card"></div>
 
 <script type="module">
@@ -148,7 +112,8 @@ collection,
 getDocs,
 updateDoc,
 deleteDoc,
-doc
+doc,
+setDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -163,37 +128,7 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ---------------- PAYMENT PROOFS ---------------- */
-async function loadPaymentProofs(){
-const container = document.getElementById("paymentProofs");
-container.innerHTML = "";
-
-const snap = await getDocs(collection(db,"payments"));
-
-if(snap.empty){
-container.innerHTML = "<div class='empty'>No payment proofs submitted</div>";
-return;
-}
-
-snap.forEach(d=>{
-const data = d.data();
-
-container.innerHTML += `
-<div class="item">
-<p><b>Username:</b> ${data.email || "N/A"}</p>
-<p><b>Phone:</b> ${data.phone || "N/A"}</p>
-<p><b>TXID:</b> ${data.txid}</p>
-<p><b>Status:</b> ${data.status}</p>
-<p><b>Date:</b> ${data.createdAt || "N/A"}</p>
-
-<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
-<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
-</div>
-`;
-});
-}
-
-/* ---------------- PAYMENTS (SAME COLLECTION VIEW) ---------------- */
+/* ---------------- PAYMENTS ---------------- */
 async function loadPayments(){
 const container = document.getElementById("payments");
 container.innerHTML = "";
@@ -201,7 +136,7 @@ container.innerHTML = "";
 const snap = await getDocs(collection(db,"payments"));
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No payment requests</div>";
+container.innerHTML = "<div class='empty'>No submissions</div>";
 return;
 }
 
@@ -212,10 +147,10 @@ container.innerHTML += `
 <div class="item">
 <p><b>Email:</b> ${data.email}</p>
 <p><b>TXID:</b> ${data.txid}</p>
-<p>Status: ${data.status}</p>
+<p><b>Status:</b> ${data.status}</p>
 
-<button class="approve" onclick="approvePayment('${d.id}')">Approve</button>
-<button class="delete" onclick="deletePayment('${d.id}')">Delete</button>
+<button class="approve" onclick="approve('${d.id}','${data.email}')">Approve</button>
+<button class="delete" onclick="remove('${d.id}')">Delete</button>
 </div>
 `;
 });
@@ -240,7 +175,7 @@ container.innerHTML += `
 <div class="item">
 <p><b>Email:</b> ${data.email || "N/A"}</p>
 <p><b>Amount:</b> ${data.amount}</p>
-<p><b>Wallet:</b> ${data.wallet || "No wallet"}</p>
+<p><b>Wallet:</b> ${data.wallet}</p>
 
 <button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
 <button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
@@ -257,7 +192,7 @@ container.innerHTML = "";
 const snap = await getDocs(collection(db,"cryptomice_free_withdrawals"));
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No free section withdrawals</div>";
+container.innerHTML = "<div class='empty'>No free withdrawals</div>";
 return;
 }
 
@@ -267,11 +202,11 @@ const data = d.data();
 container.innerHTML += `
 <div class="item">
 <p><b>User:</b> ${data.uid}</p>
-<p><b>Coins:</b> ${data.amount} Mice Coins</p>
+<p><b>Amount:</b> ${data.amount}</p>
 <p><b>Wallet:</b> ${data.wallet}</p>
-<p>Status: ${data.status}</p>
+<p><b>Status:</b> ${data.status}</p>
 
-<button class="paid" onclick="markFreePaid('${d.id}')">Mark Paid</button>
+<button class="paid" onclick="markFree('${d.id}')">Mark Paid</button>
 <button class="delete" onclick="deleteFree('${d.id}')">Delete</button>
 </div>
 `;
@@ -279,48 +214,54 @@ container.innerHTML += `
 }
 
 /* ---------------- ACTIONS ---------------- */
-window.approvePayment = async (id)=>{
-await updateDoc(doc(db,"payments",id),{status:"approved"});
+
+window.approve = async function(id,email){
+
+await updateDoc(doc(db,"payments",id),{
+status:"approved"
+});
+
+/* STRICT ACCESS GATE */
+await setDoc(doc(db,"approved_users",email),{
+email:email,
+approvedAt: new Date().toISOString()
+});
+
 loadPayments();
-loadPaymentProofs();
 };
 
-window.deletePayment = async (id)=>{
+window.remove = async function(id){
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
-loadPaymentProofs();
 };
 
-window.markPaid = async (id)=>{
+window.markPaid = async function(id){
 await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
 loadWithdrawals();
 };
 
-window.deleteWithdraw = async (id)=>{
+window.deleteWithdraw = async function(id){
 await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
-window.markFreePaid = async (id)=>{
+window.markFree = async function(id){
 await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
 loadFreeWithdrawals();
 };
 
-window.deleteFree = async (id)=>{
+window.deleteFree = async function(id){
 await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
 loadFreeWithdrawals();
 };
 
-/* ---------------- REFRESH ---------------- */
 window.manualRefresh = function(){
-loadPaymentProofs();
 loadPayments();
 loadWithdrawals();
 loadFreeWithdrawals();
 };
 
-/* ---------------- INIT ---------------- */
-loadPaymentProofs();
+/* INIT */
 loadPayments();
 loadWithdrawals();
 loadFreeWithdrawals();
@@ -328,4 +269,4 @@ loadFreeWithdrawals();
 </script>
 
 </body>
-  </html>
+</html>
