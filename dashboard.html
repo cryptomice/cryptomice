@@ -191,22 +191,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* SAFE BASE URL (FIX FOR GITHUB PAGES) */
+/* BASE URL (IMPORTANT FOR GITHUB PAGES) */
 const BASE = "https://cryptomice.github.io/cryptomice/";
 
-/* SAFE REDIRECT */
+/* SAFE REF LINK → MUST GO TO INDEX */
+const getRefLink = (uid) => {
+return `${BASE}index.html?ref=${uid}`;
+};
+
+/* REDIRECT SAFELY */
 function go(page){
 window.location.href = BASE + page;
 }
 
-/* GET REF CODE */
-function getRef(){
-return new URLSearchParams(window.location.search).get("ref");
-}
-
-/* WAIT FOR DOM SAFELY */
-window.addEventListener("DOMContentLoaded", () => {
-
+/* START APP AFTER AUTH */
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
@@ -217,11 +215,11 @@ return;
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
 
-/* FIXED REF LINK (ALWAYS CORRECT PATH) */
-const refLink = `${BASE}signup.html?ref=${user.uid}`;
+/* FIXED REF LINK (NOW POINTS TO INDEX.HTML) */
+const refLink = getRefLink(user.uid);
 document.getElementById("refLink").innerText = refLink;
 
-/* CREATE USER DOC IF NOT EXISTS (FIX FOR EXISTING USERS) */
+/* ENSURE USER EXISTS (WORKS FOR OLD + NEW USERS) */
 const userRef = doc(db, "users", user.uid);
 const snap = await getDoc(userRef);
 
@@ -249,7 +247,7 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
-/* WITHDRAW SAFE */
+/* WITHDRAW */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -306,8 +304,6 @@ console.error(e);
 msg.style.color = "red";
 msg.innerText = e.message;
 }
-
-});
 
 });
 </script>
