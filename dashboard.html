@@ -1,11 +1,177 @@
-<script type="module">
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cryptomice Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#03060c;
+color:white;
+overflow-x:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,0.15), transparent 40%),
+radial-gradient(circle at 80% 60%, rgba(255,215,0,0.08), transparent 50%);
+animation:move 8s infinite alternate;
+z-index:0;
+}
+
+@keyframes move{
+from{transform:scale(1);}
+to{transform:scale(1.2);}
+}
+
+*{position:relative;z-index:1;}
+
+.header{
+text-align:center;
+padding:15px;
+border-bottom:1px solid rgba(255,215,0,0.2);
+}
+
+.header h2{
+color:#ffd84d;
+text-shadow:0 0 15px #ffd84d;
+}
+
+.card{
+margin:15px;
+padding:15px;
+border-radius:12px;
+background:#0b1220;
+border:1px solid rgba(255,215,0,0.2);
+box-shadow:0 0 20px rgba(255,215,0,0.1);
+}
+
+.balance{
+font-size:34px;
+color:#ffd84d;
+text-align:center;
+text-shadow:0 0 20px #ffd84d;
+}
+
+.small{
+font-size:12px;
+opacity:0.7;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:6px 0;
+border-radius:8px;
+border:1px solid rgba(255,215,0,0.2);
+background:#0f172a;
+color:white;
+}
+
+button{
+width:100%;
+padding:13px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+.primary{
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+}
+
+.secondary{
+background:#1f2937;
+color:white;
+}
+
+.ref-box{
+background:#0f172a;
+padding:10px;
+border-radius:8px;
+word-break:break-all;
+margin-bottom:10px;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+text-align:center;
+}
+
+.stat h3{
+color:#ffd84d;
+margin:0;
+}
+
+.msg{
+font-size:13px;
+margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>🐭 CRYPTOMICE DASHBOARD</h2>
+<p id="userEmail">Loading...</p>
+</div>
+
+<div class="card">
+<div class="small">Available Earnings</div>
+<div class="balance">LTC <span id="earnings">0</span></div>
+</div>
+
+<div class="card">
+<h3>Your Referral Link</h3>
+<div id="refLink" class="ref-box">Loading...</div>
+<button class="secondary" onclick="copyLink()">Copy Link</button>
+</div>
+
+<div class="card">
+<h3>Stats</h3>
+<div class="stats">
+<div class="stat">
+<h3 id="refCount">0</h3>
+<p>Referrals</p>
+</div>
+<div class="stat">
+<h3>0.01 LTC</h3>
+<p>Per Signup</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Withdraw (Litecoin)</h3>
+<p class="small">Minimum withdrawal: 0.01 LTC</p>
+
+<input id="withdrawAmount" type="number" placeholder="Enter amount">
+<input id="withdrawWallet" placeholder="Enter LTC wallet">
+
+<button id="withdrawBtn" class="primary">Request Withdrawal</button>
+<p id="withdrawMsg" class="msg"></p>
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 import {
 getFirestore,
 doc,
 getDoc,
+setDoc,
 updateDoc,
 addDoc,
 collection,
@@ -25,24 +191,22 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUID = null;
-let currentUserEmail = null;
-
-/* BASE URL FIX (IMPORTANT FOR GITHUB PAGES) */
-const BASE_URL = "https://cryptomice.github.io/cryptomice/";
+/* SAFE BASE URL (FIX FOR GITHUB PAGES) */
+const BASE = "https://cryptomice.github.io/cryptomice/";
 
 /* SAFE REDIRECT */
 function go(page){
-window.location.replace(BASE_URL + page);
+window.location.href = BASE + page;
 }
 
-/* READ REF PARAM (IMPORTANT FOR REFERRALS) */
+/* GET REF CODE */
 function getRef(){
-const params = new URLSearchParams(window.location.search);
-return params.get("ref");
+return new URLSearchParams(window.location.search).get("ref");
 }
 
-/* AUTH */
+/* WAIT FOR DOM SAFELY */
+window.addEventListener("DOMContentLoaded", () => {
+
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
@@ -50,28 +214,34 @@ go("payment.html");
 return;
 }
 
-currentUID = user.uid;
-currentUserEmail = user.email;
-
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
 
-/* FIXED REF LINK (NOW CORRECT FOR GITHUB PAGES) */
-const refLink = `${BASE_URL}signup.html?ref=${user.uid}`;
-
+/* FIXED REF LINK (ALWAYS CORRECT PATH) */
+const refLink = `${BASE}signup.html?ref=${user.uid}`;
 document.getElementById("refLink").innerText = refLink;
 
-const snap = await getDoc(doc(db,"users",user.uid));
+/* CREATE USER DOC IF NOT EXISTS (FIX FOR EXISTING USERS) */
+const userRef = doc(db, "users", user.uid);
+const snap = await getDoc(userRef);
 
-if(snap.exists()){
-const data = snap.data();
+if (!snap.exists()) {
+await setDoc(userRef, {
+email: user.email,
+earnings: 0,
+referrals: 0,
+createdAt: serverTimestamp()
+});
+}
+
+const data = (await getDoc(userRef)).data();
+
 document.getElementById("refCount").innerText = data.referrals || 0;
 document.getElementById("earnings").innerText = data.earnings || 0;
-}
 
 });
 
-/* COPY */
+/* COPY LINK */
 window.copyLink = function(){
 navigator.clipboard.writeText(
 document.getElementById("refLink").innerText
@@ -79,7 +249,7 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
-/* WITHDRAW (UNCHANGED BUT SAFE) */
+/* WITHDRAW SAFE */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -88,8 +258,8 @@ const msg = document.getElementById("withdrawMsg");
 
 try {
 
-msg.style.color = "white";
 msg.innerText = "Processing...";
+msg.style.color = "white";
 
 if (!amount || amount < 0.01) {
 msg.innerText = "Minimum 0.01 LTC";
@@ -101,13 +271,8 @@ msg.innerText = "Enter wallet";
 return;
 }
 
-const userRef = doc(db, "users", currentUID);
+const userRef = doc(db, "users", auth.currentUser.uid);
 const snap = await getDoc(userRef);
-
-if (!snap.exists()) {
-msg.innerText = "User data not found";
-return;
-}
 
 const data = snap.data();
 const earnings = data.earnings || 0;
@@ -118,8 +283,8 @@ return;
 }
 
 await addDoc(collection(db, "withdrawals"), {
-userId: currentUID,
-email: currentUserEmail,
+userId: auth.currentUser.uid,
+email: auth.currentUser.email,
 amount,
 wallet,
 coin: "LTC",
@@ -134,7 +299,7 @@ earnings: earnings - amount
 document.getElementById("earnings").innerText = earnings - amount;
 
 msg.style.color = "lime";
-msg.innerText = "Withdrawal sent successfully";
+msg.innerText = "Withdrawal sent";
 
 } catch (e) {
 console.error(e);
@@ -144,4 +309,8 @@ msg.innerText = e.message;
 
 });
 
-  </script>
+});
+</script>
+
+</body>
+  </html>
