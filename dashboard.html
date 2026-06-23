@@ -1,172 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Cryptomice Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#03060c;
-color:white;
-overflow-x:hidden;
-}
-
-body::before{
-content:"";
-position:fixed;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 20% 20%, rgba(255,215,0,0.15), transparent 40%),
-radial-gradient(circle at 80% 60%, rgba(255,215,0,0.08), transparent 50%);
-animation:move 8s infinite alternate;
-z-index:0;
-}
-
-@keyframes move{
-from{transform:scale(1);}
-to{transform:scale(1.2);}
-}
-
-*{position:relative;z-index:1;}
-
-.header{
-text-align:center;
-padding:15px;
-border-bottom:1px solid rgba(255,215,0,0.2);
-}
-
-.header h2{
-color:#ffd84d;
-text-shadow:0 0 15px #ffd84d;
-}
-
-.card{
-margin:15px;
-padding:15px;
-border-radius:12px;
-background:#0b1220;
-border:1px solid rgba(255,215,0,0.2);
-box-shadow:0 0 20px rgba(255,215,0,0.1);
-}
-
-.balance{
-font-size:34px;
-color:#ffd84d;
-text-align:center;
-text-shadow:0 0 20px #ffd84d;
-}
-
-.small{
-font-size:12px;
-opacity:0.7;
-text-align:center;
-}
-
-input{
-width:100%;
-padding:12px;
-margin:6px 0;
-border-radius:8px;
-border:1px solid rgba(255,215,0,0.2);
-background:#0f172a;
-color:white;
-}
-
-button{
-width:100%;
-padding:13px;
-border:none;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
-margin-top:10px;
-}
-
-.primary{
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-color:black;
-}
-
-.secondary{
-background:#1f2937;
-color:white;
-}
-
-.ref-box{
-background:#0f172a;
-padding:10px;
-border-radius:8px;
-word-break:break-all;
-margin-bottom:10px;
-}
-
-.stats{
-display:flex;
-justify-content:space-between;
-text-align:center;
-}
-
-.stat h3{
-color:#ffd84d;
-margin:0;
-}
-
-.msg{
-font-size:13px;
-margin-top:8px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="header">
-<h2>🐭 CRYPTOMICE DASHBOARD</h2>
-<p id="userEmail">Loading...</p>
-</div>
-
-<div class="card">
-<div class="small">Available Earnings</div>
-<div class="balance">LTC <span id="earnings">0</span></div>
-<div class="small">User ID hidden</div>
-</div>
-
-<div class="card">
-<h3>Your Referral Link</h3>
-<div id="refLink" class="ref-box">Loading...</div>
-<button class="secondary" onclick="copyLink()">Copy Link</button>
-</div>
-
-<div class="card">
-<h3>Stats</h3>
-<div class="stats">
-<div class="stat">
-<h3 id="refCount">0</h3>
-<p>Referrals</p>
-</div>
-<div class="stat">
-<h3>0.01 LTC</h3>
-<p>Per Signup</p>
-</div>
-</div>
-</div>
-
-<div class="card">
-<h3>Withdraw (Litecoin)</h3>
-
-<p class="small">Minimum withdrawal: 0.01 LTC</p>
-
-<input id="withdrawAmount" type="number" placeholder="Enter amount">
-<input id="withdrawWallet" placeholder="Enter LTC wallet">
-
-<button id="withdrawBtn" class="primary">Request Withdrawal</button>
-
-<p id="withdrawMsg" class="msg"></p>
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -197,11 +28,18 @@ const db = getFirestore(app);
 let currentUID = null;
 let currentUserEmail = null;
 
+/* BASE URL FIX (IMPORTANT FOR GITHUB PAGES) */
+const BASE_URL = "https://cryptomice.github.io/cryptomice/";
+
 /* SAFE REDIRECT */
 function go(page){
-if(page){
-window.location.replace(page);
+window.location.replace(BASE_URL + page);
 }
+
+/* READ REF PARAM (IMPORTANT FOR REFERRALS) */
+function getRef(){
+const params = new URLSearchParams(window.location.search);
+return params.get("ref");
 }
 
 /* AUTH */
@@ -218,9 +56,10 @@ currentUserEmail = user.email;
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
 
-/* FIXED REF LINK (matches dashboard system) */
-document.getElementById("refLink").innerText =
-window.location.origin + "/dashboard.html?ref=" + user.uid;
+/* FIXED REF LINK (NOW CORRECT FOR GITHUB PAGES) */
+const refLink = `${BASE_URL}signup.html?ref=${user.uid}`;
+
+document.getElementById("refLink").innerText = refLink;
 
 const snap = await getDoc(doc(db,"users",user.uid));
 
@@ -240,7 +79,7 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
-/* WITHDRAW */
+/* WITHDRAW (UNCHANGED BUT SAFE) */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -305,7 +144,4 @@ msg.innerText = e.message;
 
 });
 
-</script>
-
-</body>
-  </html>
+  </script>
