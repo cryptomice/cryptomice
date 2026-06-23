@@ -167,12 +167,10 @@ margin-top:8px;
 <p id="withdrawMsg" class="msg"></p>
 </div>
 
-<script src="smartlink.js"></script>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
 getFirestore,
@@ -200,11 +198,16 @@ const db = getFirestore(app);
 let currentUID = null;
 let currentUserEmail = null;
 
+/* SAFE REDIRECT */
+function go(page){
+window.location.href = page;
+}
+
 /* AUTH */
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
-smartNavigate("payment.html");
+go("payment.html");
 return;
 }
 
@@ -227,6 +230,7 @@ document.getElementById("earnings").innerText = data.earnings || 0;
 
 });
 
+/* COPY */
 window.copyLink = function(){
 navigator.clipboard.writeText(
 document.getElementById("refLink").innerText
@@ -234,7 +238,7 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
-/* WITHDRAW (FIXED) */
+/* WITHDRAW (SAFE - NO SMARTLINK INTERFERENCE) */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -275,8 +279,8 @@ return;
 await addDoc(collection(db, "withdrawals"), {
 userId: currentUID,
 email: currentUserEmail,
-amount: amount,
-wallet: wallet,
+amount,
+wallet,
 coin: "LTC",
 status: "pending",
 createdAt: serverTimestamp()
@@ -302,4 +306,4 @@ msg.innerText = e.message;
 </script>
 
 </body>
-</html>
+  </html>
