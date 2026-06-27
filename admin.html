@@ -53,20 +53,9 @@ margin-top:5px;
 font-weight:bold;
 }
 
-.approve{
-background:linear-gradient(90deg,#00ff88,#00cc66);
-color:black;
-}
-
-.delete{
-background:linear-gradient(90deg,#ff4d4d,#cc0000);
-color:white;
-}
-
-.paid{
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-color:black;
-}
+.approve{background:linear-gradient(90deg,#00ff88,#00cc66);color:black;}
+.delete{background:linear-gradient(90deg,#ff4d4d,#cc0000);color:white;}
+.paid{background:linear-gradient(90deg,#ffd84d,#ffcc00);color:black;}
 
 .refresh-btn{
 margin:10px 15px;
@@ -129,7 +118,7 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ---------------- PAYMENTS ---------------- */
+/* ---------------- LOAD PAYMENTS ---------------- */
 async function loadPayments(){
 const container = document.getElementById("payments");
 container.innerHTML = "";
@@ -151,13 +140,13 @@ container.innerHTML += `
 <p><b>Status:</b> ${data.status}</p>
 
 <button class="approve" onclick="approve('${d.id}','${data.email}')">Approve</button>
-<button class="delete" onclick="remove('${d.id}')">Delete</button>
+<button class="delete" onclick="removeItem('${d.id}')">Delete</button>
 </div>
 `;
 });
 }
 
-/* ---------------- WITHDRAWALS ---------------- */
+/* ---------------- LOAD WITHDRAWALS ---------------- */
 async function loadWithdrawals(){
 const container = document.getElementById("withdrawals");
 container.innerHTML = "";
@@ -185,7 +174,7 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- FREE WITHDRAWALS ---------------- */
+/* ---------------- LOAD FREE WITHDRAWALS ---------------- */
 async function loadFreeWithdrawals(){
 const container = document.getElementById("freeWithdrawals");
 container.innerHTML = "";
@@ -214,26 +203,28 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- APPROVE + REFERRAL SYSTEM ---------------- */
+/* ---------------- APPROVE + REFERRAL LOGIC ---------------- */
 
 window.approve = async function(id,email){
 
+  // 1. Approve payment
   await updateDoc(doc(db,"payments",id),{
     status:"approved"
   });
 
+  // 2. Unlock user
   await setDoc(doc(db,"approved_users",email),{
     email:email,
     approvedAt: new Date().toISOString()
   });
 
-  const referralSnap = await getDocs(collection(db,"referrals"));
+  // 3. Process referrals
+  const snap = await getDocs(collection(db,"referrals"));
 
-  for (const rDoc of referralSnap.docs) {
-
+  for (const rDoc of snap.docs) {
     const r = rDoc.data();
 
-    if(r.email === email && r.credited === false){
+    if(r.email === email && r.credited === false && r.referrerId){
 
       const referrerRef = doc(db,"users",r.referrerId);
 
@@ -250,7 +241,7 @@ window.approve = async function(id,email){
   loadPayments();
 };
 
-window.remove = async function(id){
+window.removeItem = async function(id){
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
 };
@@ -289,4 +280,4 @@ loadFreeWithdrawals();
 </script>
 
 </body>
-</html>
+  </html>
