@@ -165,6 +165,7 @@ margin-top:8px;
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 import {
@@ -201,6 +202,7 @@ function go(page){
 window.location.href = BASE + page;
 }
 
+/* FIXED LOGIN FLOW (NO BLOCKING OLD USERS) */
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
@@ -218,28 +220,31 @@ document.getElementById("refLink").innerText = refLink;
 localStorage.setItem("cryptomice_referrer", user.uid);
 localStorage.setItem("referrer", user.uid);
 
-/* ENSURE USER EXISTS */
+/* SAFE USER CREATION (FIX FOR OLD USERS) */
 const userRef = doc(db, "users", user.uid);
-const snap = await getDoc(userRef);
+let snap = await getDoc(userRef);
 
 if (!snap.exists()) {
+
 await setDoc(userRef, {
 email: user.email,
 earnings: 0,
 referrals: 0,
 createdAt: serverTimestamp(),
-approved: true,
-accountType: "paid"
+accountType: "user"
 });
+
+snap = await getDoc(userRef);
 }
 
-const data = (await getDoc(userRef)).data();
+const data = snap.data() || {};
 
 document.getElementById("refCount").innerText = data.referrals || 0;
 document.getElementById("earnings").innerText = data.earnings || 0;
 
 });
 
+/* COPY LINK */
 window.copyLink = function(){
 navigator.clipboard.writeText(
 document.getElementById("refLink").innerText
@@ -247,6 +252,7 @@ document.getElementById("refLink").innerText
 alert("Copied!");
 };
 
+/* WITHDRAW */
 document.getElementById("withdrawBtn").addEventListener("click", async () => {
 
 const amount = parseFloat(document.getElementById("withdrawAmount").value);
@@ -270,6 +276,11 @@ return;
 
 const userRef = doc(db, "users", auth.currentUser.uid);
 const snap = await getDoc(userRef);
+
+if (!snap.exists()) {
+msg.innerText = "User data missing";
+return;
+}
 
 const data = snap.data();
 const earnings = data.earnings || 0;
