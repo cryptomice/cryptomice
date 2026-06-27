@@ -219,6 +219,9 @@ document.getElementById("userEmail").innerText =
 const refLink = getRefLink(user.uid);
 document.getElementById("refLink").innerText = refLink;
 
+/* SAVE REFERRAL CODE FOR PAYMENT FLOW */
+localStorage.setItem("cryptomice_referrer", user.uid);
+
 /* ENSURE USER EXISTS (WORKS FOR OLD + NEW USERS) */
 const userRef = doc(db, "users", user.uid);
 const snap = await getDoc(userRef);
