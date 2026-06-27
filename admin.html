@@ -139,7 +139,11 @@ container.innerHTML += `
 <p><b>TXID:</b> ${data.txid}</p>
 <p><b>Status:</b> ${data.status}</p>
 
-<button class="approve" onclick="approve('${d.id}','${data.email}','${data.referrerId || ""}')">Approve</button>
+<button class="approve"
+onclick="approve('${d.id}','${data.email}','${data.referrerId || ""}')">
+Approve
+</button>
+
 <button class="delete" onclick="remove('${d.id}')">Delete</button>
 </div>
 `;
@@ -203,7 +207,7 @@ container.innerHTML += `
 });
 }
 
-/* ================= APPROVE FIXED (OLD USERS SUPPORT) ================= */
+/* ================= FIXED APPROVAL (OLD USERS SAFE) ================= */
 window.approve = async function(id,email,referrerId){
 
   try {
@@ -212,27 +216,33 @@ window.approve = async function(id,email,referrerId){
       status:"approved"
     });
 
-    /* FIX: approved_users MUST USE UID-safe key */
+    /* SAFE + CONSISTENT APPROVAL STORAGE */
     await setDoc(doc(db,"approved_users",id),{
       email,
       paymentId:id,
-      approvedAt: new Date().toISOString()
+      approved:true,
+      createdAt: new Date().toISOString()
     });
 
-    /* FIX: referral system SAFE */
+    /* REFERRAL FIX (NO BREAKING OLD USERS) */
     const referralSnap = await getDocs(collection(db,"referrals"));
 
     for (const rDoc of referralSnap.docs) {
+
       const r = rDoc.data();
 
       if(r.email === email && r.credited === false){
 
         const referrerRef = doc(db,"users",r.referrerId);
 
-        await updateDoc(referrerRef,{
-          earnings: increment(0.01),
-          referrals: increment(1)
-        });
+        const refSnap = await getDoc(referrerRef);
+
+        if(refSnap.exists()){
+          await updateDoc(referrerRef,{
+            earnings: increment(0.01),
+            referrals: increment(1)
+          });
+        }
 
         await updateDoc(doc(db,"referrals",rDoc.id),{
           credited: true
@@ -243,11 +253,11 @@ window.approve = async function(id,email,referrerId){
     loadPayments();
 
   } catch(e){
-    alert("Error approving: " + e.message);
+    alert("Approval error: " + e.message);
   }
 };
 
-/* ================= OTHER ACTIONS ================= */
+/* ================= ACTIONS ================= */
 window.remove = async (id)=>{
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
@@ -287,4 +297,4 @@ loadFreeWithdrawals();
 </script>
 
 </body>
-</html>
+  </html>
