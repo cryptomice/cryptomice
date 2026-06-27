@@ -262,7 +262,7 @@ window.submitPayment = async function () {
   }
 
   try {
-    const referrerId = localStorage.getItem("cryptomice_referrer") || "";
+    const referrerId = localStorage.getItem("referrer") || "";
 
 await addDoc(collection(db, "payments"), {
   email: email,
