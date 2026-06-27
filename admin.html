@@ -118,7 +118,7 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ---------------- LOAD PAYMENTS ---------------- */
+/* ================= PAYMENTS ================= */
 async function loadPayments(){
 const container = document.getElementById("payments");
 container.innerHTML = "";
@@ -139,14 +139,14 @@ container.innerHTML += `
 <p><b>TXID:</b> ${data.txid}</p>
 <p><b>Status:</b> ${data.status}</p>
 
-<button class="approve" onclick="approve('${d.id}','${data.email}')">Approve</button>
-<button class="delete" onclick="removeItem('${d.id}')">Delete</button>
+<button class="approve" onclick="approve('${d.id}','${data.email}','${data.referrerId || ""}')">Approve</button>
+<button class="delete" onclick="remove('${d.id}')">Delete</button>
 </div>
 `;
 });
 }
 
-/* ---------------- LOAD WITHDRAWALS ---------------- */
+/* ================= WITHDRAWALS ================= */
 async function loadWithdrawals(){
 const container = document.getElementById("withdrawals");
 container.innerHTML = "";
@@ -174,7 +174,7 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- LOAD FREE WITHDRAWALS ---------------- */
+/* ================= FREE WITHDRAWALS ================= */
 async function loadFreeWithdrawals(){
 const container = document.getElementById("freeWithdrawals");
 container.innerHTML = "";
@@ -203,70 +203,77 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- APPROVE + REFERRAL LOGIC ---------------- */
+/* ================= APPROVE FIXED (OLD USERS SUPPORT) ================= */
+window.approve = async function(id,email,referrerId){
 
-window.approve = async function(id,email){
+  try {
 
-  // 1. Approve payment
-  await updateDoc(doc(db,"payments",id),{
-    status:"approved"
-  });
+    await updateDoc(doc(db,"payments",id),{
+      status:"approved"
+    });
 
-  // 2. Unlock user
-  await setDoc(doc(db,"approved_users",email),{
-    email:email,
-    approvedAt: new Date().toISOString()
-  });
+    /* FIX: approved_users MUST USE UID-safe key */
+    await setDoc(doc(db,"approved_users",id),{
+      email,
+      paymentId:id,
+      approvedAt: new Date().toISOString()
+    });
 
-  // 3. Process referrals
-  const snap = await getDocs(collection(db,"referrals"));
+    /* FIX: referral system SAFE */
+    const referralSnap = await getDocs(collection(db,"referrals"));
 
-  for (const rDoc of snap.docs) {
-    const r = rDoc.data();
+    for (const rDoc of referralSnap.docs) {
+      const r = rDoc.data();
 
-    if(r.email === email && r.credited === false && r.referrerId){
+      if(r.email === email && r.credited === false){
 
-      const referrerRef = doc(db,"users",r.referrerId);
+        const referrerRef = doc(db,"users",r.referrerId);
 
-      await updateDoc(referrerRef,{
-        earnings: increment(0.01)
-      });
+        await updateDoc(referrerRef,{
+          earnings: increment(0.01),
+          referrals: increment(1)
+        });
 
-      await updateDoc(doc(db,"referrals",rDoc.id),{
-        credited: true
-      });
+        await updateDoc(doc(db,"referrals",rDoc.id),{
+          credited: true
+        });
+      }
     }
-  }
 
-  loadPayments();
+    loadPayments();
+
+  } catch(e){
+    alert("Error approving: " + e.message);
+  }
 };
 
-window.removeItem = async function(id){
+/* ================= OTHER ACTIONS ================= */
+window.remove = async (id)=>{
 await deleteDoc(doc(db,"payments",id));
 loadPayments();
 };
 
-window.markPaid = async function(id){
+window.markPaid = async (id)=>{
 await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
 loadWithdrawals();
 };
 
-window.deleteWithdraw = async function(id){
+window.deleteWithdraw = async (id)=>{
 await deleteDoc(doc(db,"withdrawals",id));
 loadWithdrawals();
 };
 
-window.markFree = async function(id){
+window.markFree = async (id)=>{
 await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
 loadFreeWithdrawals();
 };
 
-window.deleteFree = async function(id){
+window.deleteFree = async (id)=>{
 await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
 loadFreeWithdrawals();
 };
 
-window.manualRefresh = function(){
+window.manualRefresh = ()=>{
 loadPayments();
 loadWithdrawals();
 loadFreeWithdrawals();
@@ -280,4 +287,4 @@ loadFreeWithdrawals();
 </script>
 
 </body>
-  </html>
+</html>
