@@ -196,7 +196,7 @@ const BASE = "https://cryptomice.github.io/cryptomice/";
 
 /* SAFE REF LINK → MUST GO TO INDEX */
 const getRefLink = (uid) => {
-return `${BASE}index.html?ref=${uid}`;
+return `${BASE}payment.html?ref=${uid}`;
 };
 
 /* REDIRECT SAFELY */
@@ -231,7 +231,8 @@ await setDoc(userRef, {
 email: user.email,
 earnings: 0,
 referrals: 0,
-createdAt: serverTimestamp()
+createdAt: serverTimestamp(),
+approved: true
 });
 }
 
