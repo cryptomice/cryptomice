@@ -113,7 +113,8 @@ getDocs,
 updateDoc,
 deleteDoc,
 doc,
-setDoc
+setDoc,
+increment
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -213,58 +214,40 @@ container.innerHTML += `
 });
 }
 
-/* ---------------- ACTIONS ---------------- */
+/* ---------------- APPROVE + REFERRAL SYSTEM ---------------- */
 
 window.approve = async function(id,email){
 
-  // 1. Approve payment
   await updateDoc(doc(db,"payments",id),{
     status:"approved"
   });
 
-  // 2. Allow user signup/login
   await setDoc(doc(db,"approved_users",email),{
     email:email,
     approvedAt: new Date().toISOString()
   });
 
-  // 3. FIND referral entry for this user
   const referralSnap = await getDocs(collection(db,"referrals"));
 
-  referralSnap.forEach(async (rDoc) => {
+  for (const rDoc of referralSnap.docs) {
+
     const r = rDoc.data();
 
-    // match new user email
     if(r.email === email && r.credited === false){
 
-      // 4. Credit referrer
       const referrerRef = doc(db,"users",r.referrerId);
 
       await updateDoc(referrerRef,{
         earnings: increment(0.01)
       });
 
-      // 5. Mark referral as credited
       await updateDoc(doc(db,"referrals",rDoc.id),{
         credited: true
       });
     }
-  });
+  }
 
   loadPayments();
-};
-
-await updateDoc(doc(db,"payments",id),{
-status:"approved"
-});
-
-/* STRICT ACCESS GATE */
-await setDoc(doc(db,"approved_users",email),{
-email:email,
-approvedAt: new Date().toISOString()
-});
-
-loadPayments();
 };
 
 window.remove = async function(id){
