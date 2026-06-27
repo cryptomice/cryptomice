@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* SAME STYLES (UNCHANGED FOR SAFETY) */
 *{
 margin:0;
 padding:0;
@@ -60,7 +59,6 @@ text-shadow:0 0 15px #ffd84d;
 max-width:500px;
 margin:20px auto;
 padding:15px;
-overflow:hidden;
 }
 
 .card{
@@ -117,7 +115,6 @@ color:black;
 
 </div>
 
-<!-- ✅ SMART LINK ENGINE (GLOBAL ROUTER) -->
 <script src="smartlink.js"></script>
 
 <script type="module">
@@ -129,8 +126,7 @@ getFirestore,
 doc,
 setDoc,
 collection,
-addDoc,
-increment
+addDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -146,7 +142,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const ref = localStorage.getItem("cryptomice_referrer");
+/* FIXED: correct referral key */
+const referrer = localStorage.getItem("cryptomice_referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
@@ -165,33 +162,35 @@ try {
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
+/* USER ACCOUNT (UNIFIED SYSTEM) */
 await setDoc(doc(db,"users",uid),{
 email,
-referrals:0,
 earnings:0,
-createdAt:new Date()
+referrals:0,
+approved:true,
+createdAt:new Date().toISOString()
 });
 
-/* REFERRAL LOGIC (UNCHANGED) */
-if (ref) {
+/* REFERRAL TRACKING */
+if(referrer){
 await addDoc(collection(db,"referrals"),{
-  referrerId: ref,
-  newUserId: uid,
-  email,
-  createdAt: new Date(),
-  credited: false,
-  approved: false
+referrerId: referrer,
+newUserId: uid,
+email,
+credited:false,
+approved:false,
+createdAt:new Date().toISOString()
 });
 
-localStorage.removeItem("referrer");
+localStorage.removeItem("cryptomice_referrer");
 }
 
-/* AFTER SUCCESS → USE SMART NAV */
+/* SMART NAV */
 msg.style.color="#ffd84d";
 msg.innerText="Account created";
 
 setTimeout(()=>{
-smartNavigate("earn.html");
+window.location.href = "dashboard.html";
 },1000);
 
 }catch(e){
