@@ -1,6 +1,6 @@
 /* =========================
    CRYPTOMICE SMARTLINK ENGINE
-   CPA OPTIMIZED + 30 LINKS
+   CPA OPTIMIZED + REFERRAL FIX
    ========================= */
 
 /* ===== ALL 30 SMART LINKS ===== */
@@ -39,14 +39,10 @@ const SMART_LINKS = [
 "https://wrathful-piano.com/i1Tn5O"
 ];
 
-/* ===== CPA OPTIMIZATION SYSTEM =====
-   - prevents repeating same link
-   - improves conversion distribution
-*/
+/* ===== CPA OPTIMIZATION SYSTEM ===== */
 let lastIndex = -1;
 let recentLinks = [];
 
-/* pick smart CPA-optimized link */
 function getSmartLink(){
 
   let i;
@@ -59,10 +55,8 @@ function getSmartLink(){
   );
 
   lastIndex = i;
-
   recentLinks.push(i);
 
-  /* keep only last 5 to avoid repetition spam */
   if(recentLinks.length > 5){
     recentLinks.shift();
   }
@@ -82,10 +76,17 @@ window.smartNavigate = function(page){
     return;
   }
 
+  /* store target page */
   localStorage.setItem("target_page", page);
   localStorage.setItem("awaiting_return", "yes");
 
-  /* open CPA-optimized link */
+  /* ✅ REAL REFERRAL TRACKING FIX */
+  const urlRef = new URLSearchParams(window.location.search).get("ref");
+  if(urlRef){
+    localStorage.setItem("cryptomice_referrer", urlRef);
+  }
+
+  /* open CPA link */
   window.open(getSmartLink(), "_blank");
 
   alert("Return to continue access.");
@@ -110,9 +111,7 @@ window.addEventListener("focus", ()=>{
 
 });
 
-/* ===== OPTIONAL AUTO INJECTION =====
-   (SKIPS ONLY START AD BUTTON)
-*/
+/* ===== AUTO BUTTON INJECTION ===== */
 window.addEventListener("DOMContentLoaded", ()=>{
 
   const buttons = document.querySelectorAll("button");
@@ -158,7 +157,6 @@ window.addEventListener("DOMContentLoaded", ()=>{
     }
 
     btn.dataset.locked = "1";
-
   });
 
 });
