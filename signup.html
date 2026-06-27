@@ -179,13 +179,16 @@ referrerId: ref,
 newUserId: uid,
 email,
 createdAt: new Date(),
-credited: true
 });
 
-await setDoc(doc(db,"users",ref),{
-referrals: increment(1),
-earnings: increment(1)
-},{ merge:true });
+await addDoc(collection(db,"referrals"),{
+  referrerId: ref,
+  newUserId: uid,
+  email,
+  createdAt: new Date(),
+  credited: false,
+  approved: false
+});
 
 localStorage.removeItem("referrer");
 }
