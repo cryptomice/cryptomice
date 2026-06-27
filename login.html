@@ -24,7 +24,6 @@ overflow:hidden;
 position:relative;
 }
 
-/* GOLD BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -85,10 +84,6 @@ font-size:15px;
 outline:none;
 }
 
-input::placeholder{
-color:#9ca3af;
-}
-
 button{
 width:100%;
 padding:14px;
@@ -99,11 +94,6 @@ color:black;
 font-weight:bold;
 font-size:15px;
 cursor:pointer;
-transition:0.2s;
-}
-
-button:hover{
-transform:scale(1.01);
 }
 
 #msg{
@@ -112,24 +102,6 @@ text-align:center;
 font-size:13px;
 color:#ffd84d;
 word-break:break-word;
-}
-
-.footer{
-margin-top:20px;
-text-align:center;
-font-size:13px;
-color:#9ca3af;
-}
-
-.footer a{
-color:#ffd84d;
-text-decoration:none;
-font-weight:bold;
-}
-
-.loading{
-opacity:0.7;
-pointer-events:none;
 }
 </style>
 </head>
@@ -141,40 +113,35 @@ pointer-events:none;
 <div class="logo">🐭 CRYPTOMICE</div>
 
 <div class="subtitle">
-Login to access your dashboard and rewards
+Login to access dashboard
 </div>
 
 <input id="email" type="email" placeholder="Enter Email">
-
 <input id="password" type="password" placeholder="Enter Password">
 
-<button id="loginBtn">
-LOGIN
-</button>
+<button id="loginBtn">LOGIN</button>
 
 <p id="msg"></p>
-
-<div class="footer">
-Don't have an account?
-<a href="signup.html">Create Account</a>
-</div>
 
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-
 import {
 getAuth,
 signInWithEmailAndPassword,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence
-}
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-/* FIREBASE */
+import {
+getFirestore,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
 const firebaseConfig = {
 apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
 authDomain: "cryptomice-635eb.firebaseapp.com",
@@ -186,32 +153,46 @@ appId: "1:831908710470:web:e95e1bdacb90309a046247"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-/* KEEP LOGIN */
 await setPersistence(auth, browserLocalPersistence);
 
+/* CHECK APPROVAL BEFORE DASHBOARD */
+async function checkAccess(uid){
+  const snap = await getDoc(doc(db,"users",uid));
+
+  if(!snap.exists()) return false;
+
+  const data = snap.data();
+
+  /* ALLOW LOGIN ONLY IF USER EXISTS */
+  return data.approved === true || data.approved === undefined;
+}
+
 /* AUTO REDIRECT */
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
 
 if(user){
-window.location.replace("dashboard.html");
+  const ok = await checkAccess(user.uid);
+
+  if(ok){
+    window.location.replace("dashboard.html");
+  } else {
+    document.getElementById("msg").innerText =
+    "Account not approved yet";
+    auth.signOut();
+  }
 }
 
 });
 
 /* LOGIN */
-document.getElementById("loginBtn")
-.addEventListener("click", async ()=>{
+document.getElementById("loginBtn").addEventListener("click", async ()=>{
 
-const btn = document.getElementById("loginBtn");
-
-const email =
-document.getElementById("email").value.trim();
-
-const password =
-document.getElementById("password").value;
-
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value;
 const msg = document.getElementById("msg");
+const btn = document.getElementById("loginBtn");
 
 if(!email || !password){
 msg.innerText = "Enter email and password";
@@ -221,13 +202,17 @@ return;
 try{
 
 btn.innerText = "Logging in...";
-btn.classList.add("loading");
 
-await signInWithEmailAndPassword(
-auth,
-email,
-password
-);
+const cred = await signInWithEmailAndPassword(auth,email,password);
+
+const ok = await checkAccess(cred.user.uid);
+
+if(!ok){
+msg.innerText = "Account not approved yet";
+auth.signOut();
+btn.innerText = "LOGIN";
+return;
+}
 
 msg.innerText = "Login successful";
 
@@ -238,9 +223,7 @@ window.location.replace("dashboard.html");
 }catch(error){
 
 msg.innerText = error.message;
-
 btn.innerText = "LOGIN";
-btn.classList.remove("loading");
 
 }
 
