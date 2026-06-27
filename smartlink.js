@@ -1,9 +1,9 @@
 /* =========================
    CRYPTOMICE SMARTLINK ENGINE
-   CPA OPTIMIZED + REFERRAL FIX
+   FIXED: referral + free/paid routing + safer navigation
    ========================= */
 
-/* ===== ALL 30 SMART LINKS ===== */
+/* ===== ALL SMART LINKS ===== */
 const SMART_LINKS = [
 "https://omg10.com/4/10987288",
 "https://omg10.com/4/10987286",
@@ -39,49 +39,46 @@ const SMART_LINKS = [
 "https://wrathful-piano.com/i1Tn5O"
 ];
 
-/* ===== CPA OPTIMIZATION SYSTEM ===== */
+/* ===== LINK ROTATION ===== */
 let lastIndex = -1;
-let recentLinks = [];
+let recent = [];
 
 function getSmartLink(){
-
   let i;
 
   do {
     i = Math.floor(Math.random() * SMART_LINKS.length);
-  } while (
-    i === lastIndex || 
-    recentLinks.includes(i)
-  );
+  } while (i === lastIndex || recent.includes(i));
 
   lastIndex = i;
-  recentLinks.push(i);
+  recent.push(i);
 
-  if(recentLinks.length > 5){
-    recentLinks.shift();
+  if(recent.length > 5){
+    recent.shift();
   }
 
   return SMART_LINKS[i];
 }
 
-/* ===== CORE SMART NAVIGATION ===== */
+/* ===== SMART NAVIGATION ===== */
 window.smartNavigate = function(page){
 
   const unlock = localStorage.getItem("smartlink_unlock");
   const now = Date.now();
 
-  /* if already unlocked */
+  /* if user already unlocked */
   if(unlock && now < parseInt(unlock)){
     window.location.href = page;
     return;
   }
 
-  /* store target page */
+  /* save target page */
   localStorage.setItem("target_page", page);
   localStorage.setItem("awaiting_return", "yes");
 
-  /* ✅ REAL REFERRAL TRACKING FIX */
+  /* FIXED: correct referral source handling */
   const urlRef = new URLSearchParams(window.location.search).get("ref");
+
   if(urlRef){
     localStorage.setItem("cryptomice_referrer", urlRef);
   }
@@ -89,7 +86,7 @@ window.smartNavigate = function(page){
   /* open CPA link */
   window.open(getSmartLink(), "_blank");
 
-  alert("Return to continue access.");
+  alert("Complete action and return to continue.");
 };
 
 /* ===== RETURN DETECTOR ===== */
@@ -108,10 +105,9 @@ window.addEventListener("focus", ()=>{
 
     window.location.href = target;
   }
-
 });
 
-/* ===== AUTO BUTTON INJECTION ===== */
+/* ===== AUTO BUTTON ROUTER (FIXED FREE/PAID SEPARATION) ===== */
 window.addEventListener("DOMContentLoaded", ()=>{
 
   const buttons = document.querySelectorAll("button");
@@ -120,20 +116,24 @@ window.addEventListener("DOMContentLoaded", ()=>{
 
     const text = (btn.innerText || "").toLowerCase();
 
-    const isAdButton =
-      btn.onclick?.toString().includes("startAd") ||
-      text.includes("start ad");
-
-    if(isAdButton) return;
-
     if(btn.dataset.locked === "1") return;
+
+    /* IMPORTANT FIX:
+       do NOT override login/signup/payment forms */
+    const isAuthPage =
+      document.querySelector("input[type='password']") ||
+      location.href.includes("login") ||
+      location.href.includes("signup") ||
+      location.href.includes("payment");
+
+    if(isAuthPage) return;
 
     if(text.includes("activate")){
       btn.onclick = ()=> smartNavigate("payment.html");
     }
 
     else if(text.includes("join")){
-      btn.onclick = ()=> smartNavigate("register.html");
+      btn.onclick = ()=> smartNavigate("signup.html");
     }
 
     else if(text.includes("guide")){
@@ -145,11 +145,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
     }
 
     else if(text.includes("withdraw")){
-      btn.onclick = ()=> smartNavigate("withdraw.html");
-    }
-
-    else if(text.includes("faucet")){
-      btn.onclick = ()=> smartNavigate("faucet.html");
+      btn.onclick = ()=> smartNavigate("dashboard.html");
     }
 
     else if(text.includes("offer")){
