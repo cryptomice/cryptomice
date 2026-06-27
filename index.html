@@ -316,7 +316,20 @@ Download App
 
 <div class="footer">© 2026 Cryptomice</div>      
 
-<!-- SMARTLINK ENGINE (ONE FILE ONLY) -->
+<!-- REFERRAL TRACKER -->
+<script>
+// Save referrer when someone opens:
+// index.html?ref=USERID
+
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if(ref){
+localStorage.setItem("cryptomice_referrer", ref);
+}
+</script>
+
+<!-- SMARTLINK ENGINE -->
 <script src="smartlink.js"></script>
 
 <!-- HIDE DOWNLOAD BUTTON INSIDE INSTALLED APP -->
