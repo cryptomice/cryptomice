@@ -5,14 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-margin:0;
 font-family:Arial, sans-serif;
 background:#050812;
 color:white;
@@ -22,16 +17,13 @@ overflow-x:hidden;
 body::before{
 content:"";
 position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
+top:0;left:0;
+width:100%;height:100%;
 background:
 radial-gradient(circle at 20% 30%, rgba(255,215,0,0.18), transparent 40%),
 radial-gradient(circle at 80% 60%, rgba(255,215,0,0.10), transparent 45%),
 radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06), transparent 50%);
 animation:goldFlow 8s infinite alternate ease-in-out;
-pointer-events:none;
 z-index:0;
 }
 
@@ -49,11 +41,7 @@ background:rgba(17,24,39,0.8);
 border-bottom:1px solid rgba(255,215,0,0.15);
 }
 
-.header h2{
-margin:0;
-color:#ffd84d;
-text-shadow:0 0 15px #ffd84d;
-}
+.header h2{color:#ffd84d;}
 
 .container{
 max-width:500px;
@@ -86,9 +74,11 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 margin-top:10px;
-background:linear-gradient(90deg,#ffd84d,#ffcc00,#fff2a6);
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
 color:black;
 }
+
+#msg{margin-top:10px;text-align:center;}
 </style>
 </head>
 
@@ -99,12 +89,11 @@ color:black;
 </div>
 
 <div class="container">
-
 <div class="card">
 
 <h3>Create Account</h3>
 
-<input id="email" placeholder="Enter approved email">
+<input id="email" placeholder="Enter email">
 <input id="password" type="password" placeholder="Create password">
 
 <button id="signupBtn">Create Account</button>
@@ -112,14 +101,12 @@ color:black;
 <p id="msg"></p>
 
 </div>
-
 </div>
-
-<script src="smartlink.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 import {
 getFirestore,
@@ -142,16 +129,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* FIXED: correct referral key */
+/* FIX: unified referral key */
 const referrer = localStorage.getItem("cryptomice_referrer");
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
 
 const email = document.getElementById("email").value.trim().toLowerCase();
-const password = document.getElementById("password").value.trim();
+const password = document.getElementById("password").value;
 const msg = document.getElementById("msg");
 
-if (!email || !password) {
+if(!email || !password){
 msg.innerText = "Fill all fields";
 msg.style.color = "red";
 return;
@@ -162,36 +149,34 @@ try {
 const userCred = await createUserWithEmailAndPassword(auth,email,password);
 const uid = userCred.user.uid;
 
-/* USER ACCOUNT (UNIFIED SYSTEM) */
+/* FIX: ALWAYS compatible user structure (old + new users) */
 await setDoc(doc(db,"users",uid),{
 email,
 earnings:0,
 referrals:0,
 approved:true,
-createdAt:new Date().toISOString()
+createdAt: Date.now()
 });
 
-/* REFERRAL TRACKING */
+/* FIX: referral system consistent */
 if(referrer){
 await addDoc(collection(db,"referrals"),{
 referrerId: referrer,
 newUserId: uid,
 email,
 credited:false,
-approved:false,
-createdAt:new Date().toISOString()
+createdAt: Date.now()
 });
 
 localStorage.removeItem("cryptomice_referrer");
 }
 
-/* SMART NAV */
 msg.style.color="#ffd84d";
 msg.innerText="Account created";
 
 setTimeout(()=>{
 window.location.href = "dashboard.html";
-},1000);
+},800);
 
 }catch(e){
 msg.style.color="red";
