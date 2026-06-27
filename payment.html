@@ -262,13 +262,21 @@ window.submitPayment = async function () {
   }
 
   try {
-    await addDoc(collection(db, "payments"), {
-      email: email,
-      txid: txid,
-      phone: txid,
-      status: "pending",
-      createdAt: new Date().toLocaleString()
-    });
+    const referrerId = localStorage.getItem("cryptomice_referrer") || "";
+
+await addDoc(collection(db, "payments"), {
+  email: email,
+  txid: txid,
+  phone: txid,
+
+  /* Referral tracking */
+  referrerId: referrerId,
+
+  status: "pending",
+  approved: false,
+
+  createdAt: new Date().toLocaleString()
+});
 
     alert("Payment proof submitted successfully!");
 
