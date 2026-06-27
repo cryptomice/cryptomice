@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* RESET */
 *{
 margin:0;
 padding:0;
@@ -19,7 +18,6 @@ color:white;
 overflow-x:hidden;
 }
 
-/* BACKGROUND EFFECT */
 body::before{
 content:"";
 position:fixed;
@@ -107,27 +105,6 @@ border:1px solid rgba(255,215,0,0.15);
 word-break:break-all;
 }
 
-.social{
-text-align:center;
-margin:25px 0;
-}
-
-.social-text{
-font-size:13px;
-opacity:0.8;
-margin-bottom:10px;
-}
-
-.social a{
-display:inline-block;
-padding:12px 20px;
-border-radius:12px;
-background:linear-gradient(90deg,#1877f2,#0d5ddb);
-color:white;
-font-weight:bold;
-text-decoration:none;
-}
-
 .footer{
 text-align:center;
 padding:15px;
@@ -160,11 +137,10 @@ font-size:13px;
 
 <div class="container">
 
-<!-- PAYMENT -->
 <div class="card">
 <h3>1. Activate Access</h3>
 
-<p>Send <b>0.0364 Litecoin (LTC) or 20 ZMW </b>:</p>
+<p>Send <b>0.0364 Litecoin (LTC) or 20 ZMW</b>:</p>
 
 <div class="address">
 ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5 or MTN MOMO +260966497705
@@ -176,10 +152,9 @@ ltc1q6e2ad703p0sx5pe2hz8qrqylnp05vy5wkxc4u5 or MTN MOMO +260966497705
 <button class="primary" onclick="submitPayment()">
 Submit Payment
 </button>
-  
+
 </div>
 
-<!-- LOGIN -->
 <div class="card">
 <h3>2. Member Login</h3>
 
@@ -192,7 +167,6 @@ Login
 
 </div>
 
-<!-- SIGNUP -->
 <div class="card">
 <h3>3. Create Account</h3>
 
@@ -204,7 +178,6 @@ GO TO SIGN UP
 
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
 
 <a href="about.html">About</a> |
@@ -219,11 +192,9 @@ GO TO SIGN UP
 
 </div>
 
-<!-- SMARTLINK ENGINE -->
 <script src="smartlink.js"></script>
 
 <script>
-/* UNIVERSAL SMART NAVIGATION */
 function smartGo(page){
   if(window.smartNavigate){
     window.smartNavigate(page);
@@ -231,63 +202,71 @@ function smartGo(page){
     window.location.href = page;
   }
 }
+
+/* FIXED: READ REF FROM URL */
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("ref");
+
+if(ref){
+  localStorage.setItem("cryptomice_referrer", ref);
+}
 </script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  addDoc
+getFirestore,
+collection,
+addDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-  authDomain: "cryptomice-635eb.firebaseapp.com",
-  projectId: "cryptomice-635eb",
-  storageBucket: "cryptomice-635eb.firebasestorage.app",
-  messagingSenderId: "831908710470",
-  appId: "1:831908710470:web:e95e1bdacb90309a046247"
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 window.submitPayment = async function () {
-  const email = document.getElementById("email").value.trim();
-  const txid = document.getElementById("txid").value.trim();
 
-  if (!email || !txid) {
-    alert("Please enter your email and TXID/phone number");
-    return;
-  }
+const email = document.getElementById("email").value.trim();
+const txid = document.getElementById("txid").value.trim();
 
-  try {
-    const referrerId = localStorage.getItem("referrer") || "";
+if(!email || !txid){
+alert("Enter email and TXID");
+return;
+}
 
-await addDoc(collection(db, "payments"), {
-  email: email,
-  txid: txid,
-  phone: txid,
+try {
 
-  /* Referral tracking */
-  referrerId: referrerId,
+const referrerId = localStorage.getItem("cryptomice_referrer") || "";
 
-  status: "pending",
-  approved: false,
-
-  createdAt: new Date().toLocaleString()
+await addDoc(collection(db,"payments"),{
+email,
+txid,
+phone: txid,
+referrerId,
+status:"pending",
+approved:false,
+createdAt: new Date().toISOString()
 });
 
-    alert("Payment proof submitted successfully!");
+alert("Payment submitted");
 
-    document.getElementById("email").value = "";
-    document.getElementById("txid").value = "";
+document.getElementById("email").value = "";
+document.getElementById("txid").value = "";
 
-  } catch (error) {
-    console.error(error);
-    alert("Failed to submit payment proof.");
-  }
+} catch(e){
+console.error(e);
+alert("Failed to submit");
+}
 };
 </script>
+
 </body>
-</html>
+  </html>
