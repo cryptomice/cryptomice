@@ -1,134 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Cryptomice Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#03060c;
-color:white;
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-position:relative;
-}
-
-body::before{
-content:"";
-position:fixed;
-width:100%;
-height:100%;
-top:0;
-left:0;
-background:
-radial-gradient(circle at 20% 30%, rgba(255,215,0,0.15), transparent 40%),
-radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent 45%),
-radial-gradient(circle at 40% 80%, rgba(255,215,0,0.08), transparent 50%);
-animation:glow 8s infinite alternate ease-in-out;
-z-index:0;
-}
-
-@keyframes glow{
-0%{transform:scale(1);}
-100%{transform:scale(1.1);}
-}
-
-.card{
-position:relative;
-z-index:1;
-width:90%;
-max-width:420px;
-background:#0b1220;
-padding:30px 22px;
-border-radius:20px;
-border:1px solid rgba(255,215,0,0.15);
-box-shadow:0 0 30px rgba(255,215,0,0.08);
-}
-
-.logo{
-text-align:center;
-font-size:30px;
-font-weight:bold;
-color:#ffd84d;
-margin-bottom:10px;
-text-shadow:0 0 10px #ffd84d;
-}
-
-.subtitle{
-text-align:center;
-font-size:14px;
-color:#9ca3af;
-margin-bottom:25px;
-}
-
-input{
-width:100%;
-padding:14px;
-margin-bottom:14px;
-border:none;
-border-radius:12px;
-background:#111827;
-color:white;
-font-size:15px;
-outline:none;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-background:linear-gradient(90deg,#ffd84d,#ffcc00);
-color:black;
-font-weight:bold;
-font-size:15px;
-cursor:pointer;
-}
-
-#msg{
-margin-top:15px;
-text-align:center;
-font-size:13px;
-color:#ffd84d;
-word-break:break-word;
-}
-</style>
-</head>
-
-<body>
-
-<div class="card">
-
-<div class="logo">🐭 CRYPTOMICE</div>
-
-<div class="subtitle">
-Login to access dashboard
-</div>
-
-<input id="email" type="email" placeholder="Enter Email">
-<input id="password" type="password" placeholder="Enter Password">
-
-<button id="loginBtn">LOGIN</button>
-
-<p id="msg"></p>
-
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-
 import {
 getAuth,
 signInWithEmailAndPassword,
@@ -140,7 +12,8 @@ browserLocalPersistence
 import {
 getFirestore,
 doc,
-getDoc
+getDoc,
+setDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -158,35 +31,36 @@ const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
-/* SAFE ACCESS CHECK (DO NOT BLOCK OLD USERS) */
-async function checkAccess(uid){
+/* ================= SAFE LOGIN CHECK ================= */
+async function ensureUser(uid, email){
 
-  const snap = await getDoc(doc(db,"users",uid));
+const ref = doc(db,"users",uid);
+const snap = await getDoc(ref);
 
-  /* IMPORTANT FIX:
-     If user exists → ALLOW LOGIN
-     No approval system blocking */
-  return snap.exists();
+/* AUTO FIX OLD USERS */
+if(!snap.exists()){
+await setDoc(ref,{
+email: email || "unknown",
+earnings: 0,
+referrals: 0,
+createdAt: Date.now(),
+accountType: "user"
+});
+}
+
+return true; // ALWAYS allow login
 }
 
 /* AUTO REDIRECT */
 onAuthStateChanged(auth, async (user) => {
 
 if(user){
-  const ok = await checkAccess(user.uid);
-
-  if(ok){
-    window.location.replace("dashboard.html");
-  } else {
-    document.getElementById("msg").innerText =
-    "User record missing. Please contact support.";
-    auth.signOut();
-  }
+await ensureUser(user.uid, user.email);
+window.location.replace("dashboard.html");
 }
-
 });
 
-/* LOGIN */
+/* LOGIN BUTTON */
 document.getElementById("loginBtn").addEventListener("click", async ()=>{
 
 const email = document.getElementById("email").value.trim();
@@ -206,14 +80,8 @@ btn.innerText = "Logging in...";
 
 const cred = await signInWithEmailAndPassword(auth,email,password);
 
-const ok = await checkAccess(cred.user.uid);
-
-if(!ok){
-msg.innerText = "User not found in system";
-auth.signOut();
-btn.innerText = "LOGIN";
-return;
-}
+/* FIX: auto-create missing DB profile */
+await ensureUser(cred.user.uid, cred.user.email);
 
 msg.innerText = "Login successful";
 
@@ -230,7 +98,4 @@ btn.innerText = "LOGIN";
 
 });
 
-</script>
-
-</body>
-</html>
+  </script>
