@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Withdraw | Cryptomice Free Tasks</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#050812;
+color:white;
+padding:20px;
+}
+
+.header{
+background:#111827;
+padding:15px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+color:#ffd84d;
+font-size:22px;
+font-weight:bold;
+}
+
+a{
+color:#ffd84d;
+text-decoration:none;
+font-weight:bold;
+}
+
+.container{
+max-width:500px;
+margin:20px auto;
+}
+
+.card{
+background:#111827;
+padding:25px;
+border-radius:12px;
+border:1px solid rgba(255,216,77,.15);
+}
+
+h2{
+color:#ffd84d;
+margin-bottom:20px;
+}
+
+label{
+display:block;
+margin-top:15px;
+margin-bottom:5px;
+}
+
+input,select{
+
+width:100%;
+padding:12px;
+border-radius:8px;
+border:none;
+background:#1f2937;
+color:white;
+
+}
+
+button{
+
+width:100%;
+margin-top:20px;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#ffd84d;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+#msg{
+
+text-align:center;
+margin-top:15px;
+
+}
+
+.balance{
+
+background:#1f2937;
+padding:15px;
+border-radius:8px;
+margin-bottom:20px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<div class="logo">
+🐭 Cryptomice Withdraw
+</div>
+
+<a href="ft-dashboard.html">
+Dashboard
+</a>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h2>
+Request Withdrawal
+</h2>
+
+
+<div class="balance">
+
+Current Balance:
+<strong>$<span id="balance">0.00</span></strong>
+
+</div>
+
+
+
+<label>
+Payment Method
+</label>
+
+<select id="method">
+
+<option value="paypal">
+PayPal
+</option>
+
+<option value="litecoin">
+Litecoin (LTC)
+</option>
+
+</select>
+
+
+
+<label>
+Payment Details
+</label>
+
+<input 
+id="details"
+placeholder="Enter PayPal email or LTC address">
+
+
+
+<button id="submit">
+
+Submit Request
+
+</button>
+
+
+<p id="msg"></p>
+
+
+</div>
+
+
+</div>
+
+
+<script type="module">
+
+
+import {initializeApp}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+
+import {
+
+getAuth,
+
+onAuthStateChanged
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+
+
+import {
+
+getFirestore,
+
+doc,
+
+getDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyE1CGezZ5mw",
+
+authDomain:"cryptomice-635eb.firebaseapp.com",
+
+projectId:"cryptomice-635eb",
+
+storageBucket:"cryptomice-635eb.firebasestorage.app",
+
+messagingSenderId:"831908710470",
+
+appId:"1:831908710470:web:e95e1bdacb90309a046247"
+
+};
+
+
+const app=initializeApp(firebaseConfig);
+
+const auth=getAuth(app);
+
+const db=getFirestore(app);
+
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+if(!user){
+
+window.location.href="ft-login.html";
+
+return;
+
+}
+
+
+const ref=doc(db,"ft_users",user.uid);
+
+const snap=await getDoc(ref);
+
+
+if(snap.exists()){
+
+document.getElementById("balance").innerText=
+(snap.data().balance || 0).toFixed(2);
+
+}
+
+
+});
+
+
+
+document.getElementById("submit").onclick=()=>{
+
+document.getElementById("msg").innerText=
+"Withdrawal request system will be connected next.";
+
+};
+
+
+</script>
+
+
+</body>
+
+  </html>
