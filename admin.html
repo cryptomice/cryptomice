@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Cryptomice Admin</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
 body{
 margin:0;
-font-family:Arial, sans-serif;
+font-family:Arial,sans-serif;
 background:#03060c;
 color:white;
 }
@@ -53,9 +56,20 @@ margin-top:5px;
 font-weight:bold;
 }
 
-.approve{background:linear-gradient(90deg,#00ff88,#00cc66);color:black;}
-.delete{background:linear-gradient(90deg,#ff4d4d,#cc0000);color:white;}
-.paid{background:linear-gradient(90deg,#ffd84d,#ffcc00);color:black;}
+.approve{
+background:linear-gradient(90deg,#00ff88,#00cc66);
+color:black;
+}
+
+.delete{
+background:linear-gradient(90deg,#ff4d4d,#cc0000);
+color:white;
+}
+
+.paid{
+background:linear-gradient(90deg,#ffd84d,#ffcc00);
+color:black;
+}
 
 .refresh-btn{
 margin:10px 15px;
@@ -72,229 +86,625 @@ opacity:0.6;
 font-size:13px;
 padding:10px;
 }
+
 </style>
+
 </head>
 
+
 <body>
+
 
 <div class="header">
 <h2>🐭 CRYPTOMICE ADMIN</h2>
 </div>
 
-<button class="refresh-btn" onclick="manualRefresh()">🔄 Refresh Data</button>
 
-<h3 class="section-title">📩 Payment Submissions</h3>
+<button class="refresh-btn" onclick="manualRefresh()">
+🔄 Refresh Data
+</button>
+
+
+<h3 class="section-title">
+📩 Payment Submissions
+</h3>
+
 <div id="payments" class="card"></div>
 
-<h3 class="section-title">💸 Withdrawals</h3>
+
+
+<h3 class="section-title">
+💸 Withdrawals
+</h3>
+
 <div id="withdrawals" class="card"></div>
 
-<h3 class="section-title">🐭 Free Withdrawals</h3>
+
+
+<h3 class="section-title">
+🐭 Free Withdrawals
+</h3>
+
 <div id="freeWithdrawals" class="card"></div>
+
+
+
+<!-- NEW FREE TASKS SECTION -->
+
+
+<h3 class="section-title">
+🎯 Free Tasks Submissions
+</h3>
+
+<div id="ftSubmissions" class="card"></div>
+
+
+
+<h3 class="section-title">
+👥 Free Tasks Users
+</h3>
+
+<div id="ftUsers" class="card"></div>
+
+
+
+<h3 class="section-title">
+💰 Free Tasks Withdrawals
+</h3>
+
+<div id="ftWithdrawals" class="card"></div>
+
+
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+
 import {
+
 getFirestore,
+
 collection,
+
 getDocs,
+
+getDoc,
+
 updateDoc,
+
 deleteDoc,
+
 doc,
+
 setDoc,
+
 increment
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
-authDomain: "cryptomice-635eb.firebaseapp.com",
-projectId: "cryptomice-635eb",
-storageBucket: "cryptomice-635eb.firebasestorage.app",
-messagingSenderId: "831908710470",
-appId: "1:831908710470:web:e95e1bdacb90309a046247"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* ================= PAYMENTS ================= */
-async function loadPayments(){
-const container = document.getElementById("payments");
-container.innerHTML = "";
-
-const snap = await getDocs(collection(db,"payments"));
-
-if(snap.empty){
-container.innerHTML = "<div class='empty'>No submissions</div>";
-return;
 }
 
-snap.forEach(d=>{
-const data = d.data();
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-container.innerHTML += `
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyE1CGezZ5mw",
+
+authDomain: "cryptomice-635eb.firebaseapp.com",
+
+projectId: "cryptomice-635eb",
+
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+
+messagingSenderId: "831908710470",
+
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+
+/* ================= OLD PAYMENTS ================= */
+
+
+async function loadPayments(){
+
+const container=document.getElementById("payments");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"payments"));
+
+
+if(snap.empty){
+
+container.innerHTML="<div class='empty'>No submissions</div>";
+
+return;
+
+}
+
+
+snap.forEach(d=>{
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
 <div class="item">
-<p><b>Email:</b> ${data.email}</p>
-<p><b>TXID:</b> ${data.txid}</p>
+
+<p><b>Email:</b> ${data.email || "N/A"}</p>
+
+<p><b>TXID:</b> ${data.txid || "N/A"}</p>
+
+<p><b>Status:</b> ${data.status || "pending"}</p>
+
+
+<button class="approve">
+
+Approve
+
+</button>
+
+
+<button class="delete" onclick="remove('${d.id}')">
+
+Delete
+
+</button>
+
+
+</div>
+
+`;
+
+});
+
+}
+   
+/* ================= OLD WITHDRAWALS ================= */
+
+async function loadWithdrawals(){
+
+const container=document.getElementById("withdrawals");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"withdrawals"));
+
+
+if(snap.empty){
+
+container.innerHTML="<div class='empty'>No withdrawals</div>";
+
+return;
+
+}
+
+
+snap.forEach(d=>{
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
+<div class="item">
+
+<p><b>Email:</b> ${data.email || "N/A"}</p>
+
+<p><b>Amount:</b> ${data.amount || "0"}</p>
+
+<p><b>Wallet:</b> ${data.wallet || "N/A"}</p>
+
+<p><b>Status:</b> ${data.status || "pending"}</p>
+
+
+<button class="paid" onclick="markPaid('${d.id}')">
+Mark Paid
+</button>
+
+
+<button class="delete" onclick="deleteWithdraw('${d.id}')">
+Delete
+</button>
+
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+/* ================= FREE WITHDRAWALS ================= */
+
+
+async function loadFreeWithdrawals(){
+
+const container=document.getElementById("freeWithdrawals");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"cryptomice_free_withdrawals"));
+
+
+if(snap.empty){
+
+container.innerHTML="<div class='empty'>No free withdrawals</div>";
+
+return;
+
+}
+
+
+snap.forEach(d=>{
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
+<div class="item">
+
+<p><b>User:</b> ${data.uid}</p>
+
+<p><b>Amount:</b> ${data.amount}</p>
+
+<p><b>Wallet:</b> ${data.wallet}</p>
+
 <p><b>Status:</b> ${data.status}</p>
 
-<button class="approve"
-onclick="approve('${d.id}','${data.email}','${data.referrerId || ""}')">
+
+<button class="paid" onclick="markFree('${d.id}')">
+Mark Paid
+</button>
+
+
+<button class="delete" onclick="deleteFree('${d.id}')">
+Delete
+</button>
+
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+/* ================= FREE TASK USERS ================= */
+
+
+async function loadFTUsers(){
+
+const container=document.getElementById("ftUsers");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"ft_users"));
+
+
+if(snap.empty){
+
+container.innerHTML="<div class='empty'>No Free Task users</div>";
+
+return;
+
+}
+
+
+snap.forEach(d=>{
+
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
+<div class="item">
+
+<p><b>Name:</b> ${data.fullname || "N/A"}</p>
+
+<p><b>Email:</b> ${data.email}</p>
+
+<p><b>Balance:</b> $${data.balance || 0}</p>
+
+<p><b>Approved Tasks:</b> ${data.approvedTasks || 0}</p>
+
+<p><b>Status:</b> ${data.accountStatus || "active"}</p>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+
+/* ================= FREE TASK SUBMISSIONS ================= */
+
+
+async function loadFTSubmissions(){
+
+const container=document.getElementById("ftSubmissions");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"ft_submissions"));
+
+
+if(snap.empty){
+
+container.innerHTML="<div class='empty'>No pending submissions</div>";
+
+return;
+
+}
+
+
+
+snap.forEach(d=>{
+
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
+<div class="item">
+
+<p><b>User:</b> ${data.uid}</p>
+
+<p><b>Task:</b> ${data.taskId || "N/A"}</p>
+
+<p><b>Status:</b> ${data.status || "pending"}</p>
+
+<p><b>Submitted:</b> ${data.createdAt || "N/A"}</p>
+
+
+<button class="approve" onclick="approveFT('${d.id}')">
 Approve
 </button>
 
-<button class="delete" onclick="remove('${d.id}')">Delete</button>
+
+<button class="delete" onclick="rejectFT('${d.id}')">
+Reject
+</button>
+
+
 </div>
+
 `;
+
 });
+
+
 }
 
-/* ================= WITHDRAWALS ================= */
-async function loadWithdrawals(){
-const container = document.getElementById("withdrawals");
-container.innerHTML = "";
 
-const snap = await getDocs(collection(db,"withdrawals"));
+
+/* ================= FREE TASK WITHDRAWALS ================= */
+
+
+async function loadFTWithdrawals(){
+
+const container=document.getElementById("ftWithdrawals");
+
+container.innerHTML="";
+
+
+const snap=await getDocs(collection(db,"ft_withdrawals"));
+
 
 if(snap.empty){
-container.innerHTML = "<div class='empty'>No withdrawals</div>";
+
+container.innerHTML="<div class='empty'>No requests</div>";
+
 return;
+
 }
+
 
 snap.forEach(d=>{
-const data = d.data();
 
-container.innerHTML += `
+
+const data=d.data();
+
+
+container.innerHTML+=`
+
 <div class="item">
-<p><b>Email:</b> ${data.email || "N/A"}</p>
-<p><b>Amount:</b> ${data.amount}</p>
-<p><b>Wallet:</b> ${data.wallet}</p>
 
-<button class="paid" onclick="markPaid('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteWithdraw('${d.id}')">Delete</button>
-</div>
-`;
-});
-}
-
-/* ================= FREE WITHDRAWALS ================= */
-async function loadFreeWithdrawals(){
-const container = document.getElementById("freeWithdrawals");
-container.innerHTML = "";
-
-const snap = await getDocs(collection(db,"cryptomice_free_withdrawals"));
-
-if(snap.empty){
-container.innerHTML = "<div class='empty'>No free withdrawals</div>";
-return;
-}
-
-snap.forEach(d=>{
-const data = d.data();
-
-container.innerHTML += `
-<div class="item">
 <p><b>User:</b> ${data.uid}</p>
-<p><b>Amount:</b> ${data.amount}</p>
-<p><b>Wallet:</b> ${data.wallet}</p>
-<p><b>Status:</b> ${data.status}</p>
 
-<button class="paid" onclick="markFree('${d.id}')">Mark Paid</button>
-<button class="delete" onclick="deleteFree('${d.id}')">Delete</button>
+<p><b>Amount:</b> ${data.amount}</p>
+
+<p><b>Method:</b> ${data.method}</p>
+
+<p><b>Details:</b> ${data.details}</p>
+
+
+<button class="paid" onclick="payFT('${d.id}')">
+Mark Paid
+</button>
+
+
 </div>
+
 `;
+
 });
+
+
 }
 
-/* ================= FIXED APPROVAL (OLD USERS SAFE) ================= */
-window.approve = async function(id,email,referrerId){
 
-  try {
 
-    await updateDoc(doc(db,"payments",id),{
-      status:"approved"
-    });
-
-    /* SAFE + CONSISTENT APPROVAL STORAGE */
-    await setDoc(doc(db,"approved_users",id),{
-      email,
-      paymentId:id,
-      approved:true,
-      createdAt: new Date().toISOString()
-    });
-
-    /* REFERRAL FIX (NO BREAKING OLD USERS) */
-    const referralSnap = await getDocs(collection(db,"referrals"));
-
-    for (const rDoc of referralSnap.docs) {
-
-      const r = rDoc.data();
-
-      if(r.email === email && r.credited === false){
-
-        const referrerRef = doc(db,"users",r.referrerId);
-
-        const refSnap = await getDoc(referrerRef);
-
-        if(refSnap.exists()){
-          await updateDoc(referrerRef,{
-            earnings: increment(0.01),
-            referrals: increment(1)
-          });
-        }
-
-        await updateDoc(doc(db,"referrals",rDoc.id),{
-          credited: true
-        });
-      }
-    }
-
-    loadPayments();
-
-  } catch(e){
-    alert("Approval error: " + e.message);
-  }
-};
 
 /* ================= ACTIONS ================= */
-window.remove = async (id)=>{
+
+
+window.remove=async(id)=>{
+
 await deleteDoc(doc(db,"payments",id));
+
 loadPayments();
+
 };
 
-window.markPaid = async (id)=>{
-await updateDoc(doc(db,"withdrawals",id),{status:"paid"});
+
+
+window.markPaid=async(id)=>{
+
+await updateDoc(doc(db,"withdrawals",id),{
+status:"paid"
+});
+
 loadWithdrawals();
+
 };
 
-window.deleteWithdraw = async (id)=>{
+
+
+window.deleteWithdraw=async(id)=>{
+
 await deleteDoc(doc(db,"withdrawals",id));
+
 loadWithdrawals();
+
 };
 
-window.markFree = async (id)=>{
-await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{status:"paid"});
+
+
+window.markFree=async(id)=>{
+
+await updateDoc(doc(db,"cryptomice_free_withdrawals",id),{
+status:"paid"
+});
+
 loadFreeWithdrawals();
+
 };
 
-window.deleteFree = async (id)=>{
+
+
+window.deleteFree=async(id)=>{
+
 await deleteDoc(doc(db,"cryptomice_free_withdrawals",id));
+
 loadFreeWithdrawals();
+
 };
 
-window.manualRefresh = ()=>{
-loadPayments();
-loadWithdrawals();
-loadFreeWithdrawals();
+
+
+window.approveFT=async(id)=>{
+
+await updateDoc(doc(db,"ft_submissions",id),{
+
+status:"approved"
+
+});
+
+
+loadFTSubmissions();
+
 };
 
-/* INIT */
+
+
+window.rejectFT=async(id)=>{
+
+await updateDoc(doc(db,"ft_submissions",id),{
+
+status:"rejected"
+
+});
+
+
+loadFTSubmissions();
+
+};
+
+
+
+window.payFT=async(id)=>{
+
+await updateDoc(doc(db,"ft_withdrawals",id),{
+
+status:"paid"
+
+});
+
+
+loadFTWithdrawals();
+
+};
+
+
+
+window.manualRefresh=()=>{
+
 loadPayments();
+
 loadWithdrawals();
+
 loadFreeWithdrawals();
+
+loadFTUsers();
+
+loadFTSubmissions();
+
+loadFTWithdrawals();
+
+};
+
+
+
+/* ================= START ================= */
+
+
+loadPayments();
+
+loadWithdrawals();
+
+loadFreeWithdrawals();
+
+loadFTUsers();
+
+loadFTSubmissions();
+
+loadFTWithdrawals();
+
 
 </script>
 
+
 </body>
-  </html>
+
+</html>
