@@ -98,6 +98,12 @@ margin-top:20px;
 color:#facc15;
 text-decoration:none;
 }
+
+#msg{
+margin-top:15px;
+text-align:center;
+font-weight:bold;
+}
 </style>
 
 </head>
@@ -127,6 +133,8 @@ text-decoration:none;
 <button type="submit">
 Create Account
 </button>
+
+<p id="msg"></p>
 
 </form>
 
@@ -166,13 +174,114 @@ Already have an account?
 
 </div>
 
-<script>
+<script type="module">
 
-document.getElementById("signupForm").addEventListener("submit",function(e){
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+import {
+getAuth,
+createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+authDomain: "cryptomice-635eb.firebaseapp.com",
+projectId: "cryptomice-635eb",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
+messagingSenderId: "831908710470",
+appId: "1:831908710470:web:e95e1bdacb90309a046247"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+document.getElementById("signupForm").addEventListener("submit", async (e)=>{
 
 e.preventDefault();
 
-alert("Firebase signup will be connected in the next step.");
+const fullname=document.getElementById("fullname").value.trim();
+
+const email=document.getElementById("email").value.trim().toLowerCase();
+
+const password=document.getElementById("password").value;
+
+const confirmPassword=document.getElementById("confirmPassword").value;
+
+const msg=document.getElementById("msg");
+
+if(password!==confirmPassword){
+
+msg.style.color="red";
+msg.innerText="Passwords do not match.";
+
+return;
+
+}
+
+try{
+
+const userCredential=await createUserWithEmailAndPassword(auth,email,password);
+
+const uid=userCredential.user.uid;
+
+await setDoc(doc(db,"ft_users",uid),{
+
+uid:uid,
+
+fullname:fullname,
+
+email:email,
+
+balance:0,
+
+completedTasks:0,
+
+approvedTasks:0,
+
+pendingTasks:0,
+
+totalEarned:0,
+
+minimumWithdrawal:5,
+
+withdrawMethod:null,
+
+paypalEmail:null,
+
+litecoinAddress:null,
+
+accountStatus:"active",
+
+country:null,
+
+vpnChecked:false,
+
+createdAt:Date.now()
+
+});
+
+msg.style.color="#22c55e";
+msg.innerText="Account created successfully.";
+
+setTimeout(()=>{
+
+window.location.href="ft-dashboard.html";
+
+},1000);
+
+}catch(error){
+
+msg.style.color="red";
+msg.innerText=error.message;
+
+}
 
 });
 
