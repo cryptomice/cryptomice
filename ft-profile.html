@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Profile | Cryptomice Free Tasks</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#050812;
+color:white;
+padding:20px;
+}
+
+.header{
+background:#111827;
+padding:15px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+color:#ffd84d;
+font-size:22px;
+font-weight:bold;
+}
+
+a{
+color:#ffd84d;
+text-decoration:none;
+font-weight:bold;
+}
+
+.container{
+max-width:600px;
+margin:20px auto;
+}
+
+.card{
+background:#111827;
+padding:25px;
+border-radius:12px;
+border:1px solid rgba(255,216,77,.15);
+}
+
+h2{
+color:#ffd84d;
+margin-bottom:20px;
+}
+
+.info{
+background:#1f2937;
+padding:15px;
+border-radius:8px;
+margin-bottom:12px;
+}
+
+.label{
+color:#9ca3af;
+font-size:14px;
+}
+
+.value{
+font-size:18px;
+margin-top:5px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<div class="logo">
+🐭 Cryptomice Profile
+</div>
+
+<a href="ft-dashboard.html">
+Dashboard
+</a>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h2>
+Account Information
+</h2>
+
+
+<div class="info">
+
+<div class="label">
+Full Name
+</div>
+
+<div class="value" id="fullname">
+Loading...
+</div>
+
+</div>
+
+
+
+<div class="info">
+
+<div class="label">
+Email
+</div>
+
+<div class="value" id="email">
+Loading...
+</div>
+
+</div>
+
+
+
+<div class="info">
+
+<div class="label">
+Account Status
+</div>
+
+<div class="value" id="status">
+Loading...
+</div>
+
+</div>
+
+
+
+<div class="info">
+
+<div class="label">
+Total Earned
+</div>
+
+<div class="value">
+$<span id="earned">0.00</span>
+</div>
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script type="module">
+
+
+import {initializeApp}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+
+import {
+
+getAuth,
+
+onAuthStateChanged
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+
+
+import {
+
+getFirestore,
+
+doc,
+
+getDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyE1CGezZ5mw",
+
+authDomain:"cryptomice-635eb.firebaseapp.com",
+
+projectId:"cryptomice-635eb",
+
+storageBucket:"cryptomice-635eb.firebasestorage.app",
+
+messagingSenderId:"831908710470",
+
+appId:"1:831908710470:web:e95e1bdacb90309a046247"
+
+};
+
+
+
+const app=initializeApp(firebaseConfig);
+
+const auth=getAuth(app);
+
+const db=getFirestore(app);
+
+
+
+onAuthStateChanged(auth, async(user)=>{
+
+
+if(!user){
+
+window.location.href="ft-login.html";
+
+return;
+
+}
+
+
+
+const userRef=doc(db,"ft_users",user.uid);
+
+const snap=await getDoc(userRef);
+
+
+
+if(snap.exists()){
+
+
+const data=snap.data();
+
+
+document.getElementById("fullname").innerText=data.fullname || "Not set";
+
+document.getElementById("email").innerText=data.email;
+
+document.getElementById("status").innerText=data.accountStatus || "Active";
+
+document.getElementById("earned").innerText=(data.totalEarned || 0).toFixed(2);
+
+
+}
+
+
+});
+
+
+</script>
+
+
+</body>
+
+  </html>
