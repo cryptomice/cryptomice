@@ -50,8 +50,8 @@ margin-bottom:25px;
 
 label{
 display:block;
-margin-bottom:6px;
 margin-top:15px;
+margin-bottom:6px;
 font-weight:bold;
 }
 
@@ -60,10 +60,9 @@ width:100%;
 padding:14px;
 border:none;
 border-radius:8px;
-font-size:16px;
-margin-bottom:10px;
 background:#1f2937;
 color:white;
+font-size:16px;
 }
 
 button{
@@ -79,10 +78,6 @@ font-weight:bold;
 cursor:pointer;
 }
 
-button:hover{
-background:#eab308;
-}
-
 .signup{
 text-align:center;
 margin-top:20px;
@@ -93,13 +88,9 @@ color:#facc15;
 text-decoration:none;
 }
 
-.notice{
-margin-top:20px;
-background:#1f2937;
-padding:15px;
-border-radius:8px;
-font-size:14px;
-line-height:1.6;
+#msg{
+margin-top:15px;
+text-align:center;
 }
 
 </style>
@@ -112,41 +103,32 @@ line-height:1.6;
 
 <div class="container">
 
-
 <h1>
 Welcome Back
 </h1>
-
 
 <p>
 Login to your Free Tasks account.
 </p>
 
 
-
 <form id="loginForm">
 
 
-<label>
-Email Address
-</label>
+<label>Email Address</label>
 
 <input 
-type="email" 
-id="email" 
-placeholder="Enter your email" 
+type="email"
+id="email"
 required>
 
 
 
-<label>
-Password
-</label>
+<label>Password</label>
 
 <input 
-type="password" 
-id="password" 
-placeholder="Enter your password" 
+type="password"
+id="password"
 required>
 
 
@@ -156,28 +138,10 @@ Login
 </button>
 
 
+<p id="msg"></p>
+
+
 </form>
-
-
-
-<div id="msg" style="text-align:center;margin-top:15px;"></div>
-
-
-
-<div class="notice">
-
-<b>Reminder</b>
-
-<br><br>
-
-Access to Free Tasks is restricted to eligible users.
-
-<br>
-
-VPNs and proxy connections are not allowed.
-
-</div>
-
 
 
 <div class="signup">
@@ -197,9 +161,7 @@ Create one
 
 <script type="module">
 
-
 import { initializeApp }
-
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
 
@@ -207,7 +169,11 @@ import {
 
 getAuth,
 
-signInWithEmailAndPassword
+signInWithEmailAndPassword,
+
+setPersistence,
+
+browserLocalPersistence
 
 }
 
@@ -215,10 +181,9 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 
 
-const firebaseConfig={
+const firebaseConfig = {
 
-
-apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
+apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeyZ5mw",
 
 authDomain:"cryptomice-635eb.firebaseapp.com",
 
@@ -230,43 +195,72 @@ messagingSenderId:"831908710470",
 
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
-
 };
 
 
 
-const app=initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const auth=getAuth(app);
+const auth = getAuth(app);
 
 
 
-document.getElementById("loginForm").addEventListener("submit",async(e)=>{
+await setPersistence(
+auth,
+browserLocalPersistence
+);
+
+
+
+const form=document.getElementById("loginForm");
+
+const msg=document.getElementById("msg");
+
+
+
+form.addEventListener("submit",async(e)=>{
 
 
 e.preventDefault();
 
 
 
-const email=document.getElementById("email").value.trim().toLowerCase();
+const email=document.getElementById("email").value.trim();
 
 const password=document.getElementById("password").value;
 
 
-const msg=document.getElementById("msg");
+
+msg.innerText="Checking account...";
 
 
 
 try{
 
 
-await signInWithEmailAndPassword(auth,email,password);
+const userCredential = await signInWithEmailAndPassword(
+
+auth,
+
+email,
+
+password
+
+);
+
+
+
+const user=userCredential.user;
+
+
+
+console.log("Authenticated user:",user.uid);
 
 
 
 msg.style.color="#22c55e";
 
-msg.innerText="Login successful...";
+msg.innerText="Login successful";
 
 
 
@@ -274,25 +268,30 @@ setTimeout(()=>{
 
 window.location.href="ft-dashboard.html";
 
-},800);
+},1000);
 
 
 
-}catch(error){
+}
+
+catch(error){
+
+
+console.log(error);
+
 
 
 msg.style.color="#ef4444";
 
 
-if(error.code==="auth/invalid-credential"){
 
-msg.innerText="Incorrect email or password.";
+if(
+error.code==="auth/invalid-credential" ||
+error.code==="auth/user-not-found" ||
+error.code==="auth/wrong-password"
+){
 
-}
-
-else if(error.code==="auth/too-many-requests"){
-
-msg.innerText="Too many attempts. Try again later.";
+msg.innerText="Email or password is incorrect.";
 
 }
 
@@ -315,4 +314,4 @@ msg.innerText=error.message;
 
 </body>
 
-  </html>
+</html>
