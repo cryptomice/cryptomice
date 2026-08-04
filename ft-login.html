@@ -103,13 +103,16 @@ text-align:center;
 
 <div class="container">
 
+
 <h1>
 Welcome Back
 </h1>
 
+
 <p>
 Login to your Free Tasks account.
 </p>
+
 
 
 <form id="loginForm">
@@ -120,6 +123,7 @@ Login to your Free Tasks account.
 <input 
 type="email"
 id="email"
+placeholder="Enter your email"
 required>
 
 
@@ -129,6 +133,7 @@ required>
 <input 
 type="password"
 id="password"
+placeholder="Enter your password"
 required>
 
 
@@ -138,10 +143,12 @@ Login
 </button>
 
 
+
 <p id="msg"></p>
 
 
 </form>
+
 
 
 <div class="signup">
@@ -161,7 +168,9 @@ Create one
 
 <script type="module">
 
+
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
 
@@ -183,23 +192,24 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 const firebaseConfig = {
 
-apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeyZ5mw",
+apiKey: "AIzaSyA6CrK80BEX2WxISOLHXeyZ5mw",
 
-authDomain:"cryptomice-635eb.firebaseapp.com",
+authDomain: "cryptomice-635eb.firebaseapp.com",
 
-projectId:"cryptomice-635eb",
+projectId: "cryptomice-635eb",
 
-storageBucket:"cryptomice-635eb.firebasestorage.app",
+storageBucket: "cryptomice-635eb.firebasestorage.app",
 
-messagingSenderId:"831908710470",
+messagingSenderId: "831908710470",
 
-appId:"1:831908710470:web:e95e1bdacb90309a046247"
+appId: "1:831908710470:web:e95e1bdacb90309a046247",
 
 };
 
 
 
 const app = initializeApp(firebaseConfig);
+
 
 const auth = getAuth(app);
 
@@ -231,6 +241,8 @@ const password=document.getElementById("password").value;
 
 
 
+msg.style.color="white";
+
 msg.innerText="Checking account...";
 
 
@@ -238,7 +250,7 @@ msg.innerText="Checking account...";
 try{
 
 
-const userCredential = await signInWithEmailAndPassword(
+const result = await signInWithEmailAndPassword(
 
 auth,
 
@@ -250,17 +262,13 @@ password
 
 
 
-const user=userCredential.user;
-
-
-
-console.log("Authenticated user:",user.uid);
+console.log("Logged in:",result.user.uid);
 
 
 
 msg.style.color="#22c55e";
 
-msg.innerText="Login successful";
+msg.innerText="Login successful...";
 
 
 
@@ -274,24 +282,31 @@ window.location.href="ft-dashboard.html";
 
 }
 
+
 catch(error){
 
 
-console.log(error);
-
+console.log(error.code,error.message);
 
 
 msg.style.color="#ef4444";
 
 
+if(error.code==="auth/invalid-credential"){
 
-if(
-error.code==="auth/invalid-credential" ||
-error.code==="auth/user-not-found" ||
-error.code==="auth/wrong-password"
-){
+msg.innerText="Incorrect email or password.";
 
-msg.innerText="Email or password is incorrect.";
+}
+
+else if(error.code==="auth/user-not-found"){
+
+msg.innerText="Account not found.";
+
+}
+
+else if(error.code==="auth/wrong-password"){
+
+msg.innerText="Incorrect password.";
 
 }
 
