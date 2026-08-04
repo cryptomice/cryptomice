@@ -1,150 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="module">
 
-<title>Login | Cryptomice Free Tasks</title>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
+import {
+getAuth,
+signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-body{
-background:#0b1220;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
-padding:20px;
-color:white;
-}
+const firebaseConfig = {
 
-.container{
-width:100%;
-max-width:420px;
-background:#111827;
-padding:30px;
-border-radius:12px;
-box-shadow:0 0 20px rgba(0,0,0,.3);
-}
+apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
 
-h1{
-text-align:center;
-color:#facc15;
-margin-bottom:10px;
-}
+authDomain:"cryptomice-635eb.firebaseapp.com",
 
-p{
-text-align:center;
-color:#d1d5db;
-margin-bottom:25px;
-}
+projectId:"cryptomice-635eb",
 
-label{
-display:block;
-margin-bottom:6px;
-margin-top:15px;
-font-weight:bold;
-}
+storageBucket:"cryptomice-635eb.firebasestorage.app",
 
-input{
-width:100%;
-padding:14px;
-border:none;
-border-radius:8px;
-font-size:16px;
-margin-bottom:10px;
-background:#1f2937;
-color:white;
-}
+messagingSenderId:"831908710470",
 
-button{
-width:100%;
-padding:15px;
-margin-top:20px;
-border:none;
-border-radius:8px;
-background:#facc15;
-color:#111827;
-font-size:17px;
-font-weight:bold;
-cursor:pointer;
-}
+appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
-button:hover{
-background:#eab308;
-}
+};
 
-.signup{
-text-align:center;
-margin-top:20px;
-}
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-.signup a{
-color:#facc15;
-text-decoration:none;
-}
+const form = document.getElementById("loginForm");
 
-.notice{
-margin-top:20px;
-background:#1f2937;
-padding:15px;
-border-radius:8px;
-font-size:14px;
-line-height:1.6;
-}
-</style>
+const message = document.createElement("p");
+message.style.marginTop = "15px";
+message.style.textAlign = "center";
+form.appendChild(message);
 
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>Welcome Back</h1>
-
-<p>Login to your Free Tasks account.</p>
-
-<form id="loginForm">
-
-<label>Email Address</label>
-<input type="email" id="email" placeholder="Enter your email" required>
-
-<label>Password</label>
-<input type="password" id="password" placeholder="Enter your password" required>
-
-<button type="submit">
-Login
-</button>
-
-</form>
-
-<div class="notice">
-<b>Reminder</b><br><br>
-Access to Free Tasks is restricted to eligible users. VPNs and proxy connections are not allowed.
-</div>
-
-<div class="signup">
-Don't have an account?
-<a href="ft-signup.html">Create one</a>
-</div>
-
-</div>
-
-<script>
-document.getElementById("loginForm").addEventListener("submit",function(e){
+form.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
 
-alert("Firebase login will be connected in the next step.");
+const email = document.getElementById("email").value.trim().toLowerCase();
+
+const password = document.getElementById("password").value;
+
+try{
+
+await signInWithEmailAndPassword(auth,email,password);
+
+message.style.color="#22c55e";
+
+message.innerText="Login successful...";
+
+setTimeout(()=>{
+
+window.location.href="ft-dashboard.html";
+
+},800);
+
+}catch(error){
+
+message.style.color="#ef4444";
+
+switch(error.code){
+
+case "auth/invalid-credential":
+message.innerText="Incorrect email or password.";
+break;
+
+case "auth/user-not-found":
+message.innerText="Account not found.";
+break;
+
+case "auth/wrong-password":
+message.innerText="Incorrect password.";
+break;
+
+case "auth/too-many-requests":
+message.innerText="Too many attempts. Try again later.";
+break;
+
+default:
+message.innerText=error.message;
+
+}
+
+}
 
 });
-</script>
 
-</body>
-</html>
+  </script>
