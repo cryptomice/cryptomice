@@ -1,246 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard | Cryptomice Free Tasks</title>
+<title>Cryptomice Dashboard</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
-
 body{
-background:#050812;
+margin:0;
+font-family:Arial,sans-serif;
+background:#03060c;
 color:white;
-padding:20px;
 }
 
 .header{
-background:#111827;
-padding:15px;
-border-radius:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.logo{
-color:#ffd84d;
-font-size:22px;
-font-weight:bold;
-}
-
-button{
-background:#ffd84d;
-border:none;
-padding:10px 18px;
-border-radius:8px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.container{
-max-width:900px;
-margin:20px auto;
-}
-
-.welcome{
-background:#111827;
+text-align:center;
 padding:20px;
-border-radius:12px;
-margin-bottom:20px;
+border-bottom:1px solid #333;
 }
 
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
+.header h2{
+color:#ffd84d;
 }
 
 .card{
-background:#111827;
-padding:20px;
+margin:15px;
+padding:15px;
 border-radius:12px;
-border:1px solid rgba(255,216,77,.15);
+background:#0b1220;
 }
 
-.card h3{
+.balance{
+font-size:35px;
 color:#ffd84d;
-margin-bottom:10px;
-}
-
-.value{
-font-size:25px;
-font-weight:bold;
-}
-
-.progress{
-background:#1f2937;
-height:20px;
-border-radius:20px;
-overflow:hidden;
-margin-top:15px;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:#ffd84d;
-}
-
-.actions{
-margin-top:20px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:15px;
-}
-
-.action{
-background:#1f2937;
-padding:20px;
-border-radius:12px;
 text-align:center;
 }
 
-a{
-color:#ffd84d;
-text-decoration:none;
+button{
+
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+margin-top:10px;
 font-weight:bold;
+cursor:pointer;
+
+}
+
+.primary{
+
+background:#ffd84d;
+color:black;
+
+}
+
+.secondary{
+
+background:#1f2937;
+color:white;
+
+}
+
+input{
+
+width:100%;
+padding:12px;
+margin-top:8px;
+background:#111827;
+border:none;
+border-radius:8px;
+color:white;
+
+}
+
+.small{
+
+font-size:13px;
+color:#aaa;
+
 }
 
 </style>
 
 </head>
 
+
 <body>
+
 
 <div class="header">
 
-<div class="logo">
-🐭 Cryptomice Free Tasks
-</div>
+<h2>🐭 CRYPTOMICE DASHBOARD</h2>
 
-<button id="logout">
+<p id="userEmail">
+Loading user...
+</p>
+
+
+<button class="secondary" id="logoutBtn">
 Logout
 </button>
 
+
 </div>
 
 
-<div class="container">
+
+<div class="card">
+
+<div class="small">
+Available Balance
+</div>
 
 
-<div class="welcome">
+<div class="balance">
 
-<h2>
-Welcome, <span id="username">User</span>
-</h2>
+LTC <span id="balance">0</span>
 
-<p id="email">
-Loading account...
+</div>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+<h3>
+Referral Link
+</h3>
+
+
+<p id="refLink">
+Loading...
 </p>
 
+
+<button class="secondary" id="copyBtn">
+Copy Link
+</button>
+
+
 </div>
 
 
-<div class="cards">
+
 
 
 <div class="card">
-<h3>Balance</h3>
-<div class="value">$<span id="balance">0.00</span></div>
-</div>
 
+<h3>
+Statistics
+</h3>
 
-<div class="card">
-<h3>Approved Tasks</h3>
-<div class="value" id="approved">0</div>
-</div>
-
-
-<div class="card">
-<h3>Pending</h3>
-<div class="value" id="pending">0</div>
-</div>
-
-
-<div class="card">
-<h3>Completed</h3>
-<div class="value" id="completed">0</div>
-</div>
-
-
-</div>
-
-
-<div class="card" style="margin-top:20px;">
-
-<h3>Withdrawal Progress</h3>
 
 <p>
-Minimum withdrawal: $5.00
+Referrals:
+<span id="referrals">0</span>
 </p>
 
-<div class="progress">
-<div class="bar" id="progressBar"></div>
-</div>
 
 </div>
 
 
-<div class="actions">
 
-<div class="action">
-<h3>Tasks</h3>
-<a href="ft-tasks.html">View Tasks</a>
+
+
+<div class="card">
+
+
+<h3>
+Withdraw Litecoin
+</h3>
+
+
+<p class="small">
+Minimum withdrawal: 0.01 LTC
+</p>
+
+
+
+<input 
+id="amount"
+type="number"
+placeholder="Amount LTC">
+
+
+
+<input
+id="wallet"
+placeholder="Litecoin wallet">
+
+
+
+<button 
+class="primary"
+id="withdrawBtn">
+
+Request Withdrawal
+
+</button>
+
+
+<p id="message"></p>
+
+
+
 </div>
 
 
-<div class="action">
-<h3>Withdraw</h3>
-<a href="ft-withdraw.html">Request Payment</a>
-</div>
 
-
-<div class="action">
-<h3>Profile</h3>
-<a href="ft-profile.html">Account Settings</a>
-</div>
-
-
-</div>
-
-
-</div>
 
 
 <script type="module">
 
-import {initializeApp} 
+
+import {initializeApp}
+
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
-import {
-getAuth,
-onAuthStateChanged,
-signOut
-}
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
 
 import {
-getFirestore,
-doc,
-getDoc
+
+getAuth,
+
+onAuthStateChanged,
+
+signOut
+
 }
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+
+
+import {
+
+getFirestore,
+
+doc,
+
+getDoc,
+
+addDoc,
+
+collection,
+
+updateDoc,
+
+serverTimestamp
+
+}
+
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 
-const firebaseConfig = {
+
+
+
+const firebaseConfig={
+
 
 apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
 
@@ -254,14 +278,30 @@ messagingSenderId:"831908710470",
 
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
+
 };
+
+
 
 
 const app=initializeApp(firebaseConfig);
 
+
 const auth=getAuth(app);
 
+
 const db=getFirestore(app);
+
+
+
+
+
+let currentUser=null;
+
+
+
+const base="https://cryptomice.github.io/cryptomice/";
+
 
 
 
@@ -270,55 +310,226 @@ onAuthStateChanged(auth,async(user)=>{
 
 if(!user){
 
+
 window.location.href="ft-login.html";
 
 return;
 
+
 }
 
 
-const ref=doc(db,"ft_users",user.uid);
 
-const snap=await getDoc(ref);
+currentUser=user;
 
 
-if(snap.exists()){
+
+document.getElementById("userEmail").innerText=
+user.email;
+
+
+
+const userRef=doc(db,"ft_users",user.uid);
+
+
+
+const snap=await getDoc(userRef);
+
+
+
+if(!snap.exists()){
+
+
+document.getElementById("userEmail").innerText=
+"User profile missing";
+
+
+return;
+
+
+}
+
 
 
 const data=snap.data();
 
 
-document.getElementById("username").innerText=data.fullname || "User";
 
-document.getElementById("email").innerText=data.email;
-
-document.getElementById("balance").innerText=(data.balance || 0).toFixed(2);
-
-document.getElementById("approved").innerText=data.approvedTasks || 0;
-
-document.getElementById("pending").innerText=data.pendingTasks || 0;
-
-document.getElementById("completed").innerText=data.completedTasks || 0;
+document.getElementById("balance").innerText=
+data.balance || 0;
 
 
-let percent=((data.balance || 0)/5)*100;
 
-if(percent>100) percent=100;
-
-
-document.getElementById("progressBar").style.width=percent+"%";
+document.getElementById("referrals").innerText=
+data.referrals || 0;
 
 
-}
+
+document.getElementById("refLink").innerText=
+base+"ft-signup.html?ref="+user.uid;
+
 
 
 });
 
 
 
-document.getElementById("logout").onclick=()=>{
 
-signOut(auth);
+
+
+
+document.getElementById("logoutBtn")
+.onclick=async()=>{
+
+
+await signOut(auth);
+
+
+window.location.href="ft-login.html";
+
+
+};
+
+
+
+
+
+document.getElementById("copyBtn")
+.onclick=()=>{
+
+
+navigator.clipboard.writeText(
+document.getElementById("refLink").innerText
+);
+
+
+alert("Copied");
+
+
+};
+
+
+
+
+
+
+
+document.getElementById("withdrawBtn")
+.onclick=async()=>{
+
+
+const amount=parseFloat(
+document.getElementById("amount").value
+);
+
+
+const wallet=
+document.getElementById("wallet").value.trim();
+
+
+const message=
+document.getElementById("message");
+
+
+
+if(!currentUser){
+
+message.innerText="Not logged in";
+
+return;
+
+}
+
+
+
+if(!amount || amount<0.01){
+
+message.innerText="Minimum withdrawal is 0.01 LTC";
+
+return;
+
+}
+
+
+
+if(!wallet){
+
+message.innerText="Enter wallet address";
+
+return;
+
+}
+
+
+
+
+
+const ref=doc(
+db,
+"ft_users",
+currentUser.uid
+);
+
+
+
+const snap=await getDoc(ref);
+
+
+
+const data=snap.data();
+
+
+
+if(amount>data.balance){
+
+
+message.innerText="Insufficient balance";
+
+return;
+
+
+}
+
+
+
+await addDoc(
+collection(db,"withdrawals"),
+{
+
+
+userId:currentUser.uid,
+
+email:currentUser.email,
+
+amount:amount,
+
+wallet:wallet,
+
+status:"pending",
+
+createdAt:serverTimestamp()
+
+
+});
+
+
+
+
+await updateDoc(ref,{
+
+balance:data.balance-amount
+
+});
+
+
+
+document.getElementById("balance").innerText=
+data.balance-amount;
+
+
+
+message.innerText="Withdrawal request sent";
+
 
 };
 
@@ -328,4 +539,4 @@ signOut(auth);
 
 
 </body>
-  </html>
+</html>
