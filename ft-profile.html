@@ -166,15 +166,10 @@ $<span id="earned">0.00</span>
 </div>
 
 
-
 </div>
 
 
 </div>
-
-
-
-
 <script type="module">
 
 
@@ -187,7 +182,11 @@ import {
 
 getAuth,
 
-onAuthStateChanged
+onAuthStateChanged,
+
+setPersistence,
+
+browserLocalPersistence
 
 }
 
@@ -211,17 +210,24 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 
+
 apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyE1CGezZ5mw",
+
 
 authDomain:"cryptomice-635eb.firebaseapp.com",
 
+
 projectId:"cryptomice-635eb",
+
 
 storageBucket:"cryptomice-635eb.firebasestorage.app",
 
+
 messagingSenderId:"831908710470",
 
+
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
+
 
 };
 
@@ -229,13 +235,22 @@ appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 const app=initializeApp(firebaseConfig);
 
+
 const auth=getAuth(app);
+
 
 const db=getFirestore(app);
 
 
 
-onAuthStateChanged(auth, async(user)=>{
+setPersistence(auth,browserLocalPersistence);
+
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+try{
 
 
 if(!user){
@@ -248,25 +263,56 @@ return;
 
 
 
-const userRef=doc(db,"ft_users",user.uid);
+const userRef=doc(
+db,
+"ft_users",
+user.uid
+);
+
+
 
 const snap=await getDoc(userRef);
 
 
 
-if(snap.exists()){
+if(!snap.exists()){
+
+console.log("User profile not found");
+
+return;
+
+}
+
 
 
 const data=snap.data();
 
 
-document.getElementById("fullname").innerText=data.fullname || "Not set";
 
-document.getElementById("email").innerText=data.email;
+document.getElementById("fullname").innerText =
+data.fullname || "Not set";
 
-document.getElementById("status").innerText=data.accountStatus || "Active";
 
-document.getElementById("earned").innerText=(data.totalEarned || 0).toFixed(2);
+
+document.getElementById("email").innerText =
+data.email || user.email;
+
+
+
+document.getElementById("status").innerText =
+data.accountStatus || "Active";
+
+
+
+document.getElementById("earned").innerText =
+Number(data.totalEarned || 0).toFixed(2);
+
+
+
+}catch(error){
+
+
+console.error("Profile loading error:",error);
 
 
 }
@@ -280,4 +326,4 @@ document.getElementById("earned").innerText=(data.totalEarned || 0).toFixed(2);
 
 </body>
 
-  </html>
+</html>
