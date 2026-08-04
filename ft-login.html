@@ -56,6 +56,7 @@ font-weight:bold;
 }
 
 input{
+
 width:100%;
 padding:14px;
 border:none;
@@ -63,9 +64,12 @@ border-radius:8px;
 font-size:16px;
 background:#1f2937;
 color:white;
+
 }
 
+
 button{
+
 width:100%;
 padding:15px;
 margin-top:20px;
@@ -76,26 +80,40 @@ color:#111827;
 font-size:17px;
 font-weight:bold;
 cursor:pointer;
+
 }
+
 
 button:hover{
+
 background:#eab308;
+
 }
+
 
 .signup{
+
 text-align:center;
 margin-top:20px;
+
 }
+
 
 .signup a{
+
 color:#facc15;
 text-decoration:none;
+
 }
 
+
 #msg{
+
 margin-top:15px;
 text-align:center;
+
 }
+
 
 </style>
 
@@ -127,8 +145,8 @@ Email Address
 </label>
 
 <input 
-type="email" 
-id="email" 
+type="email"
+id="email"
 placeholder="Enter your email"
 required>
 
@@ -139,8 +157,8 @@ Password
 </label>
 
 <input 
-type="password" 
-id="password" 
+type="password"
+id="password"
 placeholder="Enter your password"
 required>
 
@@ -155,7 +173,6 @@ Login
 <p id="msg"></p>
 
 
-
 </form>
 
 
@@ -168,14 +185,18 @@ Don't have an account?
 Create one
 </a>
 
+
 </div>
 
 
 </div>
 <script type="module">
 
+
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
 
 
 import {
@@ -191,6 +212,8 @@ browserLocalPersistence
 }
 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+
 
 
 
@@ -219,6 +242,8 @@ appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 
 
+
+
 const app = initializeApp(firebaseConfig);
 
 
@@ -226,16 +251,26 @@ const auth = getAuth(app);
 
 
 
+
+
 await setPersistence(
+
 auth,
+
 browserLocalPersistence
+
 );
+
+
 
 
 
 const form=document.getElementById("loginForm");
 
+
 const msg=document.getElementById("msg");
+
+
 
 
 
@@ -243,6 +278,7 @@ form.addEventListener("submit",async(e)=>{
 
 
 e.preventDefault();
+
 
 
 
@@ -254,32 +290,48 @@ const email=document
 
 
 
+
 const password=document
 .getElementById("password")
 .value;
 
 
 
+
+
 msg.style.color="white";
 
+
 msg.innerText="Checking account...";
+
+
 
 
 
 try{
 
 
+
 await signInWithEmailAndPassword(
+
 auth,
+
 email,
+
 password
+
 );
+
+
 
 
 
 msg.style.color="#22c55e";
 
+
 msg.innerText="Login successful...";
+
+
 
 
 
@@ -293,6 +345,8 @@ window.location.href="ft-dashboard.html";
 
 
 
+
+
 }catch(error){
 
 
@@ -301,27 +355,54 @@ console.log(error.code);
 
 
 
+
 msg.style.color="#ef4444";
 
 
 
-if(error.code==="auth/invalid-credential"){
+
+
+if(error.code==="auth/user-not-found"){
+
+
+msg.innerText="Account not found.";
+
+
+}
+
+else if(error.code==="auth/wrong-password"){
+
+
+msg.innerText="Incorrect password.";
+
+
+}
+
+else if(error.code==="auth/invalid-credential"){
+
 
 msg.innerText="Incorrect email or password.";
+
 
 }
 
 else if(error.code==="auth/too-many-requests"){
 
+
 msg.innerText="Too many attempts. Try again later.";
+
 
 }
 
 else{
 
+
 msg.innerText=error.message;
 
+
 }
+
+
 
 
 
@@ -330,6 +411,7 @@ msg.innerText=error.message;
 
 
 });
+
 
 
 </script>
