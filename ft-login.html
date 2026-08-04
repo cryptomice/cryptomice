@@ -60,9 +60,9 @@ width:100%;
 padding:14px;
 border:none;
 border-radius:8px;
+font-size:16px;
 background:#1f2937;
 color:white;
-font-size:16px;
 }
 
 button{
@@ -76,6 +76,10 @@ color:#111827;
 font-size:17px;
 font-weight:bold;
 cursor:pointer;
+}
+
+button:hover{
+background:#eab308;
 }
 
 .signup{
@@ -114,11 +118,13 @@ Login to your Free Tasks account.
 </p>
 
 
-
 <form id="loginForm">
 
 
-<label>Email Address</label>
+<label>
+Email Address
+</label>
+
 
 <input 
 type="email"
@@ -128,7 +134,10 @@ required>
 
 
 
-<label>Password</label>
+<label>
+Password
+</label>
+
 
 <input 
 type="password"
@@ -143,12 +152,10 @@ Login
 </button>
 
 
-
 <p id="msg"></p>
 
 
 </form>
-
 
 
 <div class="signup">
@@ -159,13 +166,11 @@ Don't have an account?
 Create one
 </a>
 
-</div>
-
 
 </div>
 
 
-
+</div>
 <script type="module">
 
 
@@ -204,12 +209,13 @@ messagingSenderId: "831908710470",
 
 appId: "1:831908710470:web:e95e1bdacb90309a046247",
 
+measurementId: "G-JJFXM9CJTH"
+
 };
 
 
 
 const app = initializeApp(firebaseConfig);
-
 
 const auth = getAuth(app);
 
@@ -222,22 +228,30 @@ browserLocalPersistence
 
 
 
-const form=document.getElementById("loginForm");
+const form = document.getElementById("loginForm");
 
-const msg=document.getElementById("msg");
+const msg = document.getElementById("msg");
 
 
 
-form.addEventListener("submit",async(e)=>{
+form.addEventListener("submit", async(e)=>{
 
 
 e.preventDefault();
 
 
 
-const email=document.getElementById("email").value.trim();
+const email = document
+.getElementById("email")
+.value
+.trim()
+.toLowerCase();
 
-const password=document.getElementById("password").value;
+
+
+const password = document
+.getElementById("password")
+.value;
 
 
 
@@ -250,7 +264,7 @@ msg.innerText="Checking account...";
 try{
 
 
-const result = await signInWithEmailAndPassword(
+const userCredential = await signInWithEmailAndPassword(
 
 auth,
 
@@ -262,7 +276,10 @@ password
 
 
 
-console.log("Logged in:",result.user.uid);
+console.log(
+"Logged in user:",
+userCredential.user.uid
+);
 
 
 
@@ -274,7 +291,9 @@ msg.innerText="Login successful...";
 
 setTimeout(()=>{
 
+
 window.location.href="ft-dashboard.html";
+
 
 },1000);
 
@@ -286,10 +305,16 @@ window.location.href="ft-dashboard.html";
 catch(error){
 
 
-console.log(error.code,error.message);
+console.log(
+"Firebase error:",
+error.code,
+error.message
+);
+
 
 
 msg.style.color="#ef4444";
+
 
 
 if(error.code==="auth/invalid-credential"){
@@ -315,6 +340,7 @@ else{
 msg.innerText=error.message;
 
 }
+
 
 
 }
