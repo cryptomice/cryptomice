@@ -1,4 +1,113 @@
-<script type="module">
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Login | Cryptomice Free Tasks</title>  <style>  
+*{  
+margin:0;  
+padding:0;  
+box-sizing:border-box;  
+font-family:Arial,Helvetica,sans-serif;  
+}  
+  
+body{  
+background:#0b1220;  
+display:flex;  
+justify-content:center;  
+align-items:center;  
+min-height:100vh;  
+padding:20px;  
+color:white;  
+}  
+  
+.container{  
+width:100%;  
+max-width:420px;  
+background:#111827;  
+padding:30px;  
+border-radius:12px;  
+box-shadow:0 0 20px rgba(0,0,0,.3);  
+}  
+  
+h1{  
+text-align:center;  
+color:#facc15;  
+margin-bottom:10px;  
+}  
+  
+p{  
+text-align:center;  
+color:#d1d5db;  
+margin-bottom:25px;  
+}  
+  
+label{  
+display:block;  
+margin-bottom:6px;  
+margin-top:15px;  
+font-weight:bold;  
+}  
+  
+input{  
+width:100%;  
+padding:14px;  
+border:none;  
+border-radius:8px;  
+font-size:16px;  
+margin-bottom:10px;  
+background:#1f2937;  
+color:white;  
+}  
+  
+button{  
+width:100%;  
+padding:15px;  
+margin-top:20px;  
+border:none;  
+border-radius:8px;  
+background:#facc15;  
+color:#111827;  
+font-size:17px;  
+font-weight:bold;  
+cursor:pointer;  
+}  
+  
+button:hover{  
+background:#eab308;  
+}  
+  
+.signup{  
+text-align:center;  
+margin-top:20px;  
+}  
+  
+.signup a{  
+color:#facc15;  
+text-decoration:none;  
+}  
+  
+.notice{  
+margin-top:20px;  
+background:#1f2937;  
+padding:15px;  
+border-radius:8px;  
+font-size:14px;  
+line-height:1.6;  
+}  
+</style>  </head>  <body>  <div class="container">  <h1>Welcome Back</h1>  <p>Login to your Free Tasks account.</p>  <form id="loginForm">  <label>Email Address</label>
+<input type="email" id="email" placeholder="Enter your email" required>
+
+<label>Password</label>
+<input type="password" id="password" placeholder="Enter your password" required>
+
+<button type="submit">  
+Login  
+</button>  </form>  <div class="notice">  
+<b>Reminder</b><br><br>  
+Access to Free Tasks is restricted to eligible users. VPNs and proxy connections are not allowed.  
+</div>  <div class="signup">  
+Don't have an account?  
+<a href="ft-signup.html">Create one</a>  
+</div>  </div>  <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
@@ -86,4 +195,5 @@ message.innerText=error.message;
 
 });
 
-  </script>
+  </script>  </body>  
+</html>
