@@ -341,7 +341,9 @@ status:"paid"
 await updateDoc(
 doc(db,"ft_users",uid),
 {
-balance:increment(-Number(amount))
+balance:increment(-Number(amount)),
+lastWithdrawal:Number(amount),
+lastWithdrawalAt:new Date().getTime()
 }
 );
 
