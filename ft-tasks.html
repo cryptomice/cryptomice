@@ -257,7 +257,11 @@ import {
 
 getAuth,
 
-onAuthStateChanged
+onAuthStateChanged,
+
+setPersistence,
+
+browserLocalPersistence
 
 }
 
@@ -287,7 +291,18 @@ appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 const app=initializeApp(firebaseConfig);
 
+
 const auth=getAuth(app);
+
+
+
+await setPersistence(
+
+auth,
+
+browserLocalPersistence
+
+);
 
 
 
@@ -300,11 +315,26 @@ onAuthStateChanged(auth,(user)=>{
 
 if(user){
 
+
 currentUser=user;
+
+
+console.log(
+"Logged in:",
+user.email
+);
+
 
 }else{
 
+
+console.log(
+"No user session"
+);
+
+
 window.location.href="ft-login.html";
+
 
 }
 
@@ -326,9 +356,11 @@ const status=document.getElementById(statusId);
 
 if(!file.files[0]){
 
+
 alert("Please select a screenshot first");
 
 return;
+
 
 }
 
@@ -336,9 +368,11 @@ return;
 
 if(!currentUser){
 
-alert("Please login again");
+
+alert("Session expired. Please login again.");
 
 return;
+
 
 }
 
@@ -430,7 +464,10 @@ status.innerText=result.error || "Upload failed";
 }catch(error){
 
 
-console.log(error);
+console.error(
+"Upload error:",
+error
+);
 
 
 status.innerText="Upload failed";
@@ -444,7 +481,9 @@ status.innerText="Upload failed";
 
 
 
+
 window.submitTask001=()=>{
+
 
 uploadTask(
 
@@ -458,11 +497,14 @@ uploadTask(
 
 );
 
+
 };
 
 
 
+
 window.submitTask002=()=>{
+
 
 uploadTask(
 
@@ -476,11 +518,14 @@ uploadTask(
 
 );
 
+
 };
 
 
 
+
 window.submitTask003=()=>{
+
 
 uploadTask(
 
@@ -493,6 +538,7 @@ uploadTask(
 "Task #003"
 
 );
+
 
 };
 
