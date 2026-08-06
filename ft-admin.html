@@ -20,6 +20,13 @@ padding:20px;
 h1{
 color:#ffd84d;
 text-align:center;
+margin-bottom:20px;
+}
+
+h2{
+color:#ffd84d;
+text-align:center;
+margin-top:50px;
 }
 
 .card{
@@ -28,13 +35,14 @@ border:1px solid rgba(255,216,77,.2);
 padding:20px;
 border-radius:12px;
 margin:20px auto;
-max-width:600px;
+max-width:650px;
 }
 
 img{
 width:100%;
 border-radius:10px;
 margin-top:10px;
+margin-bottom:10px;
 }
 
 button{
@@ -65,32 +73,36 @@ font-weight:bold;
 .empty{
 text-align:center;
 opacity:.7;
+margin:20px;
 }
 
 </style>
 
 </head>
 
-
 <body>
-
 
 <h1>
 🐭 Cryptomice Free Tasks Admin
 </h1>
 
+<h2>
+Pending Task Submissions
+</h2>
 
 <div id="submissions"></div>
 
+<h2>
+💰 Pending Withdrawals
+</h2>
 
+<div id="withdrawals"></div>
 
 <script type="module">
-
 
 import { initializeApp }
 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-
 
 import {
 
@@ -104,15 +116,11 @@ doc,
 
 updateDoc,
 
-getDoc,
-
 increment
 
 }
 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-
 
 const firebaseConfig={
 
@@ -130,83 +138,52 @@ appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 };
 
-
-
 const app=initializeApp(firebaseConfig);
 
 const db=getFirestore(app);
 
-
-
 const box=document.getElementById("submissions");
 
-
-
-async function loadSubmissions(){
-
+const withdrawBox=document.getElementById("withdrawals");
+  async function loadSubmissions(){
 
 box.innerHTML="";
 
-
-const snap =
-await getDocs(collection(db,"task_submissions"));
-
-
+const snap=await getDocs(collection(db,"task_submissions"));
 
 if(snap.empty){
 
-box.innerHTML=
-"<p class='empty'>No submissions found</p>";
+box.innerHTML="<p class='empty'>No submissions found</p>";
 
 return;
 
 }
 
-
-
 snap.forEach((item)=>{
-
 
 const data=item.data();
 
-
-
 if(data.status!=="pending") return;
 
-
-
-box.innerHTML +=`
+box.innerHTML+=`
 
 <div class="card">
 
-
-<h3>
-${data.taskName || "Task"}
-</h3>
-
+<h3>${data.taskName || "Task"}</h3>
 
 <p>
-User: ${data.email || "Unknown"}
+<b>User:</b> ${data.email || "Unknown"}
 </p>
-
 
 <p>
-Task ID:
-${data.taskId || "N/A"}
+<b>Task ID:</b> ${data.taskId || "N/A"}
 </p>
-
 
 <p class="confidence">
-AI Confidence:
-${data.confidence || 0}%
+AI Confidence: ${data.confidence || 0}%
 </p>
 
-
-
-<img src="${data.imageUrl || ''}" 
-alt="Screenshot">
-
-
+<img src="${data.imageUrl || ""}" alt="Screenshot">
 
 <button class="approve"
 onclick="approveTask('${item.id}','${data.uid}')">
@@ -215,8 +192,6 @@ onclick="approveTask('${item.id}','${data.uid}')">
 
 </button>
 
-
-
 <button class="reject"
 onclick="rejectTask('${item.id}')">
 
@@ -224,6 +199,74 @@ onclick="rejectTask('${item.id}')">
 
 </button>
 
+</div>
+
+`;
+
+});
+
+}
+
+
+
+async function loadWithdrawals(){
+
+withdrawBox.innerHTML="";
+
+const snap=await getDocs(collection(db,"withdrawals"));
+
+if(snap.empty){
+
+withdrawBox.innerHTML="<p class='empty'>No withdrawal requests found</p>";
+
+return;
+
+}
+
+snap.forEach((item)=>{
+
+const data=item.data();
+
+if(data.status!=="pending") return;
+
+withdrawBox.innerHTML+=`
+
+<div class="card">
+
+<h3>
+Withdrawal Request
+</h3>
+
+<p>
+<b>User:</b> ${data.email}
+</p>
+
+<p>
+<b>Amount:</b> $${data.amount}
+</p>
+
+<p>
+<b>Method:</b> ${data.method}
+</p>
+
+<p>
+<b>Payment Details:</b><br>
+${data.details}
+</p>
+
+<button class="approve"
+onclick="payWithdrawal('${item.id}','${data.uid}','${data.amount}')">
+
+✓ Mark Paid
+
+</button>
+
+<button class="reject"
+onclick="rejectWithdrawal('${item.id}')">
+
+✗ Reject
+
+</button>
 
 </div>
 
@@ -231,17 +274,10 @@ onclick="rejectTask('${item.id}')">
 
 });
 
-
-}
-
-
-
-
-window.approveTask=async(id,uid)=>{
-
+  }
+  window.approveTask=async(id,uid)=>{
 
 try{
-
 
 await updateDoc(
 doc(db,"task_submissions",id),
@@ -250,32 +286,19 @@ status:"approved"
 }
 );
 
-
-
-const userRef =
-doc(db,"ft_users",uid);
-
-
-
-await updateDoc(userRef,{
-
+await updateDoc(
+doc(db,"ft_users",uid),
+{
 balance:increment(0.25),
-
 totalEarned:increment(0.25),
-
 completedTasks:increment(1),
-
 approvedTasks:increment(1)
+}
+);
 
-});
-
-
-
-alert("Task approved");
+alert("Task approved.");
 
 loadSubmissions();
-
-
 
 }catch(e){
 
@@ -283,27 +306,71 @@ alert(e.message);
 
 }
 
-
 };
 
 
 
 window.rejectTask=async(id)=>{
 
-
 await updateDoc(
-
 doc(db,"task_submissions",id),
-
 {
 status:"rejected"
 }
-
 );
 
+alert("Task rejected.");
 
 loadSubmissions();
 
+};
+
+
+
+window.payWithdrawal=async(id,uid,amount)=>{
+
+try{
+
+await updateDoc(
+doc(db,"withdrawals",id),
+{
+status:"paid"
+}
+);
+
+await updateDoc(
+doc(db,"ft_users",uid),
+{
+balance:increment(-Number(amount))
+}
+);
+
+alert("Withdrawal marked as paid.");
+
+loadWithdrawals();
+
+}catch(e){
+
+alert(e.message);
+
+}
+
+};
+
+
+
+window.rejectWithdrawal=async(id)=>{
+
+await updateDoc(
+doc(db,"withdrawals",id),
+{
+status:"rejected"
+}
+);
+
+alert("Withdrawal rejected.");
+
+loadWithdrawals();
 
 };
 
@@ -311,11 +378,10 @@ loadSubmissions();
 
 loadSubmissions();
 
-
+loadWithdrawals();
 
 </script>
 
-
 </body>
 
-  </html>
+</html>
