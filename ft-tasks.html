@@ -114,7 +114,6 @@ Dashboard
 </div>
 
 
-
 <div class="container">
 
 
@@ -163,6 +162,8 @@ Status: Available
 
 
 </div>
+
+
 <div class="card">
 
 <h3>
@@ -201,10 +202,6 @@ Status: Available
 
 
 </div>
-
-
-
-
 <div class="card">
 
 <h3>
@@ -245,11 +242,14 @@ Status: Available
 </div>
 
 
-
 </div>
+
+
 <script type="module">
 
+
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
 
@@ -284,25 +284,34 @@ messagingSenderId:"831908710470",
 
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
-
 };
 
 
 
-const app=initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 
-const auth=getAuth(app);
+const auth = getAuth(app);
+
+
 
 await setPersistence(
+
 auth,
+
 browserLocalPersistence
+
 );
+
+
 
 let currentUser = null;
 
 
-onAuthStateChanged(auth, async (user)=>{
+
+// Keep checking the existing login session
+
+onAuthStateChanged(auth,(user)=>{
 
 
 if(user){
@@ -312,7 +321,7 @@ currentUser = user;
 
 
 console.log(
-"User detected:",
+"Active user:",
 user.email
 );
 
@@ -321,7 +330,7 @@ user.email
 
 
 console.log(
-"No Firebase session found"
+"No active user"
 );
 
 
@@ -332,20 +341,74 @@ console.log(
 
 
 
+async function waitForUser(){
+
+
+return new Promise((resolve)=>{
+
+
+let attempts = 0;
+
+
+
+const check = setInterval(()=>{
+
+
+if(currentUser){
+
+
+clearInterval(check);
+
+resolve(currentUser);
+
+
+}
+
+
+
+attempts++;
+
+
+
+if(attempts >= 20){
+
+
+clearInterval(check);
+
+resolve(null);
+
+
+}
+
+
+
+},500);
+
+
+
+});
+
+
+}
+
+
+
 async function uploadTask(fileId,statusId,taskId,taskName){
 
 
-const file=document.getElementById(fileId);
+const file = document.getElementById(fileId);
 
-const status=document.getElementById(statusId);
+const status = document.getElementById(statusId);
 
 
 
 if(!file.files[0]){
 
+
 alert("Please select a screenshot first");
 
 return;
+
 
 }
 
@@ -355,32 +418,15 @@ status.innerText="Checking account...";
 
 
 
-// wait for Firebase user
-
-const user = await new Promise((resolve)=>{
-
-
-const unsubscribe = onAuthStateChanged(auth,(user)=>{
-
-
-unsubscribe();
-
-resolve(user);
-
-
-});
-
-
-});
+const user = await waitForUser();
 
 
 
 if(!user){
 
 
-alert("Session expired. Please login again.");
+status.innerText="No login session found";
 
-window.location.href="ft-login.html";
 
 return;
 
@@ -389,11 +435,11 @@ return;
 
 
 
-status.innerText="Uploading...";
+status.innerText="Uploading screenshot...";
 
 
 
-const formData=new FormData();
+const formData = new FormData();
 
 
 
@@ -429,10 +475,7 @@ formData.append(
 "taskName",
 taskName
 );
-
-
-
-try{
+  try{
 
 
 const response = await fetch(
@@ -458,13 +501,16 @@ const result = await response.json();
 if(result.success){
 
 
-status.innerText="Submitted for review";
+status.innerText="✅ Submitted for review";
+
+
+file.value="";
 
 
 }else{
 
 
-status.innerText=result.error || "Upload failed";
+status.innerText=result.error || "❌ Upload failed";
 
 
 }
@@ -474,18 +520,24 @@ status.innerText=result.error || "Upload failed";
 }catch(error){
 
 
-console.error(error);
+console.error(
+"Upload error:",
+error
+);
 
 
-status.innerText="Upload failed";
+status.innerText="❌ Upload failed";
 
 
 }
 
 
-  }
 
-window.submitTask001=()=>{
+}
+
+
+
+window.submitTask001 = ()=>{
 
 
 uploadTask(
@@ -505,8 +557,7 @@ uploadTask(
 
 
 
-
-window.submitTask002=()=>{
+window.submitTask002 = ()=>{
 
 
 uploadTask(
@@ -526,8 +577,7 @@ uploadTask(
 
 
 
-
-window.submitTask003=()=>{
+window.submitTask003 = ()=>{
 
 
 uploadTask(
