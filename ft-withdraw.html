@@ -143,7 +143,6 @@ Request Withdrawal
 </h2>
 
 
-
 <div class="balance">
 
 Current Balance:
@@ -155,7 +154,6 @@ $<span id="balance">0.00</span>
 </div>
 
 
-
 <label>
 Payment Method
 </label>
@@ -163,19 +161,15 @@ Payment Method
 
 <select id="method">
 
-
 <option value="paypal">
 PayPal
 </option>
-
 
 <option value="litecoin">
 Litecoin (LTC)
 </option>
 
-
 </select>
-
 
 
 <label>
@@ -186,7 +180,6 @@ Payment Details
 <input 
 id="details"
 placeholder="Enter PayPal email or LTC address">
-
 
 
 <button id="submit">
@@ -209,7 +202,6 @@ Submit Request
 import {initializeApp}
 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-
 
 
 import {
@@ -240,7 +232,9 @@ addDoc,
 
 collection,
 
-serverTimestamp
+serverTimestamp,
+
+updateDoc
 
 }
 
@@ -384,6 +378,8 @@ try{
 if(!currentUser){
 
 
+msg.style.color="#ef4444";
+
 msg.innerText="Please login again.";
 
 
@@ -406,6 +402,8 @@ const details=document.getElementById("details").value.trim();
 if(!details){
 
 
+msg.style.color="#ef4444";
+
 msg.innerText="Enter payment details.";
 
 
@@ -420,6 +418,8 @@ return;
 if(currentBalance < 5){
 
 
+msg.style.color="#ef4444";
+
 msg.innerText="Minimum withdrawal is $5.00";
 
 
@@ -430,6 +430,8 @@ return;
 
 
 
+
+msg.style.color="white";
 
 msg.innerText="Submitting request...";
 
@@ -467,10 +469,33 @@ createdAt:serverTimestamp()
 
 }
 
+);
+
+
+
+
+
+// Reset balance after request
+
+await updateDoc(
+
+doc(db,"ft_users",currentUser.uid),
+
+{
+
+balance:0
+
+}
 
 );
 
 
+
+
+currentBalance=0;
+
+
+document.getElementById("balance").innerText="0.00";
 
 
 
@@ -482,12 +507,11 @@ msg.innerText="Withdrawal request submitted successfully.";
 
 
 
-
 }catch(error){
 
 
 
-console.error(error);
+console.error("Withdraw error:",error);
 
 
 
@@ -503,6 +527,7 @@ msg.innerText=error.message;
 
 
 };
+
 
 
 </script>
