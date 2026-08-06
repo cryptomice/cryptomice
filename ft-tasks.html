@@ -294,33 +294,25 @@ const app=initializeApp(firebaseConfig);
 
 const auth=getAuth(app);
 
-
-
-await setPersistence(
-
+setPersistence(
 auth,
-
 browserLocalPersistence
-
 );
 
+let currentUser = null;
 
 
-let currentUser=null;
-
-
-
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth, async (user)=>{
 
 
 if(user){
 
 
-currentUser=user;
+currentUser = user;
 
 
 console.log(
-"Logged in:",
+"User detected:",
 user.email
 );
 
@@ -329,18 +321,14 @@ user.email
 
 
 console.log(
-"No user session"
+"No Firebase session found"
 );
-
-
-window.location.href="ft-login.html";
 
 
 }
 
 
 });
-
 
 
 
