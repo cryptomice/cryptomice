@@ -477,17 +477,7 @@ createdAt:serverTimestamp()
 
 // Reset balance after request
 
-await updateDoc(
 
-doc(db,"ft_users",currentUser.uid),
-
-{
-
-balance:0
-
-}
-
-);
 
 
 
