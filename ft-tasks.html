@@ -53,7 +53,7 @@ margin:20px auto;
 background:#111827;
 padding:20px;
 border-radius:12px;
-margin-bottom:15px;
+margin-bottom:20px;
 border:1px solid rgba(255,216,77,.15);
 }
 
@@ -65,39 +65,46 @@ margin-bottom:10px;
 .reward{
 font-size:20px;
 font-weight:bold;
+margin:12px 0;
+}
+
+input[type=file]{
+width:100%;
+padding:12px;
+background:#1f2937;
+color:white;
+border:none;
+border-radius:8px;
+margin-top:15px;
 }
 
 button{
+margin-top:15px;
 background:#ffd84d;
+color:#111827;
 border:none;
 padding:12px 20px;
 border-radius:8px;
 font-weight:bold;
 cursor:pointer;
-margin-top:15px;
+width:100%;
 }
 
-input{
-width:100%;
-margin-top:15px;
-padding:10px;
-background:#1f2937;
-color:white;
-border-radius:8px;
+button:hover{
+opacity:.9;
 }
 
 .status{
+margin-top:15px;
 color:#9ca3af;
-margin-top:10px;
+font-size:15px;
 }
 
 </style>
 
 </head>
 
-
 <body>
-
 
 <div class="header">
 
@@ -105,153 +112,110 @@ margin-top:10px;
 🐭 Cryptomice Tasks
 </div>
 
-
 <a href="ft-dashboard.html">
 Dashboard
 </a>
 
-
 </div>
-
 
 <div class="container">
 
-
-<h2>
-Available Tasks
-</h2>
+<h2>Available Tasks</h2>
 
 <br>
 
-
 <div class="card">
 
-<h3>
-Task #001
-</h3>
-
+<h3>Task #001</h3>
 
 <p>
-Complete the assigned task and submit your completion for review.
+Complete the assigned task and submit your screenshot for review.
 </p>
-
 
 <p class="reward">
 Reward: $0.25
 </p>
 
-
-<input 
+<input
 type="file"
 id="screenshot001"
 accept="image/*">
 
-
 <button onclick="submitTask001()">
-
 Submit Screenshot
-
 </button>
 
-
-<p class="status" id="status001">
-
+<p
+class="status"
+id="status001">
 Status: Available
-
 </p>
-
 
 </div>
-
-
 <div class="card">
 
-<h3>
-Task #002
-</h3>
-
+<h3>Task #002</h3>
 
 <p>
-Complete the assigned task and submit your completion for review.
+Complete the assigned task and submit your screenshot for review.
 </p>
-
 
 <p class="reward">
 Reward: $0.25
 </p>
 
-
-<input 
+<input
 type="file"
 id="screenshot002"
 accept="image/*">
 
-
 <button onclick="submitTask002()">
-
 Submit Screenshot
-
 </button>
 
-
-<p class="status" id="status002">
-
+<p
+class="status"
+id="status002">
 Status: Available
-
 </p>
-
 
 </div>
+
 <div class="card">
 
-<h3>
-Task #003
-</h3>
-
+<h3>Task #003</h3>
 
 <p>
-Complete the assigned task and submit your completion for review.
+Complete the assigned task and submit your screenshot for review.
 </p>
-
 
 <p class="reward">
 Reward: $0.25
 </p>
 
-
-<input 
+<input
 type="file"
 id="screenshot003"
 accept="image/*">
 
-
 <button onclick="submitTask003()">
-
 Submit Screenshot
-
 </button>
 
-
-<p class="status" id="status003">
-
+<p
+class="status"
+id="status003">
 Status: Available
-
 </p>
 
-
 </div>
 
-
 </div>
-
 
 <script type="module">
 
-
 import { initializeApp }
-
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-
 
 import {
 
@@ -264,13 +228,9 @@ setPersistence,
 browserLocalPersistence
 
 }
-
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-
-
 const firebaseConfig={
-
 
 apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
 
@@ -286,269 +246,132 @@ appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 };
 
+const app=initializeApp(firebaseConfig);
 
-
-const app = initializeApp(firebaseConfig);
-
-
-const auth = getAuth(app);
-
-
+const auth=getAuth(app);
 
 await setPersistence(
-
 auth,
-
 browserLocalPersistence
-
 );
 
-let currentUser = null;
-
-
-const authReady = new Promise((resolve)=>{
-
+let currentUser=null;
 
 onAuthStateChanged(auth,(user)=>{
 
+if(!user){
 
-currentUser = user;
-
-
-if(user){
-
-console.log(
-"Active user:",
-user.email
-);
-
-}
-
-
-resolve(user);
-
-
-});
-
-
-});
-
-
-
-async function waitForUser(){
-
-
-return await authReady;
-
-
-}
-
-async function uploadTask(fileId,statusId,taskId,taskName){
-
-
-const file = document.getElementById(fileId);
-
-const status = document.getElementById(statusId);
-
-
-
-if(!file.files[0]){
-
-
-alert("Please select a screenshot first");
+window.location.href="ft-login.html";
 
 return;
 
-
 }
 
+currentUser=user;
 
+console.log("Tasks user:",user.email);
 
-status.innerText="Checking account...";
+});
+  async function uploadTask(fileId,statusId,taskId,taskName){
 
+const status=document.getElementById(statusId);
 
+const file=document.getElementById(fileId);
 
-const user = await waitForUser();
-
-
-
-if(!user){
-
+if(!currentUser){
 
 status.innerText="No login session found";
 
+return;
+
+}
+
+if(file.files.length===0){
+
+alert("Please select a screenshot.");
 
 return;
 
-
 }
 
+status.innerText="Uploading...";
 
+const formData=new FormData();
 
-status.innerText="Uploading screenshot...";
+formData.append("screenshot",file.files[0]);
+formData.append("uid",currentUser.uid);
+formData.append("email",currentUser.email);
+formData.append("taskId",taskId);
+formData.append("taskName",taskName);
 
+try{
 
-
-const formData = new FormData();
-
-
-
-formData.append(
-"screenshot",
-file.files[0]
-);
-
-
-
-formData.append(
-"uid",
-user.uid
-);
-
-
-
-formData.append(
-"email",
-user.email
-);
-
-
-
-formData.append(
-"taskId",
-taskId
-);
-
-
-
-formData.append(
-"taskName",
-taskName
-);
-  try{
-
-
-const response = await fetch(
-
+const response=await fetch(
 "https://cryptomice-backend.onrender.com/upload-screenshot",
-
 {
-
 method:"POST",
-
 body:formData
-
 }
-
 );
 
-
-
-const result = await response.json();
-
-
+const result=await response.json();
 
 if(result.success){
 
-
 status.innerText="✅ Submitted for review";
-
 
 file.value="";
 
-
 }else{
 
-
-status.innerText=result.error || "❌ Upload failed";
-
+status.innerText=result.error || "Upload failed";
 
 }
-
-
 
 }catch(error){
 
+console.error(error);
 
-console.error(
-"Upload error:",
-error
-);
-
-
-status.innerText="❌ Upload failed";
-
+status.innerText="Upload failed";
 
 }
 
-
-
 }
 
-
-
-window.submitTask001 = ()=>{
-
+window.submitTask001=()=>{
 
 uploadTask(
-
 "screenshot001",
-
 "status001",
-
 "001",
-
 "Task #001"
-
 );
-
 
 };
 
-
-
-window.submitTask002 = ()=>{
-
+window.submitTask002=()=>{
 
 uploadTask(
-
 "screenshot002",
-
 "status002",
-
 "002",
-
 "Task #002"
-
 );
-
 
 };
 
-
-
-window.submitTask003 = ()=>{
-
+window.submitTask003=()=>{
 
 uploadTask(
-
 "screenshot003",
-
 "status003",
-
 "003",
-
 "Task #003"
-
 );
 
-
 };
-
-
 
 </script>
-
 
 </body>
 
