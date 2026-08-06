@@ -303,38 +303,32 @@ browserLocalPersistence
 
 );
 
-
-
 let currentUser = null;
 
 
+const authReady = new Promise((resolve)=>{
 
-// Keep checking the existing login session
 
 onAuthStateChanged(auth,(user)=>{
 
 
-if(user){
-
-
 currentUser = user;
 
+
+if(user){
 
 console.log(
 "Active user:",
 user.email
 );
 
-
-}else{
-
-
-console.log(
-"No active user"
-);
-
-
 }
+
+
+resolve(user);
+
+
+});
 
 
 });
@@ -344,54 +338,10 @@ console.log(
 async function waitForUser(){
 
 
-return new Promise((resolve)=>{
-
-
-let attempts = 0;
-
-
-
-const check = setInterval(()=>{
-
-
-if(currentUser){
-
-
-clearInterval(check);
-
-resolve(currentUser);
+return await authReady;
 
 
 }
-
-
-
-attempts++;
-
-
-
-if(attempts >= 20){
-
-
-clearInterval(check);
-
-resolve(null);
-
-
-}
-
-
-
-},500);
-
-
-
-});
-
-
-}
-
-
 
 async function uploadTask(fileId,statusId,taskId,taskName){
 
