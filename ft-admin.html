@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Free Tasks Admin | Cryptomice</title>
+
+<style>
+
+body{
+background:#050812;
+color:white;
+font-family:Arial,Helvetica,sans-serif;
+padding:20px;
+}
+
+h1{
+color:#ffd84d;
+text-align:center;
+}
+
+.card{
+background:#111827;
+border:1px solid rgba(255,216,77,.2);
+padding:20px;
+border-radius:12px;
+margin:20px auto;
+max-width:600px;
+}
+
+img{
+width:100%;
+border-radius:10px;
+margin-top:10px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+margin-right:10px;
+margin-top:10px;
+}
+
+.approve{
+background:#22c55e;
+color:black;
+}
+
+.reject{
+background:#ef4444;
+color:white;
+}
+
+.confidence{
+color:#ffd84d;
+font-weight:bold;
+}
+
+.empty{
+text-align:center;
+opacity:.7;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>
+🐭 Cryptomice Free Tasks Admin
+</h1>
+
+
+<div id="submissions"></div>
+
+
+
+<script type="module">
+
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+
+import {
+
+getFirestore,
+
+collection,
+
+getDocs,
+
+doc,
+
+updateDoc,
+
+getDoc,
+
+increment
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+
+
+const firebaseConfig={
+
+apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeyZ5mw",
+
+authDomain:"cryptomice-635eb.firebaseapp.com",
+
+projectId:"cryptomice-635eb",
+
+storageBucket:"cryptomice-635eb.firebasestorage.app",
+
+messagingSenderId:"831908710470",
+
+appId:"1:831908710470:web:e95e1bdacb90309a046247"
+
+};
+
+
+
+const app=initializeApp(firebaseConfig);
+
+const db=getFirestore(app);
+
+
+
+const box=document.getElementById("submissions");
+
+
+
+async function loadSubmissions(){
+
+
+box.innerHTML="";
+
+
+const snap =
+await getDocs(collection(db,"task_submissions"));
+
+
+
+if(snap.empty){
+
+box.innerHTML=
+"<p class='empty'>No submissions found</p>";
+
+return;
+
+}
+
+
+
+snap.forEach((item)=>{
+
+
+const data=item.data();
+
+
+
+if(data.status!=="pending") return;
+
+
+
+box.innerHTML +=`
+
+<div class="card">
+
+
+<h3>
+${data.taskName || "Task"}
+</h3>
+
+
+<p>
+User: ${data.email || "Unknown"}
+</p>
+
+
+<p>
+Task ID:
+${data.taskId || "N/A"}
+</p>
+
+
+<p class="confidence">
+AI Confidence:
+${data.confidence || 0}%
+</p>
+
+
+
+<img src="${data.imageUrl || ''}" 
+alt="Screenshot">
+
+
+
+<button class="approve"
+onclick="approveTask('${item.id}','${data.uid}')">
+
+✓ Approve
+
+</button>
+
+
+
+<button class="reject"
+onclick="rejectTask('${item.id}')">
+
+✗ Reject
+
+</button>
+
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+
+
+window.approveTask=async(id,uid)=>{
+
+
+try{
+
+
+await updateDoc(
+doc(db,"task_submissions",id),
+{
+status:"approved"
+}
+);
+
+
+
+const userRef =
+doc(db,"ft_users",uid);
+
+
+
+await updateDoc(userRef,{
+
+balance:increment(0.25),
+
+totalEarned:increment(0.25),
+
+completedTasks:increment(1)
+
+});
+
+
+
+alert("Task approved");
+
+loadSubmissions();
+
+
+
+}catch(e){
+
+alert(e.message);
+
+}
+
+
+};
+
+
+
+window.rejectTask=async(id)=>{
+
+
+await updateDoc(
+
+doc(db,"task_submissions",id),
+
+{
+status:"rejected"
+}
+
+);
+
+
+loadSubmissions();
+
+
+};
+
+
+
+loadSubmissions();
+
+
+
+</script>
+
+
+</body>
+
+  </html>
