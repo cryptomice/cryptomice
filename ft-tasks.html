@@ -111,14 +111,26 @@ font-size:15px;
 }
 
 .message{
-
 text-align:center;
 background:#111827;
 padding:15px;
 border-radius:10px;
 margin-top:20px;
 color:#ffd84d;
+}
 
+.timer{
+font-size:18px;
+font-weight:bold;
+color:#ffd84d;
+margin-top:10px;
+text-align:center;
+}
+
+.task-number{
+color:#9ca3af;
+font-size:14px;
+margin-bottom:8px;
 }
 
 </style>
@@ -134,7 +146,6 @@ color:#ffd84d;
 <div class="logo">
 🐭 Cryptomice Tasks
 </div>
-
 
 <a href="ft-dashboard.html">
 Dashboard
@@ -167,7 +178,16 @@ Loading tasks...
 
 
 </div>
+
+
 <script type="module">
+
+
+/*
+==================================================
+FIREBASE
+==================================================
+*/
 
 
 import { initializeApp }
@@ -175,15 +195,11 @@ import { initializeApp }
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 
 
-
 import {
 
 getAuth,
-
 onAuthStateChanged,
-
 setPersistence,
-
 browserLocalPersistence
 
 }
@@ -191,19 +207,12 @@ browserLocalPersistence
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
 
-
 import {
 
 getFirestore,
-
 doc,
-
 getDoc,
-
 setDoc,
-
-updateDoc,
-
 serverTimestamp
 
 }
@@ -212,45 +221,29 @@ from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 
 
-
-
 const firebaseConfig={
-
 
 apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
 
-
 authDomain:"cryptomice-635eb.firebaseapp.com",
-
 
 projectId:"cryptomice-635eb",
 
-
 storageBucket:"cryptomice-635eb.firebasestorage.app",
-
 
 messagingSenderId:"831908710470",
 
-
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
-
 
 };
 
 
 
-
 const app=initializeApp(firebaseConfig);
-
-
 
 const auth=getAuth(app);
 
-
-
 const db=getFirestore(app);
-
-
 
 
 await setPersistence(
@@ -263,69 +256,77 @@ browserLocalPersistence
 
 
 
+/*
+==================================================
+GLOBAL VARIABLES
+==================================================
+*/
 
 
 let currentUser=null;
 
-
-
 let serviceData=null;
-
-
 
 let availableLinks=[];
 
+let currentLinkIndex=0;
+
+let lastLinkTime=null;
+
+let countdownInterval=null;
 
 
-let usedLinks=[];
-
-
-
-let batchCount=0;
-
+/*
+==================================================
+SETTINGS
+==================================================
+*/
 
 
 let settings={
 
-linksPerBatch:3,
-
-breakMinutes:30,
-
-dailyResetHours:24
+breakMinutes:15
 
 };
 
 
 
-
-
 /*
-
-==============================
-
-LOAD SERVICE LINKS
-
-==============================
-
+==================================================
+LOAD SERVICE JSON
+==================================================
 */
 
 
 async function loadServiceLinks(){
 
-
 try{
 
+const response=await fetch(
 
-const response=
+"ft-service.json",
 
-await fetch("ft-service.json");
+{
+
+cache:"no-store"
+
+}
+
+);
 
 
+if(!response.ok){
 
-serviceData=
+throw new Error(
 
-await response.json();
+"Unable to load ft-service.json"
 
+);
+
+}
+
+
+serviceData=await response.json();
 
 
 availableLinks=
@@ -333,34 +334,63 @@ availableLinks=
 serviceData.links || [];
 
 
-
-settings.linksPerBatch=
-
-serviceData.linksPerBatch || 3;
-
+/*
+Only the 15-minute break is used.
+*/
 
 
 settings.breakMinutes=
 
-serviceData.breakMinutes || 30;
+Number(
+
+serviceData.breakMinutes
+
+) || 15;
 
 
-
-settings.dailyResetHours=
-
-serviceData.dailyResetHours || 24;
-
+/*
+Force the system to one link at a time.
+*/
 
 
-renderTasks();
+if(availableLinks.length===0){
 
+document.getElementById(
+
+"tasksContainer"
+
+).innerHTML=`
+
+<div class="message">
+
+No tasks are currently available.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+/*
+Load the user's saved position.
+*/
+
+
+await loadUserTaskState();
 
 
 }catch(error){
 
+console.error(
 
-console.error(error);
+"LOAD SERVICE ERROR:",
 
+error
+
+);
 
 
 document.getElementById(
@@ -371,7 +401,7 @@ document.getElementById(
 
 <div class="message">
 
-Unable to load tasks.
+Unable to load tasks. Please try again later.
 
 </div>
 
@@ -379,43 +409,35 @@ Unable to load tasks.
 
 }
 
-
 }
-
-
-
 
 
 
 /*
-
-==============================
-
+==================================================
 LOGIN CHECK
-
-==============================
-
+==================================================
 */
 
 
-onAuthStateChanged(auth,async(user)=>{
+onAuthStateChanged(
 
+auth,
+
+async(user)=>{
 
 if(!user){
 
+window.location.href=
 
-window.location.href="ft-login.html";
-
+"ft-login.html";
 
 return;
-
 
 }
 
 
-
 currentUser=user;
-
 
 
 console.log(
@@ -427,183 +449,120 @@ user.email
 );
 
 
-
-await loadUserActivity();
-
-
-
-});
-
-
-
-/*
-
-==============================
-
-LOAD USER TASK DATA
-
-==============================
-
-*/
-
-
-async function loadUserActivity(){
-
-
-const ref=doc(
-
-db,
-
-"ft_task_activity",
-
-currentUser.uid
-
-);
-
-
-
-const snap=await getDoc(ref);
-
-
-
-if(snap.exists()){
-
-
-const data=snap.data();
-
-
-
-usedLinks=data.usedLinks || [];
-
-
-
-batchCount=data.batchCount || 0;
-
-
-
-}
-
-
-
-await checkReset();
-
-
-
 await loadServiceLinks();
 
-
-
 }
-   
-/*
-==============================
-RESET CHECK
-==============================
-*/
-
-
-async function checkReset(){
-
-
-const ref=doc(
-
-db,
-
-"ft_task_activity",
-
-currentUser.uid
 
 );
 
 
 
-const snap=await getDoc(ref);
+/*
+==================================================
+LOAD USER TASK STATE
+==================================================
+*/
 
 
+async function loadUserTaskState(){
 
-if(!snap.exists()){
+if(!currentUser){
 
 return;
 
 }
 
 
+const ref=doc(
 
-const data=snap.data();
+db,
 
+"ft_task_activity",
 
-
-const now=new Date();
-
-
-
-if(data.dayStarted){
-
-
-const started=data.dayStarted.toDate();
-
-
-
-const hours=
-
-(now-started)/(1000*60*60);
-
-
-
-if(hours >= settings.dailyResetHours){
-
-
-await setDoc(
-
-ref,
-
-{
-
-usedLinks:[],
-
-batchCount:0,
-
-dayStarted:serverTimestamp(),
-
-lastBatchTime:null
-
-},
-
-{
-
-merge:true
-
-}
+currentUser.uid
 
 );
 
 
+const snap=await getDoc(ref);
 
-usedLinks=[];
 
-batchCount=0;
+if(snap.exists()){
 
+const data=snap.data();
+
+
+/*
+Current link position
+*/
+
+
+if(
+
+typeof data.currentLinkIndex==="number"
+
+){
+
+currentLinkIndex=
+
+data.currentLinkIndex;
+
+}
+
+
+/*
+Last time a link was opened
+*/
+
+
+if(data.lastLinkTime){
+
+lastLinkTime=
+
+data.lastLinkTime.toDate();
 
 }
 
 }
 
 
+/*
+Protect against invalid index.
+*/
+
+
+if(
+
+currentLinkIndex<0 ||
+
+currentLinkIndex>=availableLinks.length
+
+){
+
+currentLinkIndex=0;
+
 }
 
 
+/*
+Show current task.
+*/
+
+
+renderCurrentTask();
+
+}
 
 
 
 /*
-==============================
-CREATE TASK CARDS
-==============================
+==================================================
+RENDER CURRENT TASK
+==================================================
 */
 
 
-function renderTasks(){
-
+function renderCurrentTask(){
 
 const container=
 
@@ -614,34 +573,71 @@ document.getElementById(
 );
 
 
-
 container.innerHTML="";
 
 
+if(availableLinks.length===0){
 
-availableLinks.forEach((task,index)=>{
+container.innerHTML=`
+
+<div class="message">
+
+No tasks available.
+
+</div>
+
+`;
+
+return;
+
+}
 
 
+/*
+If all links have been used,
+start again from the first link.
+*/
 
-container.innerHTML += `
+
+if(
+
+currentLinkIndex>=availableLinks.length
+
+){
+
+currentLinkIndex=0;
+
+}
+
+
+const task=
+
+availableLinks[currentLinkIndex];
+
+
+container.innerHTML=`
 
 <div class="card">
+
+<div class="task-number">
+
+Task ${currentLinkIndex+1} of ${availableLinks.length}
+
+</div>
 
 
 <h3>
 
-Task #${task.id}
+${escapeHtml(task.title || "Task")}
 
 </h3>
 
 
-
 <p>
 
-Watch the assigned video and submit proof after completion.
+Open the assigned link, complete the task, then submit a screenshot as proof.
 
 </p>
-
 
 
 <p class="reward">
@@ -651,20 +647,17 @@ Reward: $0.25
 </p>
 
 
-
 <button
 
 class="task-link"
 
 id="link${task.id}"
 
-onclick="openTaskLink(${task.id})">
+onclick="openTaskLink()">
 
 🔗 Open Link
 
 </button>
-
-
 
 
 <input
@@ -676,15 +669,15 @@ id="screenshot${task.id}"
 accept="image/*">
 
 
-
 <button
 
-onclick="submitTask(${task.id})">
+id="submit${task.id}"
+
+onclick="submitTask()">
 
 Submit Screenshot
 
 </button>
-
 
 
 <p
@@ -698,293 +691,151 @@ Status: Available
 </p>
 
 
-
 </div>
 
 `;
 
-});
+
+/*
+Check whether the 15-minute wait
+is currently active.
+*/
 
 
-checkTaskState();
-
+checkBreak();
 
 }
-
-
 
 
 
 /*
-==============================
-CHECK USER STATUS
-==============================
+==================================================
+OPEN CURRENT LINK
+==================================================
 */
 
 
-async function checkTaskState(){
-
-
-const ref=doc(
-
-db,
-
-"ft_task_activity",
-
-currentUser.uid
-
-);
-
-
-
-const snap=
-
-await getDoc(ref);
-
-
-
-if(!snap.exists()) return;
-
-
-
-const data=snap.data();
-
-
-
-const now=new Date();
-
-
-
-if(data.lastBatchTime){
-
-
-
-const last=data.lastBatchTime.toDate();
-
-
-
-const minutes=
-
-(now-last)/(1000*60);
-
-
-
-if(minutes < settings.breakMinutes){
-
-
-
-const remaining=
-
-Math.ceil(
-
-settings.breakMinutes-minutes
-
-);
-
-
-
-showDailyMessage(
-
-"Great job! You've completed this batch of tasks. Please come back in the next "
-
-+remaining+
-
-" minutes."
-
-);
-
-
-
-disableAllLinks();
-
-
-
-return;
-
-}
-
-
-}
-
-
-
-if(usedLinks.length >= availableLinks.length){
-
-
-
-showDailyMessage(
-
-"You've completed all available tasks for today. Come back in the next 24 hours for fresh tasks."
-
-);
-
-
-
-disableAllLinks();
-
-
-
-return;
-
-
-}
-
-
-}
-
-
-
-
-
-/*
-==============================
-OPEN RANDOM UNUSED LINK
-==============================
-*/
-
-
-window.openTaskLink=async(taskId)=>{
-
-
+window.openTaskLink=async()=>{
 
 if(!currentUser){
 
+alert(
+
+"Please login again."
+
+);
+
 return;
 
 }
 
 
+const task=
 
-if(usedLinks.includes(taskId)){
+availableLinks[currentLinkIndex];
 
+
+if(!task){
 
 alert(
 
-"This task has already been completed."
+"No task available."
 
 );
-
 
 return;
 
-
 }
 
 
+/*
+If a break is still active,
+do not allow another link.
+*/
 
 
-if(batchCount >= settings.linksPerBatch){
+if(
+
+lastLinkTime
+
+){
+
+const now=new Date();
+
+const elapsed=
+
+(now-lastLinkTime)/(1000*60);
 
 
+if(
 
-await startBreak();
+elapsed<settings.breakMinutes
+
+){
+
+const remaining=Math.ceil(
+
+settings.breakMinutes-elapsed
+
+);
 
 
+showDailyMessage(
+
+"Please wait "+
+
+remaining+
+
+" minute"+
+
+(remaining===1?"":"s")+
+
+" before opening the next link."
+
+);
+
+
+checkBreak();
 
 return;
 
+}
 
 }
 
 
-
-
-const ref=doc(
-
-db,
-
-"ft_task_activity",
-
-currentUser.uid
-
-);
-
-
-
-usedLinks.push(taskId);
-
-
-
-batchCount++;
-
-
-
-
-await setDoc(
-
-ref,
-
-{
-
-usedLinks:usedLinks,
-
-batchCount:batchCount,
-
-dayStarted:serverTimestamp()
-
-},
-
-{
-
-merge:true
-
-}
-
-);
-
-
-
+/*
+Open the link.
+*/
 
 
 window.open(
 
-availableLinks.find(
-
-x=>x.id==taskId
-
-).url,
+task.url,
 
 "_blank"
 
 );
 
 
-
-
-
-const button=
-
-document.getElementById(
-
-"link"+taskId
-
-);
-
-
-
-button.disabled=true;
-
-
-
-button.innerText=
-
-"✅ Link Opened";
-
-
-
-};
-  
 /*
-==============================
-START BATCH BREAK
-==============================
+Record the time immediately.
 */
 
 
-async function startBreak(){
+lastLinkTime=new Date();
 
 
-const ref=doc(
+/*
+Save activity.
+*/
+
+
+try{
+
+await setDoc(
+
+doc(
 
 db,
 
@@ -992,19 +843,21 @@ db,
 
 currentUser.uid
 
-);
-
-
-
-await setDoc(
-
-ref,
+),
 
 {
 
-lastBatchTime:serverTimestamp(),
+currentLinkIndex:
 
-batchCount:0
+currentLinkIndex,
+
+lastLinkTime:
+
+serverTimestamp(),
+
+updatedAt:
+
+serverTimestamp()
 
 },
 
@@ -1017,163 +870,449 @@ merge:true
 );
 
 
+}catch(error){
 
-batchCount=0;
+console.error(
 
+"ACTIVITY SAVE ERROR:",
 
-
-showDailyMessage(
-
-"Great job! You've completed this batch of tasks. Please come back in the next "
-
-+settings.breakMinutes+
-
-" minutes."
+error
 
 );
-
-
-
-disableAllLinks();
-
-
 
 }
 
 
-
-
-
 /*
-==============================
-DISABLE LINKS
-==============================
+Disable current link.
 */
 
 
-function disableAllLinks(){
+const button=
 
-
-availableLinks.forEach(task=>{
-
-
-const btn=document.getElementById(
+document.getElementById(
 
 "link"+task.id
 
 );
 
 
+if(button){
 
-if(btn){
+button.disabled=true;
 
+button.innerText=
 
-btn.disabled=true;
-
-
-}
-
-
-});
-
+"⏳ 15 Minute Wait";
 
 }
 
 
+/*
+Start countdown.
+*/
+
+
+checkBreak();
+
+};
 
 
 
 /*
-==============================
-SHOW MESSAGE
-==============================
+==================================================
+CHECK 15 MINUTE BREAK
+==================================================
 */
 
 
-function showDailyMessage(text){
+function checkBreak(){
+
+if(!lastLinkTime){
+
+return;
+
+}
 
 
-const box=
+if(countdownInterval){
+
+clearInterval(
+
+countdownInterval
+
+);
+
+}
+
+
+const task=
+
+availableLinks[currentLinkIndex];
+
+
+if(!task){
+
+return;
+
+}
+
+
+const linkButton=
 
 document.getElementById(
 
-"dailyMessage"
+"link"+task.id
 
 );
 
 
+const now=new Date();
 
-if(box){
+
+const elapsed=
+
+(now-lastLinkTime)/(1000*60);
 
 
-box.innerHTML=
+const totalSeconds=
 
-`
+settings.breakMinutes*60;
 
-<div class="message">
 
-${text}
+const elapsedSeconds=
 
-</div>
+Math.floor(
 
-`;
+(now-lastLinkTime)/1000
+
+);
+
+
+let remainingSeconds=
+
+totalSeconds-
+
+elapsedSeconds;
+
+
+if(
+
+remainingSeconds<=0
+
+){
+
+finishBreak();
+
+return;
 
 }
 
 
+/*
+Disable link while waiting.
+*/
+
+
+if(linkButton){
+
+linkButton.disabled=true;
+
 }
 
 
+/*
+Display countdown.
+*/
+
+
+updateCountdown(
+
+remainingSeconds
+
+);
+
+
+countdownInterval=
+
+setInterval(()=>{
+
+const currentTime=new Date();
+
+
+const secondsPassed=
+
+Math.floor(
+
+(currentTime-lastLinkTime)/1000
+
+);
+
+
+remainingSeconds=
+
+totalSeconds-
+
+secondsPassed;
+
+
+if(
+
+remainingSeconds<=0
+
+){
+
+clearInterval(
+
+countdownInterval
+
+);
+
+countdownInterval=null;
+
+finishBreak();
+
+return;
+
+}
+
+
+updateCountdown(
+
+remainingSeconds
+
+);
+
+},1000);
+
+}
 
 
 
 /*
-==============================
-SUBMIT SCREENSHOT
-==============================
+==================================================
+UPDATE COUNTDOWN
+==================================================
 */
 
 
-window.submitTask=async(taskId)=>{
+function updateCountdown(seconds){
+
+const minutes=
+
+Math.floor(seconds/60);
+
+
+const secs=
+
+seconds%60;
+
+
+const formattedMinutes=
+
+String(minutes)
+
+.padStart(2,"0");
+
+
+const formattedSeconds=
+
+String(secs)
+
+.padStart(2,"0");
+
+
+showDailyMessage(
+
+"⏳ Next link available in "
+
++formattedMinutes+
+
+":"+
+
+formattedSeconds
+
++"."
+
+);
+
+}
+
+
+
+/*
+==================================================
+FINISH BREAK
+==================================================
+*/
+
+
+async function finishBreak(){
+
+lastLinkTime=null;
+
+
+/*
+Move to the next link.
+*/
+
+
+currentLinkIndex++;
+
+
+/*
+When the last link is reached,
+start again from link 1.
+*/
+
+
+if(
+
+currentLinkIndex>=availableLinks.length
+
+){
+
+currentLinkIndex=0;
+
+}
+
+
+/*
+Save the new link position.
+*/
+
+
+if(currentUser){
+
+try{
+
+await setDoc(
+
+doc(
+
+db,
+
+"ft_task_activity",
+
+currentUser.uid
+
+),
+
+{
+
+currentLinkIndex:
+
+currentLinkIndex,
+
+lastLinkTime:null,
+
+updatedAt:
+
+serverTimestamp()
+
+},
+
+{
+
+merge:true
+
+}
+
+);
+
+}catch(error){
+
+console.error(
+
+"NEXT LINK SAVE ERROR:",
+
+error
+
+);
+
+}
+
+}
+
+
+/*
+Render the next link.
+*/
+
+
+renderCurrentTask();
+
+
+showDailyMessage(
+
+"✅ Your 15-minute break is over. The next link is now available."
+
+);
+
+}
+
+
+
+/*
+==================================================
+SUBMIT SCREENSHOT
+==================================================
+*/
+
+
+window.submitTask=async()=>{
+
+if(!currentUser){
+
+alert(
+
+"Please login again."
+
+);
+
+return;
+
+}
+
+
+const task=
+
+availableLinks[currentLinkIndex];
+
+
+if(!task){
+
+return;
+
+}
 
 
 const file=
 
 document.getElementById(
 
-"screenshot"+taskId
+"screenshot"+task.id
 
 );
-
 
 
 const status=
 
 document.getElementById(
 
-"status"+taskId
+"status"+task.id
 
 );
 
 
-
-if(!currentUser){
-
-
-status.innerText=
-
-"No login session found";
-
+if(!file){
 
 return;
-
 
 }
 
 
-
 if(!file.files.length){
-
 
 alert(
 
@@ -1181,12 +1320,34 @@ alert(
 
 );
 
-
 return;
-
 
 }
 
+
+/*
+A screenshot can only be submitted
+after the link has been opened.
+*/
+
+
+if(!lastLinkTime){
+
+alert(
+
+"Please open the task link first."
+
+);
+
+return;
+
+}
+
+
+/*
+Check that the 15-minute period
+doesn't affect screenshot submission.
+*/
 
 
 status.innerText=
@@ -1194,10 +1355,7 @@ status.innerText=
 "Uploading...";
 
 
-
-
 const formData=new FormData();
-
 
 
 formData.append(
@@ -1209,7 +1367,6 @@ file.files[0]
 );
 
 
-
 formData.append(
 
 "uid",
@@ -1217,7 +1374,6 @@ formData.append(
 currentUser.uid
 
 );
-
 
 
 formData.append(
@@ -1229,31 +1385,26 @@ currentUser.email
 );
 
 
-
 formData.append(
 
 "taskId",
 
-taskId
+task.id
 
 );
-
 
 
 formData.append(
 
 "taskName",
 
-"Task #"+taskId
+task.title || "Task #"+task.id
 
 );
 
 
 
-
 try{
-
-
 
 const response=
 
@@ -1263,17 +1414,13 @@ await fetch(
 
 {
 
-
 method:"POST",
 
 body:formData
 
-
 }
 
 );
-
-
 
 
 const result=
@@ -1281,82 +1428,138 @@ const result=
 await response.json();
 
 
-
-
-
 if(result.success){
-
-
 
 status.innerText=
 
-"✅ Submitted for review";
-
+"✅ Screenshot submitted for review";
 
 
 file.value="";
 
 
-
 }else{
-
-
 
 status.innerText=
 
-result.error || "Upload failed";
+result.error ||
 
+"Upload failed";
 
 }
-
-
 
 
 }catch(error){
 
+console.error(
 
-console.error(error);
+"SCREENSHOT ERROR:",
 
+error
+
+);
 
 
 status.innerText=
 
-"Upload failed";
-
+"Upload failed. Please try again.";
 
 }
-
-
 
 };
 
 
 
+/*
+==================================================
+SHOW MESSAGE
+==================================================
+*/
+
+
+function showDailyMessage(text){
+
+const box=
+
+document.getElementById(
+
+"dailyMessage"
+
+);
+
+
+if(!box){
+
+return;
+
+}
+
+
+box.innerHTML=
+
+`
+
+<div class="message">
+
+${escapeHtml(text)}
+
+</div>
+
+`;
+
+}
+
+
 
 /*
-==============================
+==================================================
+ESCAPE HTML
+==================================================
+*/
+
+
+function escapeHtml(value){
+
+return String(value)
+
+.replace(/&/g,"&amp;")
+
+.replace(/</g,"&lt;")
+
+.replace(/>/g,"&gt;")
+
+.replace(/"/g,"&quot;")
+
+.replace(/'/g,"&#039;");
+
+}
+
+
+
+/*
+==================================================
 INITIAL MESSAGE
-==============================
+==================================================
 */
 
 
 setTimeout(()=>{
 
-
 if(currentUser){
 
+if(!lastLinkTime){
 
 showDailyMessage(
 
-"Complete today's available tasks and submit your screenshots."
+"Open the available link, complete the task, and submit your screenshot."
 
 );
 
+}
 
 }
 
-
-},2000);
+},1500);
 
 
 
@@ -1365,5 +1568,4 @@ showDailyMessage(
 
 </body>
 
-
-</html>
+   </html>
