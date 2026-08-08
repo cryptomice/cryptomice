@@ -1,18 +1,57 @@
 {
   "version": 1,
 
-  "linksPerBatch": 3,
+  "linksPerBatch": 1,
 
-  "breakMinutes": 30,
+  "breakMinutes": 15,
 
-  "dailyResetHours": 24,
+  "dailyResetHours": 0,
 
   "messages": {
-    "break": "Great job! You've completed this batch of tasks. Please come back in the next 30 minutes.",
-    "finished": "You've completed all available tasks for today. Come back in the next 24 hours for fresh tasks."
+    "break": "Task completed. Please come back in the next 15 minutes for your next task.",
+    "finished": "You've completed all available tasks. Please check back later for new tasks."
   },
 
   "links": [
-    { "id": 1, "title": "Task Link 1", "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }, { "id": 2, "title": "Task Link 2", "url": "https://www.youtube.com/watch?v=9bZkp7q19f0" }, { "id": 3, "title": "Task Link 3", "url": "https://www.youtube.com/watch?v=kJQP7kiw5Fk" }, { "id": 4, "title": "Task Link 4", "url": "https://www.youtube.com/watch?v=JGwWNGJdvx8" }, { "id": 5, "title": "Task Link 5", "url": "https://www.youtube.com/watch?v=OPf0YbXqDm0" }, { "id": 6, "title": "Task Link 6", "url": "https://www.youtube.com/watch?v=fRh_vgS2dFE" }, { "id": 7, "title": "Task Link 7", "url": "https://www.youtube.com/watch?v=RgKAFK5djSk" }, { "id": 8, "title": "Task Link 8", "url": "https://www.youtube.com/watch?v=CevxZvSJLk8" }, { "id": 9, "title": "Task Link 9", "url": "https://www.youtube.com/watch?v=YQHsXMglC9A" }, { "id": 10, "title": "Task Link 10", "url": "https://www.youtube.com/watch?v=lp-EO5I60KA" }
+    {
+      "id": 1,
+      "title": "Task Link 1",
+      "url": "https://www.facebook.com/61593006030970/posts/122099268465433534/?app=fbl"
+    },
+    {
+      "id": 2,
+      "title": "Task Link 2",
+      "url": "https://www.facebook.com/61593006030970/posts/122099267961433534/?app=fbl"
+    },
+    {
+      "id": 3,
+      "title": "Task Link 3",
+      "url": "https://www.facebook.com/61593006030970/posts/122099267661433534/?app=fbl"
+    },
+    {
+      "id": 4,
+      "title": "Task Link 4",
+      "url": "https://www.facebook.com/61593006030970/posts/122099267187433534/?app=fbl"
+    },
+    {
+      "id": 5,
+      "title": "Task Link 5",
+      "url": "https://www.facebook.com/61593006030970/posts/122099266041433534/?mibextid=rS40aB7S9Ucbxw6v"
+    },
+    {
+      "id": 6,
+      "title": "Task Link 6",
+      "url": "https://www.facebook.com/61593006030970/posts/122099265807433534/?app=fbl"
+    },
+    {
+      "id": 7,
+      "title": "Task Link 7",
+      "url": "https://www.facebook.com/61593006030970/posts/122099264817433534/?app=fbl"
+    },
+    {
+      "id": 8,
+      "title": "Task Link 8",
+      "url": "https://www.facebook.com/61593006030970/posts/122099259267433534/?app=fbl"
+    }
   ]
 }
