@@ -3,12 +3,12 @@
 
   "linksPerBatch": 1,
 
-  "breakMinutes": 15,
+  "breakMinutes": 0,
 
   "dailyResetHours": 0,
 
   "messages": {
-    "break": "Task completed. Please come back in the next 15 minutes for your next task.",
+    "break": "Task completed. You can continue to the next task.",
     "finished": "You've completed all available tasks. Please check back later for new tasks."
   },
 
