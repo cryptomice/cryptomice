@@ -119,14 +119,6 @@ margin-top:20px;
 color:#ffd84d;
 }
 
-.timer{
-font-size:18px;
-font-weight:bold;
-color:#ffd84d;
-margin-top:10px;
-text-align:center;
-}
-
 .task-number{
 color:#9ca3af;
 font-size:14px;
@@ -156,17 +148,13 @@ Dashboard
 
 <div class="container">
 
-
 <h2>
 Available Tasks
 </h2>
 
-
 <br>
 
-
 <div id="dailyMessage"></div>
-
 
 <div id="tasksContainer">
 
@@ -175,7 +163,6 @@ Loading tasks...
 </div>
 
 </div>
-
 
 </div>
 
@@ -220,7 +207,6 @@ serverTimestamp
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 
-
 const firebaseConfig={
 
 apiKey:"AIzaSyA6CrK80BEX2WxISOLHXeySyElCGezZ5mw",
@@ -236,7 +222,6 @@ messagingSenderId:"831908710470",
 appId:"1:831908710470:web:e95e1bdacb90309a046247"
 
 };
-
 
 
 const app=initializeApp(firebaseConfig);
@@ -255,7 +240,6 @@ browserLocalPersistence
 );
 
 
-
 /*
 ==================================================
 GLOBAL VARIABLES
@@ -270,25 +254,6 @@ let serviceData=null;
 let availableLinks=[];
 
 let currentLinkIndex=0;
-
-let lastLinkTime=null;
-
-let countdownInterval=null;
-
-
-/*
-==================================================
-SETTINGS
-==================================================
-*/
-
-
-let settings={
-
-breakMinutes:15
-
-};
-
 
 
 /*
@@ -334,25 +299,6 @@ availableLinks=
 serviceData.links || [];
 
 
-/*
-Only the 15-minute break is used.
-*/
-
-
-settings.breakMinutes=
-
-Number(
-
-serviceData.breakMinutes
-
-) || 15;
-
-
-/*
-Force the system to one link at a time.
-*/
-
-
 if(availableLinks.length===0){
 
 document.getElementById(
@@ -375,9 +321,8 @@ return;
 
 
 /*
-Load the user's saved position.
+Load the user's current task position.
 */
-
 
 await loadUserTaskState();
 
@@ -410,7 +355,6 @@ Unable to load tasks. Please try again later.
 }
 
 }
-
 
 
 /*
@@ -456,7 +400,6 @@ await loadServiceLinks();
 );
 
 
-
 /*
 ==================================================
 LOAD USER TASK STATE
@@ -492,11 +435,6 @@ if(snap.exists()){
 const data=snap.data();
 
 
-/*
-Current link position
-*/
-
-
 if(
 
 typeof data.currentLinkIndex==="number"
@@ -509,27 +447,12 @@ data.currentLinkIndex;
 
 }
 
-
-/*
-Last time a link was opened
-*/
-
-
-if(data.lastLinkTime){
-
-lastLinkTime=
-
-data.lastLinkTime.toDate();
-
-}
-
 }
 
 
 /*
-Protect against invalid index.
+Protect against an invalid task position.
 */
-
 
 if(
 
@@ -545,14 +468,12 @@ currentLinkIndex=0;
 
 
 /*
-Show current task.
+Display the current task.
 */
-
 
 renderCurrentTask();
 
 }
-
 
 
 /*
@@ -594,10 +515,9 @@ return;
 
 
 /*
-If all links have been used,
-start again from the first link.
+Start again from the first link after
+the last available link.
 */
-
 
 if(
 
@@ -695,17 +615,7 @@ Status: Available
 
 `;
 
-
-/*
-Check whether the 15-minute wait
-is currently active.
-*/
-
-
-checkBreak();
-
 }
-
 
 
 /*
@@ -749,65 +659,9 @@ return;
 
 
 /*
-If a break is still active,
-do not allow another link.
+Open the assigned link immediately.
+There is NO cooldown.
 */
-
-
-if(
-
-lastLinkTime
-
-){
-
-const now=new Date();
-
-const elapsed=
-
-(now-lastLinkTime)/(1000*60);
-
-
-if(
-
-elapsed<settings.breakMinutes
-
-){
-
-const remaining=Math.ceil(
-
-settings.breakMinutes-elapsed
-
-);
-
-
-showDailyMessage(
-
-"Please wait "+
-
-remaining+
-
-" minute"+
-
-(remaining===1?"":"s")+
-
-" before opening the next link."
-
-);
-
-
-checkBreak();
-
-return;
-
-}
-
-}
-
-
-/*
-Open the link.
-*/
-
 
 window.open(
 
@@ -819,370 +673,8 @@ task.url,
 
 
 /*
-Record the time immediately.
+Save the current task position.
 */
-
-
-lastLinkTime=new Date();
-
-
-/*
-Save activity.
-*/
-
-
-try{
-
-await setDoc(
-
-doc(
-
-db,
-
-"ft_task_activity",
-
-currentUser.uid
-
-),
-
-{
-
-currentLinkIndex:
-
-currentLinkIndex,
-
-lastLinkTime:
-
-serverTimestamp(),
-
-updatedAt:
-
-serverTimestamp()
-
-},
-
-{
-
-merge:true
-
-}
-
-);
-
-
-}catch(error){
-
-console.error(
-
-"ACTIVITY SAVE ERROR:",
-
-error
-
-);
-
-}
-
-
-/*
-Disable current link.
-*/
-
-
-const button=
-
-document.getElementById(
-
-"link"+task.id
-
-);
-
-
-if(button){
-
-button.disabled=true;
-
-button.innerText=
-
-"⏳ 15 Minute Wait";
-
-}
-
-
-/*
-Start countdown.
-*/
-
-
-checkBreak();
-
-};
-
-
-
-/*
-==================================================
-CHECK 15 MINUTE BREAK
-==================================================
-*/
-
-
-function checkBreak(){
-
-if(!lastLinkTime){
-
-return;
-
-}
-
-
-if(countdownInterval){
-
-clearInterval(
-
-countdownInterval
-
-);
-
-}
-
-
-const task=
-
-availableLinks[currentLinkIndex];
-
-
-if(!task){
-
-return;
-
-}
-
-
-const linkButton=
-
-document.getElementById(
-
-"link"+task.id
-
-);
-
-
-const now=new Date();
-
-
-const elapsed=
-
-(now-lastLinkTime)/(1000*60);
-
-
-const totalSeconds=
-
-settings.breakMinutes*60;
-
-
-const elapsedSeconds=
-
-Math.floor(
-
-(now-lastLinkTime)/1000
-
-);
-
-
-let remainingSeconds=
-
-totalSeconds-
-
-elapsedSeconds;
-
-
-if(
-
-remainingSeconds<=0
-
-){
-
-finishBreak();
-
-return;
-
-}
-
-
-/*
-Disable link while waiting.
-*/
-
-
-if(linkButton){
-
-linkButton.disabled=true;
-
-}
-
-
-/*
-Display countdown.
-*/
-
-
-updateCountdown(
-
-remainingSeconds
-
-);
-
-
-countdownInterval=
-
-setInterval(()=>{
-
-const currentTime=new Date();
-
-
-const secondsPassed=
-
-Math.floor(
-
-(currentTime-lastLinkTime)/1000
-
-);
-
-
-remainingSeconds=
-
-totalSeconds-
-
-secondsPassed;
-
-
-if(
-
-remainingSeconds<=0
-
-){
-
-clearInterval(
-
-countdownInterval
-
-);
-
-countdownInterval=null;
-
-finishBreak();
-
-return;
-
-}
-
-
-updateCountdown(
-
-remainingSeconds
-
-);
-
-},1000);
-
-}
-
-
-
-/*
-==================================================
-UPDATE COUNTDOWN
-==================================================
-*/
-
-
-function updateCountdown(seconds){
-
-const minutes=
-
-Math.floor(seconds/60);
-
-
-const secs=
-
-seconds%60;
-
-
-const formattedMinutes=
-
-String(minutes)
-
-.padStart(2,"0");
-
-
-const formattedSeconds=
-
-String(secs)
-
-.padStart(2,"0");
-
-
-showDailyMessage(
-
-"⏳ Next link available in "
-
-+formattedMinutes+
-
-":"+
-
-formattedSeconds
-
-+"."
-
-);
-
-}
-
-
-
-/*
-==================================================
-FINISH BREAK
-==================================================
-*/
-
-
-async function finishBreak(){
-
-lastLinkTime=null;
-
-
-/*
-Move to the next link.
-*/
-
-
-currentLinkIndex++;
-
-
-/*
-When the last link is reached,
-start again from link 1.
-*/
-
-
-if(
-
-currentLinkIndex>=availableLinks.length
-
-){
-
-currentLinkIndex=0;
-
-}
-
-
-/*
-Save the new link position.
-*/
-
-
-if(currentUser){
 
 try{
 
@@ -1224,7 +716,7 @@ merge:true
 
 console.error(
 
-"NEXT LINK SAVE ERROR:",
+"ACTIVITY SAVE ERROR:",
 
 error
 
@@ -1232,25 +724,42 @@ error
 
 }
 
+
+/*
+Disable the current link after opening.
+*/
+
+const button=
+
+document.getElementById(
+
+"link"+task.id
+
+);
+
+
+if(button){
+
+button.disabled=true;
+
+button.innerText=
+
+"✅ Link Opened";
+
 }
 
 
 /*
-Render the next link.
+Tell the user to submit proof.
 */
-
-
-renderCurrentTask();
-
 
 showDailyMessage(
 
-"✅ Your 15-minute break is over. The next link is now available."
+"✅ Link opened. Complete the task and submit your screenshot."
 
 );
 
-}
-
+};
 
 
 /*
@@ -1325,31 +834,6 @@ return;
 }
 
 
-/*
-A screenshot can only be submitted
-after the link has been opened.
-*/
-
-
-if(!lastLinkTime){
-
-alert(
-
-"Please open the task link first."
-
-);
-
-return;
-
-}
-
-
-/*
-Check that the 15-minute period
-doesn't affect screenshot submission.
-*/
-
-
 status.innerText=
 
 "Uploading...";
@@ -1398,10 +882,11 @@ formData.append(
 
 "taskName",
 
-task.title || "Task #"+task.id
+task.title ||
+
+"Task #"+task.id
 
 );
-
 
 
 try{
@@ -1438,6 +923,98 @@ status.innerText=
 file.value="";
 
 
+/*
+Move to the next task immediately.
+*/
+
+currentLinkIndex++;
+
+
+/*
+Loop back to the first link when
+all available links have been used.
+*/
+
+if(
+
+currentLinkIndex>=availableLinks.length
+
+){
+
+currentLinkIndex=0;
+
+}
+
+
+/*
+Save the next task position.
+*/
+
+try{
+
+await setDoc(
+
+doc(
+
+db,
+
+"ft_task_activity",
+
+currentUser.uid
+
+),
+
+{
+
+currentLinkIndex:
+
+currentLinkIndex,
+
+lastLinkTime:null,
+
+updatedAt:
+
+serverTimestamp()
+
+},
+
+{
+
+merge:true
+
+}
+
+);
+
+}catch(error){
+
+console.error(
+
+"NEXT TASK SAVE ERROR:",
+
+error
+
+);
+
+}
+
+
+/*
+Show the next task immediately.
+*/
+
+setTimeout(()=>{
+
+renderCurrentTask();
+
+showDailyMessage(
+
+"✅ Submission received. Your next task is ready."
+
+);
+
+},500);
+
 }else{
 
 status.innerText=
@@ -1447,7 +1024,6 @@ result.error ||
 "Upload failed";
 
 }
-
 
 }catch(error){
 
@@ -1459,7 +1035,6 @@ error
 
 );
 
-
 status.innerText=
 
 "Upload failed. Please try again.";
@@ -1467,7 +1042,6 @@ status.innerText=
 }
 
 };
-
 
 
 /*
@@ -1510,7 +1084,6 @@ ${escapeHtml(text)}
 }
 
 
-
 /*
 ==================================================
 ESCAPE HTML
@@ -1535,7 +1108,6 @@ return String(value)
 }
 
 
-
 /*
 ==================================================
 INITIAL MESSAGE
@@ -1547,8 +1119,6 @@ setTimeout(()=>{
 
 if(currentUser){
 
-if(!lastLinkTime){
-
 showDailyMessage(
 
 "Open the available link, complete the task, and submit your screenshot."
@@ -1557,10 +1127,7 @@ showDailyMessage(
 
 }
 
-}
-
 },1500);
-
 
 
 </script>
